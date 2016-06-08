@@ -4,3 +4,5 @@ syntax: glob
 .vs/JMW/v14/.suo
 *.user
 packages
+**.nupkg
+.vs
