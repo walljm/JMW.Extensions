@@ -241,12 +241,5 @@ namespace JMW.Extensions.Conversions.Tests
             Assert.AreEqual(false, v25);
         }
 
-        [Test]
-        public void ConvertedConstructorTest1()
-        {
-            string v = null;
-            var c = new Converted<string>(v);
-            Assert.AreEqual(false, c.Success);
-        }
     }
 }

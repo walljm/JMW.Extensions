@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Extensions.Conversions.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Types.Tests", "JMW.Types.Tests\JMW.Types.Tests.csproj", "{775E9640-3BFD-4252-A374-DD37C35EA16E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.AlgebraicTypes", "JMW.AlgebraicTypes\JMW.AlgebraicTypes.csproj", "{61CC4ABF-7F50-4EF9-B142-B74230641DE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.AlgebraicTypes.Tests", "JMW.AlgebraicTypes.Tests\JMW.AlgebraicTypes.Tests.csproj", "{8D0485E8-E243-4434-A71F-17C022077B1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +61,14 @@ Global
 		{775E9640-3BFD-4252-A374-DD37C35EA16E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{775E9640-3BFD-4252-A374-DD37C35EA16E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{775E9640-3BFD-4252-A374-DD37C35EA16E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61CC4ABF-7F50-4EF9-B142-B74230641DE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61CC4ABF-7F50-4EF9-B142-B74230641DE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61CC4ABF-7F50-4EF9-B142-B74230641DE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61CC4ABF-7F50-4EF9-B142-B74230641DE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D0485E8-E243-4434-A71F-17C022077B1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D0485E8-E243-4434-A71F-17C022077B1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D0485E8-E243-4434-A71F-17C022077B1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D0485E8-E243-4434-A71F-17C022077B1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

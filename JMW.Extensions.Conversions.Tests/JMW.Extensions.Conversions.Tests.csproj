@@ -48,6 +48,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JMW.AlgebraicTypes\JMW.AlgebraicTypes.csproj">
+      <Project>{61cc4abf-7f50-4ef9-b142-b74230641de5}</Project>
+      <Name>JMW.AlgebraicTypes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JMW.Extensions.Conversions\JMW.Extensions.Conversions.csproj">
       <Project>{09de972f-e558-4e4c-9a01-f31e8f99359c}</Project>
       <Name>JMW.Extensions.Conversions</Name>
