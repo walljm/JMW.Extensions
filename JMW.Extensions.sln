@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Extensions.Text", "JMW.Extensions.Text\JMW.Extensions.Text.csproj", "{E613B4B4-CBF4-4362-ABB2-36D4F8234ED9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Extensions.Text.Tests", "JMW.Extenstions.Text.Tests\JMW.Extensions.Text.Tests.csproj", "{91E9421F-59C6-4F9D-9435-4F9DC426514A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Extensions.Text.Tests", "JMW.Extensions.Text.Tests\JMW.Extensions.Text.Tests.csproj", "{91E9421F-59C6-4F9D-9435-4F9DC426514A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
