@@ -6,7 +6,7 @@ namespace JMW.AlgebraicTypes
     /// The Maybe Class is an algebraic data type that allows you to safely work with nullable values and forces you to handle exceptions.
     /// </summary>
     /// <typeparam name="T">The type of value</typeparam>
-    public class Maybe<T>
+    public class Maybe<T> : IEquatable<T>
     {
         private T _value;
         private Exception _exception;
@@ -71,5 +71,44 @@ namespace JMW.AlgebraicTypes
             if (_Success) return if_success(_value);
             else return if_exception(_exception);
         }
+        
+        public bool Equals(T other)
+        {
+            if (_Success) return _value.Equals(other);
+            else return false;
+        }
+        
+        #region Operators
+        
+        public static bool operator ==(Maybe<T> left, Maybe<T> right)
+        {
+            if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+                return true;
+            if (object.ReferenceEquals(left, null) || object.ReferenceEquals(right, null))
+                return false;
+            return left.Equals(right);
+        }
+        
+        public static bool operator !=(Maybe<T> left, Maybe<T> right)
+        {
+            return !(left == right);
+        }
+        
+        public static bool operator ==(Maybe<T> left, T right)
+        {
+            if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+                return true;
+            if (object.ReferenceEquals(left, null) || object.ReferenceEquals(right, null))
+                return false;
+            
+            return left.Equals(right);
+        }
+        
+        public static bool operator !=(Maybe<T> left, T right)
+        {
+            return !(left == right)
+        }        
+        
+        #endregion
     }
 }
