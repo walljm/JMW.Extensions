@@ -106,7 +106,7 @@ namespace JMW.AlgebraicTypes
         
         public static bool operator !=(Maybe<T> left, T right)
         {
-            return !(left == right)
+            return !(left == right);
         }        
         
         #endregion
