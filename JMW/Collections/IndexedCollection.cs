@@ -1,26 +1,25 @@
-﻿using System;
+﻿using JMW.Extensions.Reflection;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
 namespace JMW.Types.Collections
 {
-    public class IndexedCollection<T> : IEnumerable<T>, ICollection<T>, IBindingList, IList<T> where T : IndexedClass
+    public class IndexedCollection<T> : IEnumerable<T>, ICollection<T>, INotifyCollectionChanged, INotifyPropertyChanged, IList<T> where T : IndexedClass
     {
         private Dictionary<string, Dictionary<string, List<T>>> _IndexCollection = new Dictionary<string, Dictionary<string, List<T>>>();
         private Dictionary<string, Dictionary<string, T>> _UniqueIndexCollection = new Dictionary<string, Dictionary<string, T>>();
-        private BindingList<T> _Collection = new BindingList<T>();
+        private ObservableCollection<T> _Collection = new ObservableCollection<T>();
         private Dictionary<string, PropInfo> _IndexedProps = new Dictionary<string, PropInfo>();
 
         public IndexedCollection()
         {
-            _IndexedProps = typeof(T).GetProperties<Indexed>().ToDictionary(k => k.Name, v => new PropInfo(v, isUnique(v)));
-
-            _Collection.AllowEdit = true;
-            _Collection.AllowNew = true;
-            _Collection.AllowRemove = true;
+            _IndexedProps = typeof(T).GetPropertiesByAttribute<Indexed>().ToDictionary(k => k.Name, v => new PropInfo(v, isUnique(v)));
 
             foreach (var prop in _IndexedProps)
             {
@@ -29,7 +28,17 @@ namespace JMW.Types.Collections
             }
         }
 
-        public event ListChangedEventHandler ListChanged;
+        public event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add { _Collection.CollectionChanged += value; }
+            remove { _Collection.CollectionChanged -= value; }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged
+        {
+            add { ((INotifyPropertyChanged)_Collection).PropertyChanged += value; }
+            remove { ((INotifyPropertyChanged)_Collection).PropertyChanged -= value; }
+        }
 
         #region Private Methods
 
@@ -294,77 +303,10 @@ namespace JMW.Types.Collections
             return true;
         }
 
-        public object AddNew()
-        {
-            var n = Activator.CreateInstance<T>();
-            this.Add(n);
-            return n;
-        }
-
-        public void AddIndex(PropertyDescriptor property)
-        {
-            ((IBindingList)_Collection).AddIndex(property);
-        }
-
-        public void ApplySort(PropertyDescriptor property, ListSortDirection direction)
-        {
-            ((IBindingList)_Collection).ApplySort(property, direction);
-        }
-
-        public int Find(PropertyDescriptor property, object key)
-        {
-            return ((IBindingList)_Collection).Find(property, key);
-        }
-
-        public void RemoveIndex(PropertyDescriptor property)
-        {
-            ((IBindingList)_Collection).RemoveIndex(property);
-        }
-
-        public void RemoveSort()
-        {
-            ((IBindingList)_Collection).RemoveSort();
-        }
-
-        public int Add(object value)
-        {
-            T obj = (T)value;
-            addToDictionaries(obj);
-
-            var r = ((IBindingList)_Collection).Add(value);
-            obj.IndexedPropertyChanged += new IndexedClass.IndexedPropertyChangedHandler(onIndexedPropertyChanged);
-            return r;
-        }
-
-        public bool Contains(object value)
-        {
-            return ((IBindingList)_Collection).Contains(value);
-        }
-
-        public int IndexOf(object value)
-        {
-            return ((IBindingList)_Collection).IndexOf(value);
-        }
-
-        public void Insert(int index, object value)
-        {
-            ((IBindingList)_Collection).Insert(index, value);
-        }
-
-        public void Remove(object value)
-        {
-            Remove((T)value);
-        }
-
         public void RemoveAt(int index)
         {
             var item = _Collection[index];
             Remove(item);
-        }
-
-        public void CopyTo(Array array, int index)
-        {
-            ((IBindingList)_Collection).CopyTo(array, index);
         }
 
         #endregion IEnumerable<T>
@@ -408,102 +350,6 @@ namespace JMW.Types.Collections
 
         #region IBindingList
 
-        public bool AllowNew
-        {
-            get
-            {
-                return ((IBindingList)_Collection).AllowNew;
-            }
-        }
-
-        public bool AllowEdit
-        {
-            get
-            {
-                return ((IBindingList)_Collection).AllowEdit;
-            }
-        }
-
-        public bool AllowRemove
-        {
-            get
-            {
-                return ((IBindingList)_Collection).AllowRemove;
-            }
-        }
-
-        public bool SupportsChangeNotification
-        {
-            get
-            {
-                return ((IBindingList)_Collection).SupportsChangeNotification;
-            }
-        }
-
-        public bool SupportsSearching
-        {
-            get
-            {
-                return ((IBindingList)_Collection).SupportsSearching;
-            }
-        }
-
-        public bool SupportsSorting
-        {
-            get
-            {
-                return ((IBindingList)_Collection).SupportsSorting;
-            }
-        }
-
-        public bool IsSorted
-        {
-            get
-            {
-                return ((IBindingList)_Collection).IsSorted;
-            }
-        }
-
-        public PropertyDescriptor SortProperty
-        {
-            get
-            {
-                return ((IBindingList)_Collection).SortProperty;
-            }
-        }
-
-        public ListSortDirection SortDirection
-        {
-            get
-            {
-                return ((IBindingList)_Collection).SortDirection;
-            }
-        }
-
-        public bool IsFixedSize
-        {
-            get
-            {
-                return ((IBindingList)_Collection).IsFixedSize;
-            }
-        }
-
-        public object SyncRoot
-        {
-            get
-            {
-                return ((IBindingList)_Collection).SyncRoot;
-            }
-        }
-
-        public bool IsSynchronized
-        {
-            get
-            {
-                return ((IBindingList)_Collection).IsSynchronized;
-            }
-        }
-
         T IList<T>.this[int index]
         {
             get
@@ -533,7 +379,7 @@ namespace JMW.Types.Collections
         #endregion IBindingList
 
         #region Linq
-        
+
         public T First()
         {
             return _Collection.First();

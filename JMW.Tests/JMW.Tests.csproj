@@ -44,19 +44,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\IndexedCollectionTest.cs" />
     <Compile Include="ConversionsExtensionsTests.cs" />
+    <Compile Include="EitherTests.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
+    <Compile Include="MaybeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringEnumTests.cs" />
+    <Compile Include="ReflectionExtensions.cs" />
     <Compile Include="TextExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JMW.Extensions.Conversions\JMW.Extensions.csproj">
+    <ProjectReference Include="..\JMW\JMW.csproj">
       <Project>{09de972f-e558-4e4c-9a01-f31e8f99359c}</Project>
-      <Name>JMW.Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JMW.Types\JMW.Types.csproj">
-      <Project>{5dc62577-b42e-42b2-b12c-1eeddc28cb70}</Project>
-      <Name>JMW.Types</Name>
+      <Name>JMW</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

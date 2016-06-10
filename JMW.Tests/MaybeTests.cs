@@ -40,5 +40,15 @@ namespace JMW.Types.Functional.Tests
             Assert.That(!m5.Equals("woo"));
             Assert.That(m1 != m6);
         }
+
+        [Test]
+        public void DoTest1()
+        {
+            var m1 = new Maybe<string>("jason");
+            var m2 = new Maybe<string>(new Exception("broke"));
+
+            Assert.AreEqual("jason", m1.Do(if_success: v => v, if_exception: err => "wat!?"));
+            Assert.AreEqual("wat!?", m2.Do(if_success: v => v, if_exception: err => "wat!?"));
+        }
     }
 }
