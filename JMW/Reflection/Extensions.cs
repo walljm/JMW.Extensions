@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Linq.Expressions;
 
 namespace JMW.Extensions.Reflection
 {
@@ -43,7 +44,9 @@ namespace JMW.Extensions.Reflection
         /// <returns>Boolean indicated if the type implments the interface.</returns>
         public static bool HasInterface<T>(this Type type) where T : class
         {
-            return type.GetInterfaces().Any(t => t == typeof(T));
+            var t_name = typeof(T).Name;
+
+            return type.GetInterfaces().Any(t => t.Name == t_name);
         }
 
         public static T GetValue<T>(this PropertyInfo info, object obj)
@@ -81,5 +84,6 @@ namespace JMW.Extensions.Reflection
 
             return false;
         }
+
     }
 }

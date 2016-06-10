@@ -3,12 +3,19 @@ using JMW.Extensions.Reflection;
 using JMW.Types.Collections;
 using NUnit.Framework;
 using System.Linq;
+using JMW.Reflection;
 
 namespace JMW.Extensions.Text.Tests
 {
     [TestFixture]
     public class ReflectionExtensions
     {
+        [Test]
+        public void GetPropertyNameTest1()
+        {
+            Assert.That("Prop1" == Linq.GetPropertyName<Test1>(p => p.Prop1));
+        }
+
         [Test]
         public void GetPropertiesByAttributeTest1()
         {

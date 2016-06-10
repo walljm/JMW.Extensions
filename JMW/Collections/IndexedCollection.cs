@@ -10,6 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 using JMW.Extensions.Reflection;
+using JMW.Reflection;
+using JMW.Types.Functional;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace JMW.Types.Collections
@@ -49,6 +52,38 @@ namespace JMW.Types.Collections
         {
             add { ((INotifyPropertyChanged)_Collection).PropertyChanged += value; }
             remove { ((INotifyPropertyChanged)_Collection).PropertyChanged -= value; }
+        }
+
+        /// <summary>
+        /// This function returns a copy of the dictionary index for a given uniquely indexed property. 
+        /// The values themselves are not
+        /// copied, but the Dictionary is, and can be modified without damaging the IndexedCollection.
+        /// </summary>
+        /// <param name="propertyLambda">an expression in the form of p=>p.PropertyName</param>
+        /// <returns>A <see cref="Maybe{T}"/> with a copy of the dictionary.</returns>
+        public Maybe<Dictionary<string, T>> GetUniqueIndexCollection(Expression<Func<T, object>> propertyLambda)
+        {
+            var name = Linq.GetPropertyName<T>(propertyLambda);
+            if (_UniqueIndexCollection.ContainsKey(name))
+                return new Maybe<Dictionary<string, T>>(_UniqueIndexCollection[name].ToDictionary(k => k.Key, v => v.Value));
+            else
+                return new Maybe<Dictionary<string, T>>(new ArgumentException("Property \"" + name + "\" does not exist."));
+        }
+
+        /// <summary>
+        /// This function returns a copy of the dictionary index for a given property.  The values themselves are not
+        /// copied, but the Dictionary is, and can be modified without damaging the IndexedCollection.
+        /// </summary>
+        /// <param name="propertyLambda">an expression in the form of p=>p.PropertyName</param>
+        /// <returns>A <see cref="Maybe{T}"/> with a copy of the dictionary.</returns>
+        public Maybe<Dictionary<string, List<T>>> GetIndexCollection(Expression<Func<T, object>> propertyLambda)
+        {
+            var name = Linq.GetPropertyName<T>(propertyLambda);
+
+            if (_IndexCollection.ContainsKey(name))
+                return new Maybe<Dictionary<string, List<T>>>(_IndexCollection[name].ToDictionary(k => k.Key, v => v.Value));
+            else
+                return new Maybe<Dictionary<string, List<T>>>(new ArgumentException("Property \"" + name + "\" does not exist."));
         }
 
         #region Private Methods
@@ -136,7 +171,7 @@ namespace JMW.Types.Collections
         {
             foreach (var prop in _IndexedProps.Values)
             {
-                var is_collection = prop.Info.PropertyType.HasInterface<IEnumerable<T>>();
+                var is_collection = prop.Info.PropertyType.HasInterface<IEnumerable<T>>() && prop.Info.PropertyType != typeof(string);
                 var is_dict = prop.Info.PropertyType.HasInterface<IDictionary>();
                 var p = prop.Info;
 
@@ -192,7 +227,7 @@ namespace JMW.Types.Collections
         {
             foreach (var prop in _IndexedProps.Values)
             {
-                var is_collection = prop.Info.PropertyType.HasInterface<IEnumerable<T>>();
+                var is_collection = prop.Info.PropertyType.HasInterface<IEnumerable<T>>() && prop.Info.PropertyType != typeof(string);
                 var is_dict = prop.Info.PropertyType.HasInterface<IDictionary>();
                 var p = prop.Info;
 
@@ -357,37 +392,28 @@ namespace JMW.Types.Collections
             }
         }
 
+        public T this[int index]
+        {
+            get
+            {
+                return _Collection[index];
+            }
+
+            set
+            {
+                var item = _Collection[index];
+
+                removeFromDictionaries(item);
+                item.IndexedPropertyChanged -= onIndexedPropertyChanged;
+
+                _Collection[index] = value;
+
+                addToDictionaries(value);
+                value.IndexedPropertyChanged += new IndexedClass.IndexedPropertyChangedHandler(onIndexedPropertyChanged);
+            }
+        }
+
         #endregion ICollection<T>
-
-        #region IBindingList
-
-        T IList<T>.this[int index]
-        {
-            get
-            {
-                return ((IList<T>)_Collection)[index];
-            }
-
-            set
-            {
-                ((IList<T>)_Collection)[index] = value;
-            }
-        }
-
-        public object this[int index]
-        {
-            get
-            {
-                return ((IBindingList)_Collection)[index];
-            }
-
-            set
-            {
-                ((IBindingList)_Collection)[index] = value;
-            }
-        }
-
-        #endregion IBindingList
 
         #region Linq
 
