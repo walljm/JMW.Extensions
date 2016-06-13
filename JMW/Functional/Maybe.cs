@@ -24,7 +24,7 @@ namespace JMW.Types.Functional
 
         private bool _Success = false;
         /// <summary>
-        /// Indicates if the convertion was successful.
+        /// Indicates if the conversion was successful.
         /// </summary>
         public bool Success
         {
@@ -44,7 +44,7 @@ namespace JMW.Types.Functional
         }
 
         /// <summary>
-        /// Constructor if the converstion succeeded.
+        /// Constructor if the conversion succeeded.
         /// </summary>
         /// <param name="val"></param>
         public Maybe(T val)
@@ -62,7 +62,7 @@ namespace JMW.Types.Functional
         }
 
         /// <summary>
-        /// This function allows you to use the converted value.
+        /// This function allows you to use the converted value.  Functions are not executed if they are null.
         /// </summary>
         /// <param name="if_success">The Action to execute on the successfully converted value.</param>
         /// <param name="if_exception">The Action to execute on the Exception produced by the conversion.</param>
@@ -79,10 +79,25 @@ namespace JMW.Types.Functional
         /// <param name="if_exception">A function that gets the exception and allows you to return a value of type T.</param>
         public T Do(Func<T, T> if_success, Func<Exception, T> if_exception)
         {
-            if (_Success) return if_success(_value);
-            else return if_exception(_exception);
+            if (_Success)
+            {
+                if (if_success == null) throw new ArgumentException("if_success parameter cannot be null.");
+                return if_success(_value);
+            }
+            else
+            {
+                if (if_exception == null) throw new ArgumentException("if_exception parameter cannot be null.");
+                return if_exception(_exception);
+            }
         }
 
+        /// <summary>
+        /// Does an equality comparison between the provided value of type <typeparamref name="T"/> and the internal value of the <see cref="Maybe{T}"/>.
+        /// 
+        /// This function returns false if the <see cref="Maybe{T}"/> is not successful.
+        /// </summary>
+        /// <param name="other">Value to compare.</param>
+        /// <returns>True if the <see cref="Maybe{T}"/> was successful and the value is equal to <paramref name="other"/></returns>
         public bool Equals(T other)
         {
             if (_Success) return _value.Equals(other);
@@ -90,6 +105,11 @@ namespace JMW.Types.Functional
             return false;
         }
 
+        /// <summary>
+        /// Compares two <see cref="Maybe{T}"/> objects.  
+        /// </summary>
+        /// <param name="other">Value to compare</param>
+        /// <returns>Returns true if both <see cref="Maybe{T}"/> were successful and their values are equal.</returns>
         public bool Equals(Maybe<T> other)
         {
             var r = false;
@@ -104,6 +124,12 @@ namespace JMW.Types.Functional
 
         #region Operators
 
+        /// <summary>
+        ///   Operator overload.  Compares two <see cref="Maybe{T}"/> objects.  
+        /// </summary>
+        /// <param name="left">Left side parameter</param>
+        /// <param name="right">Right side parameter</param>
+        /// <returns>Returns true if both <see cref="Maybe{T}"/> were successful and their values are equal, or if both are null.</returns>
         public static bool operator ==(Maybe<T> left, Maybe<T> right)
         {
             if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
@@ -113,11 +139,23 @@ namespace JMW.Types.Functional
             return left.Equals(right);
         }
 
+        /// <summary>
+        /// Operator overload. Compares two <see cref="Maybe{T}"/> objects.  
+        /// </summary>
+        /// <param name="left">Left side parameter</param>
+        /// <param name="right">Right side parameter</param>
+        /// <returns>Returns false if both <see cref="Maybe{T}"/> were successful and their values are equal, or if both are null.</returns>
         public static bool operator !=(Maybe<T> left, Maybe<T> right)
         {
             return !(left == right);
         }
 
+        /// <summary>
+        ///   Operator overload.  Compares a <see cref="Maybe{T}"/> object and an object of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="left">Left side parameter</param>
+        /// <param name="right">Right side parameter</param>
+        /// <returns>Returns true if the <see cref="Maybe{T}"/> was successful and their values are equal, or if both are null.</returns>
         public static bool operator ==(Maybe<T> left, T right)
         {
             if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
@@ -128,16 +166,34 @@ namespace JMW.Types.Functional
             return left.Equals(right);
         }
 
+        /// <summary>
+        /// Operator overload. Compares a <see cref="Maybe{T}"/> object and an object of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="left">Left side parameter</param>
+        /// <param name="right">Right side parameter</param>
+        /// <returns>Returns false if the <see cref="Maybe{T}"/> was successful and their values are equal, or if both are null.</returns>
         public static bool operator !=(Maybe<T> left, T right)
         {
             return !(left == right);
         }
 
+        /// <summary>
+        ///   Operator overload.  Compares a <see cref="Maybe{T}"/> object and an object of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="left">Left side parameter</param>
+        /// <param name="right">Right side parameter</param>
+        /// <returns>Returns true if the <see cref="Maybe{T}"/> was successful and their values are equal, or if both are null.</returns>
         public static bool operator ==(T left, Maybe<T> right)
         {
             return right == left;
         }
 
+        /// <summary>
+        /// Operator overload. Compares a <see cref="Maybe{T}"/> object and an object of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="left">Left side parameter</param>
+        /// <param name="right">Right side parameter</param>
+        /// <returns>Returns false if the <see cref="Maybe{T}"/> was successful and their values are equal, or if both are null.</returns>
         public static bool operator !=(T left, Maybe<T> right)
         {
             return !(right == left);

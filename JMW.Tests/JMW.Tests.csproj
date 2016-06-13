@@ -46,7 +46,6 @@
   <ItemGroup>
     <Compile Include="Collections\IndexedCollectionTest.cs" />
     <Compile Include="ConversionsExtensionsTests.cs" />
-    <Compile Include="EitherTests.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="MaybeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
