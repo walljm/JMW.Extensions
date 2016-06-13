@@ -4,6 +4,7 @@ using JMW.Types.Collections;
 using NUnit.Framework;
 using System.Linq;
 using JMW.Reflection;
+using System;
 
 namespace JMW.Extensions.Text.Tests
 {
@@ -14,6 +15,15 @@ namespace JMW.Extensions.Text.Tests
         public void GetPropertyNameTest1()
         {
             Assert.That("Prop1" == Linq.GetPropertyName<Test1>(p => p.Prop1));
+
+            try
+            {
+                Linq.GetPropertyName<Test1>(p => p.Prop1 + 1);
+            }
+            catch(Exception ex)
+            {
+                Assert.That(ex.GetType() == typeof(ArgumentException));
+            }
         }
 
         [Test]

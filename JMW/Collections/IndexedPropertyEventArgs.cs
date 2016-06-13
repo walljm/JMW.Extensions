@@ -28,11 +28,6 @@ namespace JMW.Types.Collections
             {
                 return _Before;
             }
-
-            set
-            {
-                _Before = value;
-            }
         }
 
         private object _After;
@@ -44,11 +39,6 @@ namespace JMW.Types.Collections
             get
             {
                 return _After;
-            }
-
-            set
-            {
-                _After = value;
             }
         }
 

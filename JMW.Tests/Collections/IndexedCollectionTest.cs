@@ -11,8 +11,8 @@ namespace JMW.Types.Functional.Tests
         public void Test1()
         {
             var idx = new IndexedCollection<Foo>();
-            var f1 = new Foo() { Bar = "jason", BarCollection=new List<string>() { "one", "two" } };
-            var f2 = new Foo() { Bar = "wall", BarCollection = new List<string>() { "three", "two" } };
+            var f1 = new Foo() { Bar = "jason", BarCollection = new List<string>() { "one", "two" }, Baz = "me", BazCollection = new List<int>() { 1, 2 } };
+            var f2 = new Foo() { Bar = "wall", BarCollection = new List<string>() { "three", "two" }, Baz = "me", BazCollection = new List<int>() { 3, 4 } };
             idx.Add(f1);
             idx.Add(f2);
 
@@ -32,6 +32,11 @@ namespace JMW.Types.Functional.Tests
 
             Assert.That(idx.Contains(f1));
 
+            f1.Baz = "my";
+            f1.BazCollection = new List<int>() { 1, 2, 5 };
+            f1.BarCollection = new List<string>() { "1", "2" };
+            f1.BarCollection = new List<string>() { "three", "two" };
+
             Assert.That(idx.Count == 2);
 
             Assert.That(idx.Equals(idx));
@@ -44,6 +49,28 @@ namespace JMW.Types.Functional.Tests
 
             indices.Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
             indices2.Do(if_success: d => Assert.That(d.Count == 3), if_exception: null);
+
+            // make sure the indices can be modified without modifying the original.
+            indices.Do(if_success: d => d.Remove("jeremy"), if_exception: null);
+            idx.GetUniqueIndexCollection(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+
+            Assert.That(idx.First() == f1);
+            var i = idx.First(d => d.Bar == "jeremy");
+            Assert.That(i == f1);
+
+            idx.Remove(f1);
+            idx.GetUniqueIndexCollection(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
+            idx.GetIndexCollection(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.Add(f1);
+
+            idx.Remove(p => p.Bar == "jeremy");
+            idx.GetUniqueIndexCollection(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
+            idx.GetIndexCollection(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.Add(f1);
+
+            idx.Clear();
+            Assert.That(idx.Count == 0);
+            idx.GetUniqueIndexCollection(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 0), if_exception: null);
         }
 
         private class Foo : IndexedClass
@@ -78,7 +105,35 @@ namespace JMW.Types.Functional.Tests
                 }
             }
 
-               
+            private string _Baz = "";
+            [Indexed]
+            public string Baz
+            {
+                get
+                {
+                    return _Baz;
+                }
+
+                set
+                {
+                    Set(ref _Baz, value);
+                }
+            }
+
+            private List<int> _BazCollection = new List<int>();
+            [Indexed(IsUnique = true)]
+            public List<int> BazCollection
+            {
+                get
+                {
+                    return _BazCollection;
+                }
+
+                set
+                {
+                    Set(ref _BazCollection, value);
+                }
+            }
         }
     }
 }

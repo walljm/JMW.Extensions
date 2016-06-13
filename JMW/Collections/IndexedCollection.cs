@@ -264,14 +264,22 @@ namespace JMW.Types.Collections
                             foreach (object o in objs)
                             {
                                 string key = (is_dict) ? o.GetType().GetProperty("Value").GetValue(o).ToString() : o.ToString();
-                                _IndexCollection[p.Name].Remove(key);
+                                var idx = _IndexCollection[p.Name];
+                                if (idx[key].Count > 1)
+                                    idx[key].Remove(val);
+                                else
+                                    idx.Remove(key);
                             }
                         }
                     }
                     else
                     {
                         var key = p.GetValue(val).ToString();
-                        _IndexCollection[p.Name].Remove(key);
+                        var idx = _IndexCollection[p.Name];
+                        if (idx[key].Count > 1)
+                            idx[key].Remove(val);
+                        else
+                            idx.Remove(key);
                     }
                 }
             }
@@ -344,7 +352,8 @@ namespace JMW.Types.Collections
 
         public bool Remove(Func<T, bool> predicate)
         {
-            foreach (T o in _Collection.Where(predicate))
+            var items = _Collection.Where(predicate).ToList();
+            foreach (T o in items)
                 Remove(o);
             return true;
         }

@@ -47,8 +47,24 @@ namespace JMW.Types.Functional.Tests
             var m1 = new Maybe<string>("jason");
             var m2 = new Maybe<string>(new Exception("broke"));
 
-            Assert.AreEqual("jason", m1.Do(if_success: v => v, if_exception: err => "wat!?"));
-            Assert.AreEqual("wat!?", m2.Do(if_success: v => v, if_exception: err => "wat!?"));
+            Assert.AreEqual("jason", m1.Do(if_success: v => v, if_exception: null));
+            Assert.AreEqual("wat!?", m2.Do(if_success: null, if_exception: err => "wat!?"));
+            try
+            {
+                m2.Do((Func<string, string>)null, (Func<Exception, string>)null);
+            }
+            catch (Exception ex)
+            {
+                Assert.That(ex.GetType() == typeof(ArgumentException));
+            }
+            try
+            {
+                m1.Do((Func<string, string>)null, (Func<Exception, string>)null);
+            }
+            catch (Exception ex)
+            {
+                Assert.That(ex.GetType() == typeof(ArgumentException));
+            }
         }
     }
 }
