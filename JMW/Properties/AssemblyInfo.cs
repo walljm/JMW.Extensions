@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("JMW Extensions and Types")]
-[assembly: AssemblyDescription("Useful Extensions and Types")]
+[assembly: AssemblyDescription("Useful Extensions for string manipulation, list manipulation, conversions, as well as Types like the algebraic Maybe<T> and an IndexedCollection for when you need to look up values by more than one property.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("JMW.ExtensionsAndTypes")]

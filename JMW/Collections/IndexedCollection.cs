@@ -62,6 +62,27 @@ namespace JMW.Types.Collections
         /// </summary>
         /// <param name="property_lambda">A property lambda that identifies a property that has been indexed.</param>
         /// <param name="key">The value in the index that the object is keyed to.</param>
+        /// <param name="value">The object identified by the <paramref name="key"/>.</param>
+        /// <returns>True if the operation succeeded.</returns>
+        public bool TryGetByIndex(Expression<Func<T, object>> property_lambda, object key, out List<T> value)
+        {
+            var name = Linq.GetPropertyName<T>(property_lambda);
+
+            if (!_IndexCollection.ContainsKey(name))
+            {
+                value = null;
+                return false;
+            }
+
+            value = _IndexCollection[name][key.ToString()];
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the object keyed by the <paramref name="key"/> for the index indicated by the <paramref name="property_lambda"/>.
+        /// </summary>
+        /// <param name="property_lambda">A property lambda that identifies a property that has been indexed.</param>
+        /// <param name="key">The value in the index that the object is keyed to.</param>
         /// <returns>A <see cref="Maybe{List{T}}"/> that holds the object.</returns>
         public Maybe<List<T>> GetByIndex(Expression<Func<T, object>> property_lambda, object key)
         {
@@ -71,6 +92,27 @@ namespace JMW.Types.Collections
                 return new Maybe<List<T>>(new ArgumentException("Property does not have an index."));
 
             return new Maybe<List<T>>(_IndexCollection[name][key.ToString()]);
+        }
+
+        /// <summary>
+        /// Gets the object keyed by the <paramref name="key"/> for the index indicated by the <paramref name="property_lambda"/>.
+        /// </summary>
+        /// <param name="property_lambda">A property lambda that identifies a property that has been indexed.</param>
+        /// <param name="key">The value in the index that the object is keyed to.</param>
+        /// <param name="value">The object identified by the <paramref name="key"/>.</param>
+        /// <returns>True if the operation succeeded.</returns>
+        public bool TryGetByUniqueIndex(Expression<Func<T, object>> property_lambda, object key, out T value)
+        {
+            var name = Linq.GetPropertyName<T>(property_lambda);
+
+            if (!_UniqueIndexCollection.ContainsKey(name))
+            {
+                value = null;
+                return false;
+            }
+
+            value = _UniqueIndexCollection[name][key.ToString()];
+            return true;
         }
 
         /// <summary>
@@ -96,7 +138,7 @@ namespace JMW.Types.Collections
         /// </summary>
         /// <param name="property_lambda">an expression in the form of p=>p.PropertyName</param>
         /// <returns>A <see cref="Maybe{T}"/> with a copy of the dictionary.</returns>
-        public Maybe<Dictionary<string, T>> GetUniqueIndexCollection(Expression<Func<T, object>> property_lambda)
+        public Maybe<Dictionary<string, T>> GetUniqueIndex(Expression<Func<T, object>> property_lambda)
         {
             var name = Linq.GetPropertyName<T>(property_lambda);
             if (_UniqueIndexCollection.ContainsKey(name))
@@ -111,7 +153,7 @@ namespace JMW.Types.Collections
         /// </summary>
         /// <param name="propertyLambda">an expression in the form of p=>p.PropertyName</param>
         /// <returns>A <see cref="Maybe{T}"/> with a copy of the dictionary.</returns>
-        public Maybe<Dictionary<string, List<T>>> GetIndexCollection(Expression<Func<T, object>> propertyLambda)
+        public Maybe<Dictionary<string, List<T>>> GetIndex(Expression<Func<T, object>> propertyLambda)
         {
             var name = Linq.GetPropertyName<T>(propertyLambda);
 
