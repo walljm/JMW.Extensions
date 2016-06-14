@@ -11,6 +11,7 @@ namespace JMW.Types
     public class WeakEventSource<TEventArgs> where TEventArgs : EventArgs
     {
         private readonly List<WeakDelegate> _handlers;
+        public int HandlerCount { get { return _handlers.Count; } }
 
         public WeakEventSource()
         {

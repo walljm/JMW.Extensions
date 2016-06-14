@@ -38,6 +38,65 @@ namespace JMW.Types.Collections
         /// <param name="e">The <see cref="IndexedPropertyChangedEventArgs"/></param>
         public delegate void IndexedPropertyChangedHandler(object sender, IndexedPropertyChangedEventArgs e);
 
+        #region Properties
+
+        /// <summary>
+        /// The number of registered handlers for the event.
+        /// </summary>
+        public int PropertyChangingEventCount { get { return _PropertyChanging.HandlerCount; } }
+
+        /// <summary>
+        /// The number of registered handlers for the event.
+        /// </summary>
+        public int PropertyChangedEventCount { get { return _PropertyChanged.HandlerCount; } }
+
+        /// <summary>
+        /// The number of registered handlers for the event.
+        /// </summary>
+        public int IndexedPropertyChangedEventCount { get { return _IndexedPropertyChanged.HandlerCount; } }
+
+        #endregion Properties
+
+        #region Public Methods
+
+        /// <summary>
+        ///   Clears all the events attached to the object.
+        ///
+        /// <para>Specifically IndexedPropertyChanged, PropertyChanged, and PropertyChanging</para>
+        /// </summary>
+        public void ClearEvents()
+        {
+            _IndexedPropertyChanged.Clear();
+            _PropertyChanged.Clear();
+            _PropertyChanging.Clear();
+        }
+
+        /// <summary>
+        /// Clears the IndexedPropertyChanged events.
+        /// </summary>
+        public void ClearIndexedPropertyChanged()
+        {
+            _IndexedPropertyChanged.Clear();
+        }
+
+        /// <summary>
+        /// Clears the PropertyChanged events.
+        /// </summary>
+        public void ClearPropertyChanged()
+        {
+            _PropertyChanged.Clear();
+        }
+
+        /// <summary>
+        /// Clears the PropertyChanging events.
+        /// </summary>
+        public void ClearPropertyChanging()
+        {
+            _PropertyChanging.Clear();
+        }
+
+        #endregion Public Methods
+
         #region Events
 
         private WeakEventSource<IndexedPropertyChangedEventArgs> _IndexedPropertyChanged = new WeakEventSource<IndexedPropertyChangedEventArgs>();

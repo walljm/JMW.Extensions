@@ -17,14 +17,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace JMW.Types.Collections
 {
-    public class IndexedCollection<T> : IEnumerable<T>, ICollection<T>, INotifyCollectionChanged, INotifyPropertyChanged, IList<T> where T : IndexedClass
+    /// <summary>
+    /// A collection that allows you to index more than one property.  The indices are maintained, so when a value
+    /// is modified, the indices are updated.
+    /// </summary>
+    /// <typeparam name="T">The type of object being stored in the collection.</typeparam>
+    public class IndexedCollection<T> : IEnumerable<T>, ICollection<T>, INotifyCollectionChanged, IList<T>, IEnumerable where T : IndexedClass
     {
         private Dictionary<string, Dictionary<string, List<T>>> _IndexCollection = new Dictionary<string, Dictionary<string, List<T>>>();
         private Dictionary<string, Dictionary<string, T>> _UniqueIndexCollection = new Dictionary<string, Dictionary<string, T>>();
@@ -42,28 +46,59 @@ namespace JMW.Types.Collections
             }
         }
 
+        /// <summary>
+        /// This event gets fired whenever the collection is modified.
+        /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged
         {
             add { _Collection.CollectionChanged += value; }
             remove { _Collection.CollectionChanged -= value; }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged
+        #region Public Methods
+
+        /// <summary>
+        /// Gets the object keyed by the <paramref name="key"/> for the index indicated by the <paramref name="property_lambda"/>.
+        /// </summary>
+        /// <param name="property_lambda">A property lambda that identifies a property that has been indexed.</param>
+        /// <param name="key">The value in the index that the object is keyed to.</param>
+        /// <returns>A <see cref="Maybe{List{T}}"/> that holds the object.</returns>
+        public Maybe<List<T>> GetByIndex(Expression<Func<T, object>> property_lambda, object key)
         {
-            add { ((INotifyPropertyChanged)_Collection).PropertyChanged += value; }
-            remove { ((INotifyPropertyChanged)_Collection).PropertyChanged -= value; }
+            var name = Linq.GetPropertyName<T>(property_lambda);
+
+            if (!_IndexCollection.ContainsKey(name))
+                return new Maybe<List<T>>(new ArgumentException("Property does not have an index."));
+
+            return new Maybe<List<T>>(_IndexCollection[name][key.ToString()]);
         }
 
         /// <summary>
-        /// This function returns a copy of the dictionary index for a given uniquely indexed property. 
+        /// Gets the object keyed by the <paramref name="key"/> for the index indicated by the <paramref name="property_lambda"/>.
+        /// </summary>
+        /// <param name="property_lambda">A property lambda that identifies a property that has been indexed.</param>
+        /// <param name="key">The value in the index that the object is keyed to.</param>
+        /// <returns>A <see cref="Maybe{T}"/> that holds the object.</returns>
+        public Maybe<T> GetByUniqueIndex(Expression<Func<T, object>> property_lambda, object key)
+        {
+            var name = Linq.GetPropertyName<T>(property_lambda);
+
+            if (!_UniqueIndexCollection.ContainsKey(name))
+                return new Maybe<T>(new ArgumentException("Property does not have an index."));
+
+            return new Maybe<T>(_UniqueIndexCollection[name][key.ToString()]);
+        }
+
+        /// <summary>
+        /// This function returns a copy of the dictionary index for a given uniquely indexed property.
         /// The values themselves are not
         /// copied, but the Dictionary is, and can be modified without damaging the IndexedCollection.
         /// </summary>
-        /// <param name="propertyLambda">an expression in the form of p=>p.PropertyName</param>
+        /// <param name="property_lambda">an expression in the form of p=>p.PropertyName</param>
         /// <returns>A <see cref="Maybe{T}"/> with a copy of the dictionary.</returns>
-        public Maybe<Dictionary<string, T>> GetUniqueIndexCollection(Expression<Func<T, object>> propertyLambda)
+        public Maybe<Dictionary<string, T>> GetUniqueIndexCollection(Expression<Func<T, object>> property_lambda)
         {
-            var name = Linq.GetPropertyName<T>(propertyLambda);
+            var name = Linq.GetPropertyName<T>(property_lambda);
             if (_UniqueIndexCollection.ContainsKey(name))
                 return new Maybe<Dictionary<string, T>>(_UniqueIndexCollection[name].ToDictionary(k => k.Key, v => v.Value));
             else
@@ -86,8 +121,92 @@ namespace JMW.Types.Collections
                 return new Maybe<Dictionary<string, List<T>>>(new ArgumentException("Property \"" + name + "\" does not exist."));
         }
 
+        /// <summary>
+        /// Clears then rebuilds the indices.  This is sometimes necessary if an exception was thrown during an operation.
+        /// </summary>
+        public void RefreshIndices()
+        {
+            foreach (var idx in _IndexCollection) idx.Value.Clear();
+            foreach (var idx in _UniqueIndexCollection) idx.Value.Clear();
+            foreach (var item in _Collection)
+            {
+                item.IndexedPropertyChanged -= onIndexedPropertyChanged;
+                addToDictionaries(item);
+                item.IndexedPropertyChanged += onIndexedPropertyChanged;
+            }
+        }
+
+        /// <summary>
+        /// Adds an item to the collection.  Throws an exception of type <see cref="OperationCanceledException"/> if the item is unable to be added.
+        /// </summary>
+        /// <param name="item">The item to add.</param>
+        public void Add(T item)
+        {
+            if (!TryAdd(item))
+                throw new OperationCanceledException("Operation was cancelled due to an index violation. The Index may have been violated.");
+        }
+
+        /// <summary>
+        /// Adds an item to the collection.  Throws an exception of type <see cref="OperationCanceledException"/> if the item is unable to be added.
+        /// </summary>
+        /// <param name="obj">The obejct to add</param>
+        /// <returns>True if the item was added successfully.</returns>
+        public bool TryAdd(T obj)
+        {
+            if (!addToDictionaries(obj))
+                return false;
+
+            _Collection.Add(obj);
+            obj.IndexedPropertyChanged += onIndexedPropertyChanged;
+            return true;
+        }
+
+        /// <summary>
+        /// Removes an item from the collection.
+        /// </summary>
+        /// <param name="item">Item to remove</param>
+        /// <returns>Returns true if the item was successfully removed.</returns>
+        public bool Remove(T item)
+        {
+            var r = removeFromDictionaries(item);
+            _Collection.Remove(item);
+            item.IndexedPropertyChanged -= onIndexedPropertyChanged;
+
+            return r;
+        }
+
+        /// <summary>
+        /// Removes items that match the supplied predicate.
+        /// </summary>
+        /// <param name="predicate">A function that evaluates if the item is something we want to remove.</param>
+        /// <returns>True if the operation succeeds.</returns>
+        public bool Remove(Func<T, bool> predicate)
+        {
+            var items = _Collection.Where(predicate).ToList();
+            foreach (T o in items)
+                Remove(o);
+            return true;
+        }
+
+        /// <summary>
+        /// Removes an item at the supplied location.
+        /// </summary>
+        /// <param name="index">The index to remove the item from.</param>
+        public void RemoveAt(int index)
+        {
+            var item = _Collection[index];
+            Remove(item);
+        }
+
+        #endregion Public Methods
+
         #region Private Methods
 
+        /// <summary>
+        /// This event fires whenever an Indexed Property has been changed.
+        /// </summary>
+        /// <param name="sender">The object being changed</param>
+        /// <param name="e">Arguments that give you the name of the property, the value of the property before and after the change.</param>
         private void onIndexedPropertyChanged(object sender, IndexedPropertyChangedEventArgs e)
         {
             if (!_IndexedProps.ContainsKey(e.PropertyName)) return; // don't update the index if the property isn't indexed
@@ -146,27 +265,42 @@ namespace JMW.Types.Collections
             }
         }
 
+        /// <summary>
+        /// Removes a value from the dictionaries (indexes).  This is called by the onIndexedPropertyChanged function.
+        /// </summary>
+        /// <param name="sender">The value/object being added.</param>
+        /// <param name="curr">The current value of the property</param>
+        /// <param name="alter">The altered value.</param>
         private void removeFromIndex(object sender, object prev, Dictionary<string, List<T>> alter)
         {
             if (alter.ContainsKey(prev.ToString()))
             {
-                if (alter[prev.ToString()].Count == 1) alter.Remove(prev.ToString());
-                else alter[prev.ToString()].Remove((T)sender);
+                if (alter[prev.ToString()].Count == 1)
+                    alter.Remove(prev.ToString());
+                else
+                    alter[prev.ToString()].Remove((T)sender);
             }
         }
 
+        /// <summary>
+        /// Adds a value to the dictionaries (indexes).  This is called by the onIndexedPropertyChanged function.
+        /// </summary>
+        /// <param name="sender">The value/object being added.</param>
+        /// <param name="curr">The current value of the property</param>
+        /// <param name="alter">The altered value.</param>
         private void addToIndex(object sender, object curr, Dictionary<string, List<T>> alter)
         {
             if (alter.ContainsKey(curr.ToString()))
-            {
                 alter[curr.ToString()].Add((T)sender);
-            }
             else
-            {
                 alter.Add(curr.ToString(), new List<T>() { (T)sender });
-            }
         }
 
+        /// <summary>
+        /// Adds the value to all the relevant dictionaries (indexes)
+        /// </summary>
+        /// <param name="val">The value to add.</param>
+        /// <returns>True if the operation succeeded.</returns>
         private bool addToDictionaries(T val)
         {
             foreach (var prop in _IndexedProps.Values)
@@ -223,6 +357,11 @@ namespace JMW.Types.Collections
             return true;
         }
 
+        /// <summary>
+        /// Removes the value from all the relevant dictionaries (indexes)
+        /// </summary>
+        /// <param name="val">The value to remove</param>
+        /// <returns>True if the operation succeeded.</returns>
         private bool removeFromDictionaries(T val)
         {
             foreach (var prop in _IndexedProps.Values)
@@ -287,33 +426,33 @@ namespace JMW.Types.Collections
             return true;
         }
 
+        /// <summary>
+        /// Determines if a property is uniquely indexed or not.
+        /// </summary>
+        /// <param name="prop">A <see cref="PropertyInfo"/> to check for the IsUnique attribute.</param>
+        /// <returns>True if the property is unigue.</returns>
+        private static bool isUnique(PropertyInfo prop)
+        {
+            var attrs = prop.GetCustomAttributes(typeof(Indexed), false);
+            if (attrs.Length > 0 && (attrs[0] as Indexed).IsUnique)
+            {
+                return true;
+            }
+            return false;
+        }
+
         #endregion Private Methods
 
         #region IEnumerable<T>
 
         public IEnumerator<T> GetEnumerator()
         {
-            return ((IEnumerable<T>)_Collection).GetEnumerator();
+            return _Collection.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable<T>)_Collection).GetEnumerator();
-        }
-
-        public void Add(T item)
-        {
-            if (!TryAdd(item))
-                throw new OperationCanceledException("Operation was cancelled due to an index violation.");
-        }
-
-        public bool TryAdd(T obj)
-        {
-            if (!addToDictionaries(obj)) return false;
-
-            _Collection.Add(obj);
-            obj.IndexedPropertyChanged += new IndexedClass.IndexedPropertyChangedHandler(onIndexedPropertyChanged);
-            return true;
+            return _Collection.GetEnumerator(); ;
         }
 
         public void Clear()
@@ -322,7 +461,7 @@ namespace JMW.Types.Collections
 
             _Collection.Clear();
 
-            foreach (PropInfo p in _IndexedProps.Values)
+            foreach (var p in _IndexedProps.Values)
             {
                 if (p.IsUnique)
                     _UniqueIndexCollection[p.Name].Clear();
@@ -341,29 +480,6 @@ namespace JMW.Types.Collections
             _Collection.CopyTo(array, arrayIndex);
         }
 
-        public bool Remove(T item)
-        {
-            removeFromDictionaries(item);
-            _Collection.Remove(item);
-            item.IndexedPropertyChanged -= onIndexedPropertyChanged;
-
-            return true;
-        }
-
-        public bool Remove(Func<T, bool> predicate)
-        {
-            var items = _Collection.Where(predicate).ToList();
-            foreach (T o in items)
-                Remove(o);
-            return true;
-        }
-
-        public void RemoveAt(int index)
-        {
-            var item = _Collection[index];
-            Remove(item);
-        }
-
         #endregion IEnumerable<T>
 
         #region IList
@@ -375,10 +491,11 @@ namespace JMW.Types.Collections
 
         public void Insert(int index, T item)
         {
+            item.IndexedPropertyChanged -= onIndexedPropertyChanged;
             addToDictionaries(item);
 
             ((IList<T>)_Collection).Insert(index, item);
-            item.IndexedPropertyChanged += new IndexedClass.IndexedPropertyChangedHandler(onIndexedPropertyChanged);
+            item.IndexedPropertyChanged += onIndexedPropertyChanged;
         }
 
         #endregion IList
@@ -443,15 +560,7 @@ namespace JMW.Types.Collections
 
         #endregion Linq
 
-        private static bool isUnique(System.Reflection.PropertyInfo prop)
-        {
-            var attrs = prop.GetCustomAttributes(typeof(Indexed), false);
-            if (attrs.Length > 0)
-            {
-                return (attrs[0] as Indexed).IsUnique;
-            }
-            return false;
-        }
+        #region Private classes
 
         private class PropInfo
         {
@@ -488,5 +597,7 @@ namespace JMW.Types.Collections
                 }
             }
         }
+
+        #endregion Private classes
     }
 }
