@@ -17,14 +17,21 @@ namespace JMW.Types
     /// <summary>
     /// The StringEnum class is designed to allow you to use a class like an Enum.
     /// </summary>
-    public class StringEnum : IEquatable<StringEnum>, IComparable, IComparable<StringEnum>
+    public abstract class StringEnum : IEquatable<StringEnum>, IComparable, IComparable<StringEnum>
     {
         private static HashSet<StringEnum> _values = new HashSet<StringEnum>();
 
         #region Constructors
 
-        public StringEnum(string value)
+        /// <summary>
+        /// Constructs a StringEnum.
+        /// </summary>
+        /// <param name="value">The string value of the enum</param>
+        /// <param name="ordinal">The optional numeric value of the enum</param>
+        public StringEnum(string value, int ordinal = -1)
         {
+            // auto set the ordinal if not explicitly added, to count up from 0
+            _Ordinal = ordinal < 0 ? _values.Count : ordinal;
             _Value = value;
         }
 
@@ -39,6 +46,15 @@ namespace JMW.Types
         public string Value
         {
             get { return _Value; }
+        }
+
+        private long _Ordinal = -1;
+        /// <summary>
+        /// This provides an optional ordinal value for backwards compatibility.
+        /// </summary>
+        public long Ordinal
+        {
+            get { return _Ordinal; }
         }
 
         #endregion Properties
@@ -121,6 +137,16 @@ namespace JMW.Types
             return GetValue(value);
         }
 
+        /// <summary>
+        /// Implicitly converts string to StringEnum.
+        /// </summary>
+        /// <param name="value">the string value to convert to a StringEnum</param>
+        /// <returns>the StringEnum with the matching valuel (case sensitive)</returns>
+        public static implicit operator StringEnum(long ordinal)
+        {
+            return GetValue(ordinal);
+        }
+
         #endregion Operators
 
         #region Functions
@@ -162,6 +188,25 @@ namespace JMW.Types
             foreach (StringEnum val in _values)
             {
                 if (val.Value.ToUpper() == value.ToUpper())
+                {
+                    return val;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Searches all the static OSs for a desired instance
+        /// </summary>
+        /// <param name="ordinal">The ordinal (numeric) value of the desired enum value</param>
+        /// <returns>the instance of the StringEnum with a matching value (case sensitive),
+        /// null if nothing is found</returns>
+        public static StringEnum GetValue(long ordinal)
+        {
+            foreach (StringEnum val in _values)
+            {
+                if (val.Ordinal == ordinal)
                 {
                     return val;
                 }

@@ -347,8 +347,8 @@ namespace JMW.Types.Collections
         {
             foreach (var prop in _IndexedProps.Values)
             {
-                var is_collection = prop.Info.PropertyType.HasInterface<IEnumerable<T>>() && prop.Info.PropertyType != typeof(string);
-                var is_dict = prop.Info.PropertyType.HasInterface<IDictionary>();
+                var is_collection = prop.PropertyType.HasInterface<IEnumerable<T>>() && prop.PropertyType != typeof(string);
+                var is_dict = prop.PropertyType.HasInterface<IDictionary>();
                 var p = prop.Info;
 
                 if (prop.IsUnique)
@@ -408,8 +408,8 @@ namespace JMW.Types.Collections
         {
             foreach (var prop in _IndexedProps.Values)
             {
-                var is_collection = prop.Info.PropertyType.HasInterface<IEnumerable<T>>() && prop.Info.PropertyType != typeof(string);
-                var is_dict = prop.Info.PropertyType.HasInterface<IDictionary>();
+                var is_collection = prop.PropertyType.HasInterface<IEnumerable<T>>() && prop.PropertyType != typeof(string);
+                var is_dict = prop.PropertyType.HasInterface<IDictionary>();
                 var p = prop.Info;
 
                 if (prop.IsUnique)
@@ -485,7 +485,7 @@ namespace JMW.Types.Collections
 
         #endregion Private Methods
 
-        #region IEnumerable<T>
+        #region Interface Implementations
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -522,10 +522,6 @@ namespace JMW.Types.Collections
             _Collection.CopyTo(array, arrayIndex);
         }
 
-        #endregion IEnumerable<T>
-
-        #region IList
-
         public int IndexOf(T item)
         {
             return ((IList<T>)_Collection).IndexOf(item);
@@ -539,10 +535,6 @@ namespace JMW.Types.Collections
             ((IList<T>)_Collection).Insert(index, item);
             item.IndexedPropertyChanged += onIndexedPropertyChanged;
         }
-
-        #endregion IList
-
-        #region ICollection<T>
 
         public int Count
         {
@@ -581,7 +573,7 @@ namespace JMW.Types.Collections
             }
         }
 
-        #endregion ICollection<T>
+        #endregion Interface Implementations
 
         #region Linq
 
@@ -608,11 +600,13 @@ namespace JMW.Types.Collections
         {
             private PropertyInfo _Info;
             private bool _IsUnique;
+            private Type _PropertyType;
 
             public PropInfo(PropertyInfo info, bool is_unique)
             {
                 _Info = info;
                 _IsUnique = is_unique;
+                _PropertyType = info.PropertyType;
             }
 
             public PropertyInfo Info
@@ -636,6 +630,14 @@ namespace JMW.Types.Collections
                 get
                 {
                     return _Info.Name;
+                }
+            }
+
+            public Type PropertyType
+            {
+                get
+                {
+                    return _PropertyType;
                 }
             }
         }
