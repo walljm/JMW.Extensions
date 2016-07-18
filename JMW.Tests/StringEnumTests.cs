@@ -11,6 +11,8 @@ namespace JMW.Types.Tests
         public void StringEnumTest1()
         {
             var val = ExampleEnum.ONE;
+            var v2 = ExampleEnum2.ONE;
+            var v3 = ExampleEnum2.TWO;
 
             Assert.AreEqual(val, ExampleEnum.GetValue("One"));
             Assert.AreEqual(val, ExampleEnum.GetValue(0));
@@ -20,20 +22,20 @@ namespace JMW.Types.Tests
             Assert.That(val.Equals("One"));
             Assert.That(val == 0);
             Assert.That(null == (ExampleEnum)3);
-            Assert.That(null == (ExampleEnum)3);
             Assert.That(ExampleEnum.ONE == 0);
             Assert.That(ExampleEnum.TWO == 1);
             Assert.That(!val.Equals("Two"));
             Assert.That(val == "One");
             Assert.That(val != "Two");
+            Assert.That(val != 1);
             Assert.That(val.ToString() == "One");
-            Assert.That(ExampleEnum.GetValue("blah") == null);
-            Assert.That(ExampleEnum.GetValue(new ExampleEnum("jason")) == null);
+            Assert.That(ExampleEnum.GetValue("blah") == (string)null);
+            Assert.That(ExampleEnum.GetValue(13) == (string)null);
             Assert.That(val.Equals((object)ExampleEnum.ONE));
-            Assert.That(!val.Equals(null));
-            Assert.IsFalse(val == null);
+            Assert.That(!val.Equals((string)null));
+            Assert.IsFalse(val == (string)null);
             string t1 = null;
-            StringEnum t2 = null;
+            ExampleEnum t2 = null;
 
             Assert.IsFalse(val == t1);
             Assert.IsFalse(val == t2);
@@ -49,13 +51,18 @@ namespace JMW.Types.Tests
             Assert.That(val.CompareTo(ExampleEnum.TWO) == -1);
             Assert.That(val.CompareTo((object)ExampleEnum.ONE) == 0);
             Assert.That(val.CompareTo("Two") == -1);
+            Assert.That(val.CompareTo((string)null) == 1);
             Assert.That(val.CompareTo(t2) == 1);
-            Assert.That(ExampleEnum.GetValue(t1) == null);
-            Assert.That(ExampleEnum.GetValue(t2) == null);
+            Assert.That(ExampleEnum.GetValue(t1) == (string)null);
+            Assert.That(ExampleEnum.GetValue(t2) == (string)null);
 
             var vals = ExampleEnum.GetValues();
+            var vals2 = ExampleEnum2.GetValues();
 
-            CollectionAssert.AreEqual(new List<string>() { "One", "Two" }, ExampleEnum.GetValues());
+            CollectionAssert.AreEqual(new List<string>() { "One", "Two" }, vals);
+
+            Assert.IsTrue((ExampleEnum)null == (string)null);
+            Assert.IsFalse((ExampleEnum)null == 1);
 
             Assert.IsFalse(val.Equals((object)null));
             Assert.IsFalse(val.Equals((object)1));
@@ -67,6 +74,8 @@ namespace JMW.Types.Tests
         {
             foo f = new foo();
             f.E1 = ExampleEnum.TWO;
+
+            //f.E1 = "One";
 
             var s1 = new JsonSerializerSettings();
             s1.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
@@ -144,24 +153,13 @@ namespace JMW.Types.Tests
         }
     }
 
-    public class ExampleEnum : StringEnum
+    public class ExampleEnum : StringEnum<ExampleEnum>
     {
-        private const string OneValue = "One";
-        private const string TwoValue = "Two";
-
-        static ExampleEnum()
-        {
-            _One = new ExampleEnum(OneValue);
-            _Two = new ExampleEnum(TwoValue, 1);
-            ExampleEnum.AddValue(_One);
-            ExampleEnum.AddValue(_Two);
-        }
-
         public ExampleEnum(string value, int ord = -1) : base(value, ord)
         {
         }
 
-        private static ExampleEnum _One;
+        private static ExampleEnum _One = new ExampleEnum("One");
         public static ExampleEnum ONE
         {
             get
@@ -170,7 +168,7 @@ namespace JMW.Types.Tests
             }
         }
 
-        private static ExampleEnum _Two;
+        private static ExampleEnum _Two = new ExampleEnum("Two");
         public static ExampleEnum TWO
         {
             get
@@ -180,23 +178,48 @@ namespace JMW.Types.Tests
         }
 
         /// <summary>
-        /// Explicitly converts string to ExampleEnum.
+        /// Implicitly converts string to ExampleEnum.
         /// </summary>
         /// <param name="value">the string value to convert to a ExampleEnum</param>
         /// <returns>the ExampleEnum with the matching value (case sensitive)</returns>
-        public static explicit operator ExampleEnum(string value)
+        public static implicit operator ExampleEnum(string value)
         {
             return (ExampleEnum)GetValue(value);
         }
 
         /// <summary>
-        /// Explicitly converts string to ExampleEnum.
+        /// Implicitly converts string to ExampleEnum.
         /// </summary>
         /// <param name="ordinal">the numeric value to convert to a ExampleEnum</param>
         /// <returns>the ExampleEnum with the matching ordinal (case sensitive)</returns>
-        public static explicit operator ExampleEnum(long ordinal)
+        public static implicit operator ExampleEnum(long ordinal)
         {
             return (ExampleEnum)GetValue(ordinal);
+        }
+    }
+
+    public class ExampleEnum2 : StringEnum<ExampleEnum2>
+    {
+        public ExampleEnum2(string value, int ord = -1) : base(value, ord)
+        {
+        }
+
+        private static ExampleEnum2 _One = new ExampleEnum2("Three");
+        public static ExampleEnum2 ONE
+        {
+            get
+            {
+                return _One;
+            }
+        }
+
+        private static ExampleEnum2 _Two = new ExampleEnum2("Four");
+        public static ExampleEnum2 TWO
+        {
+            get
+            {
+                return _Two;
+            }
         }
     }
 }
