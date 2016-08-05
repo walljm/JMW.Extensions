@@ -9,9 +9,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-using JMW.Extensions.Reflection;
-using JMW.Reflection;
-using JMW.Types.Functional;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +17,9 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using JMW.Extensions.Reflection;
+using JMW.Reflection;
+using JMW.Types.Functional;
 
 namespace JMW.Types.Collections
 {
@@ -37,7 +37,7 @@ namespace JMW.Types.Collections
 
         public IndexedCollection()
         {
-            _IndexedProps = typeof(T).GetPropertiesByAttribute<Indexed>().ToDictionary(k => k.Name, v => new PropInfo(v, isUnique(v)));
+            _IndexedProps = typeof(T).GetPropertiesByAttribute<Indexed>().ToDictionary(k => k.Name, v => new PropInfo(v));
 
             foreach (var prop in _IndexedProps)
             {
@@ -253,13 +253,12 @@ namespace JMW.Types.Collections
         {
             if (!_IndexedProps.ContainsKey(e.PropertyName)) return; // don't update the index if the property isn't indexed
             var prop = _IndexedProps[e.PropertyName];
-            bool is_collection = prop.Info.PropertyType.HasInterface<ICollection>();
 
             if (prop.IsUnique)
             {
                 var alter = (Dictionary<string, T>)_UniqueIndexCollection[e.PropertyName];
 
-                if (is_collection)
+                if (prop.IsCollection)
                 {
                     var before = ((IEnumerable)e.Before).GetEnumerator();
                     var after = ((IEnumerable)e.After).GetEnumerator();
@@ -284,7 +283,7 @@ namespace JMW.Types.Collections
             {
                 var alter = (Dictionary<string, List<T>>)_IndexCollection[e.PropertyName];
 
-                if (is_collection)
+                if (prop.IsCollection)
                 {
                     var before = ((IEnumerable)e.Before).GetEnumerator();
                     var after = ((IEnumerable)e.After).GetEnumerator();
@@ -347,13 +346,11 @@ namespace JMW.Types.Collections
         {
             foreach (var prop in _IndexedProps.Values)
             {
-                var is_collection = prop.PropertyType.HasInterface<IEnumerable<T>>() && prop.PropertyType != typeof(string);
-                var is_dict = prop.PropertyType.HasInterface<IDictionary>();
                 var p = prop.Info;
 
                 if (prop.IsUnique)
                 {
-                    if (is_collection)
+                    if (prop.IsCollection || prop.IsDict)
                     {
                         // setup events on the list.
                         var objs = (IEnumerable)p.GetValue(val);
@@ -376,14 +373,14 @@ namespace JMW.Types.Collections
                 }
                 else
                 {
-                    if (is_collection)
+                    if (prop.IsCollection || prop.IsDict)
                     {
                         var objs = (IEnumerable)p.GetValue(val);
                         if (objs != null) // its possible for a property to be specified as indexed, but be null.
                         {
                             foreach (object o in objs)
                             {
-                                string key = (is_dict) ? o.GetType().GetProperty("Value").GetValue(o).ToString() : o.ToString();
+                                string key = (prop.IsDict) ? o.GetType().GetProperty("Value").GetValue(o).ToString() : o.ToString();
                                 _IndexCollection[p.Name].SafeAdd<string, T>(key, val);
                             }
                         }
@@ -408,13 +405,11 @@ namespace JMW.Types.Collections
         {
             foreach (var prop in _IndexedProps.Values)
             {
-                var is_collection = prop.PropertyType.HasInterface<IEnumerable<T>>() && prop.PropertyType != typeof(string);
-                var is_dict = prop.PropertyType.HasInterface<IDictionary>();
                 var p = prop.Info;
 
                 if (prop.IsUnique)
                 {
-                    if (is_collection)
+                    if (prop.IsCollection || prop.IsDict)
                     {
                         // setup events on the list.
                         var objs = (IEnumerable)p.GetValue(val);
@@ -437,14 +432,14 @@ namespace JMW.Types.Collections
                 }
                 else
                 {
-                    if (is_collection)
+                    if (prop.IsCollection || prop.IsDict)
                     {
                         var objs = (IEnumerable)p.GetValue(val);
                         if (objs != null) // its possible for a property to be specified as indexed, but be null.
                         {
                             foreach (object o in objs)
                             {
-                                string key = (is_dict) ? o.GetType().GetProperty("Value").GetValue(o).ToString() : o.ToString();
+                                string key = (prop.IsDict) ? o.GetType().GetProperty("Value").GetValue(o).ToString() : o.ToString();
                                 var idx = _IndexCollection[p.Name];
                                 if (idx[key].Count > 1)
                                     idx[key].Remove(val);
@@ -600,12 +595,17 @@ namespace JMW.Types.Collections
         {
             private PropertyInfo _Info;
             private bool _IsUnique;
+            private bool _IsCollection;
+            private bool _IsDict;
             private Type _PropertyType;
 
-            public PropInfo(PropertyInfo info, bool is_unique)
+            public PropInfo(PropertyInfo info)
             {
                 _Info = info;
-                _IsUnique = is_unique;
+                _IsUnique = isUnique(info);
+                _IsCollection = info.PropertyType.HasInterface<ICollection>();
+                _IsDict = info.PropertyType.HasInterface<IDictionary>();
+
                 _PropertyType = info.PropertyType;
             }
 
@@ -638,6 +638,32 @@ namespace JMW.Types.Collections
                 get
                 {
                     return _PropertyType;
+                }
+            }
+
+            public bool IsDict
+            {
+                get
+                {
+                    return _IsDict;
+                }
+
+                set
+                {
+                    _IsDict = value;
+                }
+            }
+
+            public bool IsCollection
+            {
+                get
+                {
+                    return _IsCollection;
+                }
+
+                set
+                {
+                    _IsCollection = value;
                 }
             }
         }

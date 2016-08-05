@@ -51,10 +51,12 @@
     <Compile Include="Collections\IndexedCollectionTest.cs" />
     <Compile Include="ConversionsExtensionsTests.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
+    <Compile Include="DifferentialTests.cs" />
     <Compile Include="MaybeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringEnumTests.cs" />
     <Compile Include="ReflectionExtensions.cs" />
+    <Compile Include="ObjectExtensionTests.cs" />
     <Compile Include="TextExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>

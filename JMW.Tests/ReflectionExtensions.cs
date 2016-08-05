@@ -6,7 +6,7 @@ using System.Linq;
 using JMW.Reflection;
 using System;
 
-namespace JMW.Extensions.Text.Tests
+namespace JMW.Extensions.String.Tests
 {
     [TestFixture]
     public class ReflectionExtensions

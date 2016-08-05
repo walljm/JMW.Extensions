@@ -9,7 +9,9 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-namespace JMW.Extensions.Text
+using JMW.Extensions.Object;
+
+namespace JMW.Extensions.String
 {
     public static class Extensions
     {
@@ -315,6 +317,26 @@ namespace JMW.Extensions.Text
             }
 
             return s.Substring(start, len);
+        }
+
+        /// <summary>
+        ///  Determines if the string is either null or has no characters
+        /// </summary>
+        /// <param name="str">String to evaluate</param>
+        /// <returns>True or False</returns>
+        public static bool IsEmpty(this string str)
+        {
+            return str.IsNull() || str.Length == 0;
+        }
+
+        /// <summary>
+        ///  Determines if the string is both not null and has at least 1 character.
+        /// </summary>
+        /// <param name="str">String to evaluate</param>
+        /// <returns>True or False</returns>
+        public static bool IsNotEmpty(this string str)
+        {
+            return !str.IsEmpty();
         }
     }
 }

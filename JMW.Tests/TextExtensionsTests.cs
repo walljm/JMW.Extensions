@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace JMW.Extensions.Text.Tests
+namespace JMW.Extensions.String.Tests
 {
     [TestFixture]
     public class TextExtensionsTests
