@@ -44,6 +44,7 @@
     <Compile Include="Collections\IndexedClass.cs" />
     <Compile Include="Collections\IndexedCollection.cs" />
     <Compile Include="Collections\IndexedPropertyEventArgs.cs" />
+    <Compile Include="Collections\RingBuffer.cs" />
     <Compile Include="Extensions\Conversions.cs" />
     <Compile Include="Extensions\Enumerable.cs" />
     <Compile Include="Functional\Maybe.cs" />

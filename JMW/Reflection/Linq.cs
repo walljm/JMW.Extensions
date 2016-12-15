@@ -9,9 +9,8 @@ namespace JMW.Reflection
         {
             MemberExpression member = propertyLambda.Body as MemberExpression;
             if (member == null)
-                throw new ArgumentException(string.Format(
-                    "Expression '{0}' refers to a method, not a property.",
-                    propertyLambda.ToString()));
+                throw new ArgumentException(
+                    $"Expression '{propertyLambda.ToString()}' refers to a method, not a property.");
 
             return member.Member.Name;
         }

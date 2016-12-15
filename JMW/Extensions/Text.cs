@@ -9,6 +9,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+using System;
 using JMW.Extensions.Object;
 
 namespace JMW.Extensions.String
@@ -286,9 +287,9 @@ namespace JMW.Extensions.String
             // get the index of our search parameter
             var idx = -1;
             if (case_insensitive)
-                idx = last ? str.LastIndexOf(search_string.ToLower()) : str.IndexOf(search_string.ToLower());
+                idx = last ? str.LastIndexOf(search_string.ToLower(), StringComparison.Ordinal) : str.IndexOf(search_string.ToLower(), StringComparison.Ordinal);
             else
-                idx = last ? str.LastIndexOf(search_string) : str.IndexOf(search_string);
+                idx = last ? str.LastIndexOf(search_string, StringComparison.Ordinal) : str.IndexOf(search_string, StringComparison.Ordinal);
             return idx;
         }
 

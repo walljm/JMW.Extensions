@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\IndexedCollectionTest.cs" />
+    <Compile Include="Collections\RingBufferTest.cs" />
     <Compile Include="ConversionsExtensionsTests.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="DifferentialTests.cs" />

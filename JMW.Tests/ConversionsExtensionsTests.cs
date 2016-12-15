@@ -124,24 +124,7 @@ namespace JMW.Extensions.Conversions.Tests
             Assert.AreEqual(12, v1);
             Assert.AreEqual(-1, v2);
         }
-
-        [Test]
-        public void ToSingleTest()
-        {
-            "12".ToSingle().Do(v => Assert.AreEqual(12, v), null);
-            "blah".ToSingle().Do(null,
-                v =>
-                {
-                    Assert.AreEqual(typeof(ArgumentException), v.GetType());
-                });
-
-            var v1 = "12".ToSingle().Do(val => val, null);
-            var v2 = "blah".ToSingle().Do(null, val => -1);
-
-            Assert.AreEqual(12, v1);
-            Assert.AreEqual(-1, v2);
-        }
-
+        
         [Test]
         public void ToFloatTest()
         {

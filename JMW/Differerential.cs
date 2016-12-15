@@ -16,7 +16,7 @@ namespace JMW.Differentials
         /// <param name="retriever">A function that takes an object and list of objects and returns an object from the list that matches the supplied object or returns null if no matching object exists in the supplied list.</param>
         /// <param name="comparer">A function that compares two objects found in both lists and returns an <seealso cref="ObjectDifferential{T, M}"/></param>
         /// <returns></returns>
-        public static CollectionDifferential<T, M> DiffList<T, M>(
+        public static CollectionDifferential<T, M> RunnCollectionDifferential<T, M>(
             IList<T> lstA,
             IList<T> lstB,
             Func<T, IList<T>, T> retriever,

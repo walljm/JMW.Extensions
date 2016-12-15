@@ -9,135 +9,120 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-using JMW.Types.Functional;
 using System;
+using JMW.Functional;
 
 namespace JMW.Extensions.Conversions
 {
     public static class Extensions
     {
         /// <summary>
-        /// Converts a string into an <typeparamref name="Int16"/> safely.
+        /// Converts a string into an <typeref name="short"/> safely.
         /// </summary>
         /// <param name="s">String to convert.</param>
-        public static Maybe<Int16> ToInt16(this string s)
+        public static Maybe<short> ToInt16(this string s)
         {
-            Int16 v;
-            if (Int16.TryParse(s, out v))
+            short v;
+            if (short.TryParse(s, out v))
             {
-                return new Maybe<Int16>(v);
+                return new Maybe<short>(v);
             }
 
-            return new Maybe<Int16>(new ArgumentException("Argument " + s + " is not a number."));
+            return new Maybe<short>(new ArgumentException("Argument " + s + " is not a number."));
         }
 
         /// <summary>
-        /// Converts a string into an <typeparamref name="UInt16"/> safely.
+        /// Converts a string into an <typeref name="ushort"/> safely.
         /// </summary>
         /// <param name="s">String to convert.</param>
-        public static Maybe<UInt16> ToUInt16(this string s)
+        public static Maybe<ushort> ToUInt16(this string s)
         {
-            UInt16 v;
-            if (UInt16.TryParse(s, out v))
+            ushort v;
+            if (ushort.TryParse(s, out v))
             {
-                return new Maybe<UInt16>(v);
+                return new Maybe<ushort>(v);
             }
 
-            return new Maybe<UInt16>(new ArgumentException("Argument " + s + " is not a number."));
+            return new Maybe<ushort>(new ArgumentException("Argument " + s + " is not a number."));
         }
 
         /// <summary>
-        /// Converts a string into an <typeparamref name="Int32"/> safely.
+        /// Converts a string into an <typeref name="int"/> safely.
         /// </summary>
         /// <param name="s">String to convert.</param>
-        public static Maybe<Int32> ToInt32(this string s)
+        public static Maybe<int> ToInt32(this string s)
         {
-            Int32 v;
-            if (Int32.TryParse(s, out v))
+            int v;
+            if (int.TryParse(s, out v))
             {
-                return new Maybe<Int32>(v);
+                return new Maybe<int>(v);
             }
 
-            return new Maybe<Int32>(new ArgumentException("Argument " + s + " is not a number."));
+            return new Maybe<int>(new ArgumentException("Argument " + s + " is not a number."));
         }
 
         /// <summary>
-        /// Converts a string into an <typeparamref name="UInt32"/> safely.
+        /// Converts a string into an <typeref name="uint"/> safely.
         /// </summary>
         /// <param name="s">String to convert.</param>
-        public static Maybe<UInt32> ToUInt32(this string s)
+        public static Maybe<uint> ToUInt32(this string s)
         {
-            UInt32 v;
-            if (UInt32.TryParse(s, out v))
+            uint v;
+            if (uint.TryParse(s, out v))
             {
-                return new Maybe<UInt32>(v);
+                return new Maybe<uint>(v);
             }
 
-            return new Maybe<UInt32>(new ArgumentException("Argument " + s + " is not a number."));
+            return new Maybe<uint>(new ArgumentException("Argument " + s + " is not a number."));
         }
 
         /// <summary>
-        /// Converts a string into an <typeparamref name="Int64"/> safely.
+        /// Converts a string into an <typeref name="long"/> safely.
         /// </summary>
         /// <param name="s">String to convert.</param>
-        public static Maybe<Int64> ToInt64(this string s)
+        public static Maybe<long> ToInt64(this string s)
         {
-            Int64 v;
-            if (Int64.TryParse(s, out v))
+            long v;
+            if (long.TryParse(s, out v))
             {
-                return new Maybe<Int64>(v);
+                return new Maybe<long>(v);
             }
 
-            return new Maybe<Int64>(new ArgumentException("Argument " + s + " is not a number."));
+            return new Maybe<long>(new ArgumentException("Argument " + s + " is not a number."));
         }
 
         /// <summary>
-        /// Converts a string into an <typeparamref name="UInt64"/> safely.
+        /// Converts a string into an <typeref name="ulong"/> safely.
         /// </summary>
         /// <param name="s">String to convert.</param>
-        public static Maybe<UInt64> ToUInt64(this string s)
+        public static Maybe<ulong> ToUInt64(this string s)
         {
-            UInt64 v;
-            if (UInt64.TryParse(s, out v))
+            ulong v;
+            if (ulong.TryParse(s, out v))
             {
-                return new Maybe<UInt64>(v);
+                return new Maybe<ulong>(v);
             }
 
-            return new Maybe<UInt64>(new ArgumentException("Argument " + s + " is not a number."));
+            return new Maybe<ulong>(new ArgumentException("Argument " + s + " is not a number."));
         }
 
         /// <summary>
-        /// Converts a string into an <typeparamref name="Decimal"/> safely.
+        /// Converts a string into an <typeref name="decimal"/> safely.
         /// </summary>
         /// <param name="s">String to convert.</param>
-        public static Maybe<Decimal> ToDecimal(this string s)
+        public static Maybe<decimal> ToDecimal(this string s)
         {
-            Decimal v;
-            if (Decimal.TryParse(s, out v))
+            decimal v;
+            if (decimal.TryParse(s, out v))
             {
-                return new Maybe<Decimal>(v);
+                return new Maybe<decimal>(v);
             }
 
-            return new Maybe<Decimal>(new ArgumentException("Argument " + s + " is not a number."));
+            return new Maybe<decimal>(new ArgumentException("Argument " + s + " is not a number."));
         }
 
         /// <summary>
-        /// Converts a string into an <typeparamref name="Single"/> safely.
-        /// </summary>
-        /// <param name="s">String to convert.</param>
-        public static Maybe<Single> ToSingle(this string s)
-        {
-            Single v;
-            if (Single.TryParse(s, out v))
-            {
-                return new Maybe<Single>(v);
-            }
-
-            return new Maybe<Single>(new ArgumentException("Argument " + s + " is not a number."));
-        }
-
-        /// <summary>
-        /// Converts a string into an <typeparamref name="float"/> safely.
+        /// Converts a string into an <typeref name="float"/> safely.
         /// </summary>
         /// <param name="s">String to convert.</param>
         public static Maybe<float> ToFloat(this string s)
@@ -152,22 +137,22 @@ namespace JMW.Extensions.Conversions
         }
 
         /// <summary>
-        /// Converts a string into an <typeparamref name="Double"/> safely.
+        /// Converts a string into an <typeref name="double"/> safely.
         /// </summary>
         /// <param name="s">String to convert.</param>
-        public static Maybe<Double> ToDouble(this string s)
+        public static Maybe<double> ToDouble(this string s)
         {
-            Double v;
-            if (Double.TryParse(s, out v))
+            double v;
+            if (double.TryParse(s, out v))
             {
-                return new Maybe<Double>(v);
+                return new Maybe<double>(v);
             }
 
-            return new Maybe<Double>(new ArgumentException("Argument " + s + " is not a number."));
+            return new Maybe<double>(new ArgumentException("Argument " + s + " is not a number."));
         }
 
         /// <summary>
-        /// Converts a string into a <typeparamref name="Boolean"/> safely, and intuitively.
+        /// Converts a string into a <typeref name="bool"/> safely, and intuitively.
         ///
         ///  true/false
         ///  0/1
@@ -177,18 +162,18 @@ namespace JMW.Extensions.Conversions
         ///  t/f
         /// </summary>
         /// <param name="s">String to convert.</param>
-        public static Maybe<Boolean> ToBoolean(this string s)
+        public static Maybe<bool> ToBoolean(this string s)
         {
-            Boolean v;
-            if (Boolean.TryParse(s, out v))
+            bool v;
+            if (bool.TryParse(s, out v))
             {
-                return new Maybe<Boolean>(v);
+                return new Maybe<bool>(v);
             }
             var s1 = s.ToLower().Trim();
-            if (s1 == "yes" || s1 == "1" || s1 == "on" || s1 == "t" || s1 == "y") return new Maybe<Boolean>(true);
-            if (s1 == "no" || s1 == "0" || s1 == "off" || s1 == "f" || s1 == "n") return new Maybe<Boolean>(false);
+            if (s1 == "yes" || s1 == "1" || s1 == "on" || s1 == "t" || s1 == "y") return new Maybe<bool>(true);
+            if (s1 == "no" || s1 == "0" || s1 == "off" || s1 == "f" || s1 == "n") return new Maybe<bool>(false);
 
-            return new Maybe<Boolean>(new ArgumentException("Argument " + s + " is not a true/false, yes/no, 0/1, or on/off."));
+            return new Maybe<bool>(new ArgumentException("Argument " + s + " is not a true/false, yes/no, 0/1, or on/off."));
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using JMW.Differentials;
 
-namespace JMW.Types.Functional.Tests
+namespace JMW.Differentials.Tests
 {
     [TestFixture]
     public class DifferentialTests
@@ -15,13 +13,15 @@ namespace JMW.Types.Functional.Tests
             var lstA = new List<string> { "b", "c", "d" };
             var lstB = new List<string> { "A", "B", "c" };
 
-            var diff = Differerential.DiffList<string, MyDiff>(
-                lstA, 
-                lstB, 
-                (k, lst) => {
+            var diff = Differerential.RunnCollectionDifferential<string, MyDiff>(
+                lstA,
+                lstB,
+                (k, lst) =>
+                {
                     return lst.FirstOrDefault(i => i.ToLower() == k.ToLower());
-                }, 
-                (a, b) => {
+                },
+                (a, b) =>
+                {
                     if (a != b)
                     {
                         return new ObjectDifferential<string, MyDiff>(a, b, new List<MyDiff>() { new MyDiff() { Difference = a + " " + b } });
@@ -42,6 +42,5 @@ namespace JMW.Types.Functional.Tests
         {
             public string Difference { get; set; } = "";
         }
-
     }
 }

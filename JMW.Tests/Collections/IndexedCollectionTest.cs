@@ -1,9 +1,9 @@
-﻿using JMW.Types.Collections;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using JMW.Collections;
 
-namespace JMW.Types.Functional.Tests
+namespace JMW.Collections.Tests
 {
     [TestFixture]
     public class IndexedCollectionTest
@@ -12,8 +12,8 @@ namespace JMW.Types.Functional.Tests
         public void Test1()
         {
             var idx = new IndexedCollection<Foo>();
-            var f1 = new Foo() { Bar = "jason", BarCollection = new List<string>() { "one", "two" }, Baz = "me", BazCollection = new List<int>() { 1, 2 } };
-            var f2 = new Foo() { Bar = "wall", BarCollection = new List<string>() { "three", "two" }, Baz = "me", BazCollection = new List<int>() { 3, 4 } };
+            var f1 = new Foo { Bar = "jason", BarCollection = new List<string> { "one", "two" }, Baz = "me", BazCollection = new List<int> { 1, 2 } };
+            var f2 = new Foo { Bar = "wall", BarCollection = new List<string> { "three", "two" }, Baz = "me", BazCollection = new List<int> { 3, 4 } };
             idx.Add(f1);
             idx.Add(f2);
 
@@ -36,9 +36,9 @@ namespace JMW.Types.Functional.Tests
             Assert.That(idx.Contains(f1));
 
             f1.Baz = "my";
-            f1.BazCollection = new List<int>() { 1, 2, 5 };
-            f1.BarCollection = new List<string>() { "1", "2" };
-            f1.BarCollection = new List<string>() { "one", "two" };
+            f1.BazCollection = new List<int> { 1, 2, 5 };
+            f1.BarCollection = new List<string> { "1", "2" };
+            f1.BarCollection = new List<string> { "one", "two" };
 
             Assert.That(idx.Count == 2);
 
@@ -112,7 +112,7 @@ namespace JMW.Types.Functional.Tests
             idx.RefreshIndices();
             try
             {
-                f1.BazCollection = new List<int>() { 1, 2, 5, 5 };
+                f1.BazCollection = new List<int> { 1, 2, 5, 5 };
             }
             catch (Exception ex)
             {
@@ -120,7 +120,7 @@ namespace JMW.Types.Functional.Tests
             }
             try
             {
-                var f3 = new Foo() { Bar = "wall", BarCollection = new List<string>() { "three", "two" }, Baz = "me", BazCollection = new List<int>() { 6, 7, 7 } };
+                var f3 = new Foo { Bar = "wall", BarCollection = new List<string> { "three", "two" }, Baz = "me", BazCollection = new List<int> { 6, 7, 7 } };
                 idx.Add(f3);
             }
             catch
@@ -128,7 +128,7 @@ namespace JMW.Types.Functional.Tests
             {
                 Assert.That(ex.GetType() == typeof(OperationCanceledException));
             }
-            f1.BarCollection = new List<string>() { "1", "2", "3" };
+            f1.BarCollection = new List<string> { "1", "2", "3" };
 
             f1.PropertyChanged += F1_PropertyChanged;
             f1.PropertyChanging += F1_PropertyChanging;

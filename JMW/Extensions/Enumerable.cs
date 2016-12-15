@@ -24,12 +24,13 @@ namespace JMW.Extensions.Enumerable
         /// <param name="qty">The number of items to return</param>
         public static IEnumerable<T> Last<T>(this IEnumerable<T> lst, int qty = 1)
         {
-            var len = lst.Count();
+            var enumerable = lst as T[] ?? lst.ToArray();
+            var len = enumerable.Count();
 
             // if the quatity requested is greater than the number of items in the list, just return the list
             if (qty > len)
             {
-                foreach (var item in lst) yield return item;
+                foreach (var item in enumerable) yield return item;
             }
 
             // if the quatity requested is less than 1, return and empty list
@@ -41,7 +42,7 @@ namespace JMW.Extensions.Enumerable
             {
                 var start = len - qty;
                 var i = 0;
-                foreach (var item in lst)
+                foreach (var item in enumerable)
                 {
                     if (i++ < start) continue;
                     yield return item;
@@ -50,7 +51,7 @@ namespace JMW.Extensions.Enumerable
         }
 
         /// <summary>
-        /// Converts an IEnumerable<T> to a HashSet<T>, excluding duplicate entries.
+        /// Converts an IEnumerable{T} to a HashSet{T}, excluding duplicate entries.
         /// </summary>
         /// <typeparam name="T">Type of objects to store in the HashSet</typeparam>
         /// <param name="lst">The list of objects to convert</param>
@@ -78,6 +79,37 @@ namespace JMW.Extensions.Enumerable
             }
 
             return hsh1;
+        }
+
+        /// <summary>
+        /// Safely adds values to a dictionary of lists.  This function handles creating the list if the key is new.
+        /// </summary>
+        /// <typeparam name="K">Type of the Key</typeparam>
+        /// <typeparam name="V">Type of the List value</typeparam>
+        /// <param name="dict">Dictionary to add pairs to</param>
+        /// <param name="key">The key</param>
+        /// <param name="val">The value to add to the list</param>
+        public static void SafeAdd<K, V>(this IDictionary<K, List<V>> dict, K key, V val)
+        {
+            if (dict.ContainsKey(key))
+            {
+                dict[key].Add(val);
+            }
+            else
+            {
+                dict.Add(key, new List<V>() { val });
+            }
+        }
+
+        public static bool AddIfNotPresent<K, V>(this IDictionary<K, V> dict, K key, V val)
+        {
+            if (!dict.ContainsKey(key))
+            {
+                dict.Add(key, val);
+                return true;
+            }
+
+            return false;
         }
     }
 }

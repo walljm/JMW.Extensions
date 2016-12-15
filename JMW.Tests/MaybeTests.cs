@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 
-namespace JMW.Types.Functional.Tests
+namespace JMW.Functional.Tests
 {
     [TestFixture]
     public class MaybeTests

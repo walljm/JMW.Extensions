@@ -11,7 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 using System;
 
-namespace JMW.Types.Collections
+namespace JMW.Collections
 {
     /// <summary>
     /// An attribute that indicated the property will be indexed by an <see cref="IndexedCollection{T}"/>

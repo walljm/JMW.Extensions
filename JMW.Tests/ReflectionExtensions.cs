@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using JMW.Extensions.Reflection;
-using JMW.Types.Collections;
 using NUnit.Framework;
 using System.Linq;
 using JMW.Reflection;
 using System;
+using JMW.Collections;
+using JMW.Extensions.Enumerable;
 
 namespace JMW.Extensions.String.Tests
 {
@@ -29,7 +30,7 @@ namespace JMW.Extensions.String.Tests
         [Test]
         public void GetPropertiesByAttributeTest1()
         {
-            var obj = new Test1() { Prop1 = "Jason" };
+            var obj = new Test1 { Prop1 = "Jason" };
             var props = obj.GetType().GetPropertiesByAttribute<Indexed>();
             Assert.That(props.Count() == 1);
             Assert.That(props.First().Name == "Prop1");
@@ -39,7 +40,7 @@ namespace JMW.Extensions.String.Tests
         [Test]
         public void HasInterfaceTest1()
         {
-            var obj = new Test1() { Prop1 = "Jason" };
+            var obj = new Test1 { Prop1 = "Jason" };
             var t = obj.GetType().HasInterface<ITest>();
             Assert.That(t);
         }
@@ -73,7 +74,7 @@ namespace JMW.Extensions.String.Tests
         [Test]
         public void GetValueTest1()
         {
-            var obj = new Test1() { Prop1 = "Jason" };
+            var obj = new Test1 { Prop1 = "Jason" };
             var t = obj.GetType().GetProperty("Prop1");
             var v = t.GetValue(obj);
             Assert.That(v.ToString() == "Jason");
@@ -84,10 +85,7 @@ namespace JMW.Extensions.String.Tests
         public void CastDelegateTest1()
         {
             Jason d1 =
-                s =>
-            {
-                return "";
-            };
+                s => "";
 
             var d2 = d1.CastDelegate<Jason>();
             
@@ -103,20 +101,8 @@ namespace JMW.Extensions.String.Tests
 
         private class Test1 : ITest
         {
-            private string _Prop1 = "";
             [Indexed]
-            public string Prop1
-            {
-                get
-                {
-                    return _Prop1;
-                }
-
-                set
-                {
-                    _Prop1 = value;
-                }
-            }
+            public string Prop1 { get; set; } = "";
         }
     }
 }

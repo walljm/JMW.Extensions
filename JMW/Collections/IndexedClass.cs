@@ -14,8 +14,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using JMW.Types;
 
-namespace JMW.Types.Collections
+namespace JMW.Collections
 {
     /// <summary>
     /// <para>
@@ -49,17 +50,17 @@ namespace JMW.Types.Collections
         /// <summary>
         /// The number of registered handlers for the event.
         /// </summary>
-        public int PropertyChangingEventCount { get { return _PropertyChanging.HandlerCount; } }
+        public int PropertyChangingEventCount => _PropertyChanging.HandlerCount;
 
         /// <summary>
         /// The number of registered handlers for the event.
         /// </summary>
-        public int PropertyChangedEventCount { get { return _PropertyChanged.HandlerCount; } }
+        public int PropertyChangedEventCount => _PropertyChanged.HandlerCount;
 
         /// <summary>
         /// The number of registered handlers for the event.
         /// </summary>
-        public int IndexedPropertyChangedEventCount { get { return _IndexedPropertyChanged.HandlerCount; } }
+        public int IndexedPropertyChangedEventCount => _IndexedPropertyChanged.HandlerCount;
 
         #endregion Properties
 

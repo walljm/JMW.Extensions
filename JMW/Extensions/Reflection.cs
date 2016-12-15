@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Linq.Expressions;
 
 namespace JMW.Extensions.Reflection
 {
@@ -53,37 +52,5 @@ namespace JMW.Extensions.Reflection
         {
             return (T)info.GetValue(obj, null);
         }
-
-        /// <summary>
-        /// Safely adds values to a dictionary of lists.  This function handles creating the list if the key is new.
-        /// </summary>
-        /// <typeparam name="K">Type of the Key</typeparam>
-        /// <typeparam name="V">Type of the List value</typeparam>
-        /// <param name="dict">Dictionary to add pairs to</param>
-        /// <param name="key">The key</param>
-        /// <param name="val">The value to add to the list</param>
-        public static void SafeAdd<K, V>(this IDictionary<K, List<V>> dict, K key, V val)
-        {
-            if (dict.ContainsKey(key))
-            {
-                dict[key].Add(val);
-            }
-            else
-            {
-                dict.Add(key, new List<V>() { val });
-            }
-        }
-
-        public static bool AddIfNotPresent<K, V>(this IDictionary<K, V> dict, K key, V val)
-        {
-            if (!dict.ContainsKey(key))
-            {
-                dict.Add(key, val);
-                return true;
-            }
-
-            return false;
-        }
-
     }
 }
