@@ -9,23 +9,46 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace JMW.Extensions.Enumerable
 {
     public static class Extensions
     {
         /// <summary>
+        /// Indicates if the given index is the last item in the list.
+        /// </summary>
+        /// <param name="lst">List to check</param>
+        /// <param name="i">Index to check</param>
+        /// <returns></returns>
+        public static bool IsLast<T>(this IEnumerable<T> source, int i)
+        {
+            if (source is T[])
+            {
+                return (source as T[]).Length - 1 == i;
+            }
+            if (source is ICollection<T>)
+            {
+                return (source as ICollection<T>).Count - 1 == i;
+            }
+
+            return source.ToArray().Length - 1 == i;
+        }
+
+        /// <summary>
         ///   Return the last items in the list in the specified quantity
         /// </summary>
         /// <typeparam name="T">Type of items in the list</typeparam>
-        /// <param name="lst">The list to return items from</param>
+        /// <param name="source">The list to return items from</param>
         /// <param name="qty">The number of items to return</param>
-        public static IEnumerable<T> Last<T>(this IEnumerable<T> lst, int qty = 1)
+        public static IEnumerable<T> Last<T>(this IEnumerable<T> source, int qty = 1)
         {
-            var enumerable = lst as T[] ?? lst.ToArray();
-            var len = enumerable.Count();
+            var enumerable = source as T[] ?? source.ToArray();
+            var len = enumerable.Length;
 
             // if the quatity requested is greater than the number of items in the list, just return the list
             if (qty > len)
@@ -82,6 +105,49 @@ namespace JMW.Extensions.Enumerable
         }
 
         /// <summary>
+        /// Merges the list into the set and returns the set with the merged items in it.
+        /// </summary>
+        /// <typeparam name="T">Type of items stored in the sets</typeparam>
+        /// <param name="hsh">The ISet to merge the items into</param>
+        /// <param name="enumerable">The IEnumerable being merged in</param>
+        public static ISet<T> Merge<T>(this ISet<T> hsh, IEnumerable<T> enumerable)
+        {
+            foreach (var i in enumerable)
+            {
+                hsh.Merge(i);
+            }
+
+            return hsh;
+        }
+
+        /// <summary>
+        /// Merges the item into the first set and returns the first set with the merged item in it.
+        /// </summary>
+        /// <typeparam name="T">Type of items stored in the sets</typeparam>
+        /// <param name="hsh">The ISet to merge the items into</param>
+        /// <param name="item">The item being merged in</param>
+        public static ISet<T> Merge<T>(this ISet<T> hsh, T item)
+        {
+            hsh.TryAdd(item);
+
+            return hsh;
+        }
+
+        /// <summary>
+        /// Trys to add a value to an ISet
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="hsh"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static bool TryAdd<T>(this ISet<T> hsh, T item)
+        {
+            if (hsh.Contains(item)) return false;
+            hsh.Add(item);
+            return true;
+        }
+
+        /// <summary>
         /// Safely adds values to a dictionary of lists.  This function handles creating the list if the key is new.
         /// </summary>
         /// <typeparam name="K">Type of the Key</typeparam>
@@ -101,15 +167,234 @@ namespace JMW.Extensions.Enumerable
             }
         }
 
+        /// <summary>
+        /// Adds a key and value if not present in the dict.
+        /// </summary>
+        /// <typeparam name="K"></typeparam>
+        /// <typeparam name="V"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="key"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static bool AddIfNotPresent<K, V>(this IDictionary<K, V> dict, K key, V val)
         {
-            if (!dict.ContainsKey(key))
+            if (dict.ContainsKey(key)) return false;
+            dict.Add(key, val);
+            return true;
+        }
+
+        /// <summary>
+        /// Converts a list of strings into a dilimited string.
+        /// </summary>
+        /// <param name="Ss">List of strings to concatenate</param>
+        /// <param name="delimiter">char to insert between items</param>
+        /// <param name="trimend">whether to leave a trailing dilimeter</param>
+        public static string ToDelimitedString(this IEnumerable Ss, char delimiter, bool trimend = true)
+        {
+            return Ss.ToDelimitedString(delimiter.ToString(), trimend);
+        }
+
+        /// <summary>
+        /// Converts a list of strings into a dilimited string.
+        /// </summary>
+        /// <param name="Ss">List of strings to concatenate</param>
+        /// <param name="delimiter">text to insert between items</param>
+        /// <param name="trimend">whether to leave a trailing dilimeter</param>
+        /// <returns></returns>
+        public static string ToDelimitedString(this IEnumerable Ss, string delimiter, bool trimend = true)
+        {
+            var r = "";
+            var o = new StringBuilder();
+            foreach (var s in Ss)
             {
-                dict.Add(key, val);
-                return true;
+                o.Append(s); o.Append(delimiter);
+            }
+            if (trimend)
+            {
+                r = o.ToString().TrimEnd(delimiter.ToCharArray());
+            }
+            else r = o.ToString();
+            return r;
+        }
+
+        /// <summary>
+        /// Converts an IEnumerable into an IEnumerable{T}
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumerable"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> Shim<T>(this IEnumerable enumerable)
+        {
+            return from object current in enumerable select (T)current;
+        }
+
+        /// <summary>
+        /// Maps a function across every item in an enumerable list, then returns the items.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="lst"></param>
+        /// <param name="act"></param>
+        /// <returns></returns>
+        public static void Each<T>(this IEnumerable<T> lst, Action<T> act) where T : class
+        {
+            foreach (var item in lst)
+                act(item);
+
+        }
+
+        private static class ThreadSafeRandom
+        {
+            [ThreadStatic]
+            private static Random Local;
+
+            public static Random ThisThreadsRandom => Local ?? (Local = new Random(unchecked(Environment.TickCount * 31 + System.Threading.Thread.CurrentThread.ManagedThreadId)));
+        }
+
+        /// <summary>
+        /// Randomly shuffles a list of items.
+        /// </summary>
+        /// <typeparam name="T">Type of item in the list</typeparam>
+        /// <param name="list">List to be shuffled</param>
+        /// <returns></returns>
+        public static IList<T> Shuffle<T>(this IList<T> list)
+        {
+            //http://stackoverflow.com/questions/273313/randomize-a-listt-in-c-sharp
+            var n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                var k = ThreadSafeRandom.ThisThreadsRandom.Next(n + 1);
+                var value = list[k];
+                list[k] = list[n];
+                list[n] = value;
             }
 
-            return false;
+            return list;
+        }
+
+        /// <summary>
+        /// Returns a list of the duplicate items (without duplicates beign removed).
+        /// </summary>
+        /// <param name="lst">List to enumerate</param>
+        /// <returns></returns>
+        public static IEnumerable<T> GetDuplicates<T>(this IEnumerable<T> lst)
+        {
+            var niques = new HashSet<T>();
+
+            foreach (var s in lst)
+            {
+                if (niques.Contains(s))
+                    yield return s;
+                else
+                    niques.Add(s);
+            }
+        }
+
+        /// <summary>
+        /// Safely gets a range of values from a list.  If the start index begins after the end of the list, no values are returned.  If the
+        ///   length of the request exceeds the list, the values are returned up to the end of the list.
+        /// </summary>
+        /// <typeparam name="T">Type of objects in enumeration</typeparam>
+        /// <param name="lst">List to be enumerated</param>
+        /// <param name="start">Starting index</param>
+        /// <param name="length">Number of items to return</param>
+        /// <returns></returns>
+        public static List<T> GetRangeSafe<T>(this List<T> lst, int start, int length)
+        {
+            if (lst.Count == 0 || start > lst.Count) return new List<T>();
+            if (lst.Count < start + length) return lst.GetRange(start, lst.Count - start);
+            return lst.GetRange(start, length);
+        }
+
+        /// <summary> This function allows you to create a histogram on any property of an
+        /// IEnumerable{T} list. </summary> <typeparam name="T">The type of object being examined in the
+        /// IEnumberable{T} <param name="items">The list of items being evaluated for the
+        /// histogram</param> <param name="get_key">a function that returns the value being tested in the
+        /// histogram</param> <returns>a histogram of the values returned by the get function</returns>
+        public static Dictionary<string, List<T>> CreateHistogram<T>(this IEnumerable<T> items, Func<T, string> get_key)
+        {
+            var groups = new Dictionary<string, List<T>>();
+            foreach (var dvc in items)
+            {
+                if (!groups.ContainsKey(get_key(dvc)))
+                {
+                    groups.Add(get_key(dvc), new List<T>() { dvc });
+                }
+                else
+                {
+                    groups[get_key(dvc)].Add(dvc);
+                }
+            }
+
+            return groups;
+        }
+
+
+        /// <summary> This function allows you to create a histogram on any property of an
+        /// IEnumerable{V} list. </summary> 
+        /// <typeparam name="V">The type of object being examined in the
+        /// IEnumberable{V} </typeparam>
+        /// <param name="items">The list of items being evaluated for the
+        /// histogram</param> 
+        /// <param name="key">a function that returns the value being tested in the
+        /// histogram</param> 
+        /// <returns>a histogram of the values returned by the get function</returns>
+        public static Dictionary<K, List<V>> CreateHistogram<K, V>(this IEnumerable<V> items, Func<V, K> key)
+        {
+            var groups = new Dictionary<K, List<V>>();
+            foreach (var dvc in items)
+            {
+                if (!groups.ContainsKey(key(dvc)))
+                {
+                    groups.Add(key(dvc), new List<V> { dvc });
+                }
+                else
+                {
+                    groups[key(dvc)].Add(dvc);
+                }
+            }
+
+            return groups;
+        }
+
+
+        /// <summary>
+        /// Wraps an object instance into an IEnumerable{T}; consisting of a single item.
+        /// </summary>
+        /// <typeparam name="T">Type of the object.</typeparam>
+        /// <param name="item">The instance that will be wrapped.</param>
+        /// <returns>An IEnumerable{T}; consisting of a single item.</returns>
+        public static IEnumerable<T> Yield<T>(this T item)
+        {
+            yield return item;
+        }
+
+        /// <summary>
+        /// Wraps an object instance into an IEnumerable&lt;T&gt; consisting of a single item.
+        /// </summary>
+        /// <typeparam name="T">Type of the object.</typeparam>
+        /// <param name="item">The instance that will be wrapped.</param>
+        /// <returns>An IEnumerable&lt;T&gt; consisting of a single item.</returns>
+        public static List<T> ToListOfItem<T>(this T item)
+        {
+            return new List<T> { item };
+        }
+
+        /// <summary>
+        /// Returns the distinct items using a selector to indicate the distinct key
+        /// </summary>
+        /// <typeparam name="T">Type of object in list</typeparam>
+        /// <param name="lst">List to enumerate</param>
+        /// <param name="get_key">Function that returns a string to be used as distinct value</param>
+        /// <returns></returns>
+        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> lst, Func<T, string> get_key)
+        {
+            var hsh = new HashSet<string>();
+            foreach (var item in lst)
+            {
+                if (hsh.TryAdd(get_key(item)))
+                    yield return item;
+            }
         }
     }
 }

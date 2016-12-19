@@ -9,6 +9,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+using JMW.Extensions.Enumerable;
+using JMW.Extensions.Reflection;
+using JMW.Functional;
+using JMW.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,10 +21,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using JMW.Extensions.Enumerable;
-using JMW.Extensions.Reflection;
-using JMW.Functional;
-using JMW.Reflection;
 
 namespace JMW.Collections
 {
@@ -31,19 +31,19 @@ namespace JMW.Collections
     /// <typeparam name="T">The type of object being stored in the collection.</typeparam>
     public class IndexedCollection<T> : INotifyCollectionChanged, IList<T> where T : IndexedClass
     {
-        private Dictionary<string, Dictionary<string, List<T>>> _IndexCollection = new Dictionary<string, Dictionary<string, List<T>>>();
-        private Dictionary<string, Dictionary<string, T>> _UniqueIndexCollection = new Dictionary<string, Dictionary<string, T>>();
-        private ObservableCollection<T> _Collection = new ObservableCollection<T>();
-        private Dictionary<string, PropInfo> _IndexedProps;
+        private Dictionary<string, Dictionary<string, List<T>>> _indexCollection = new Dictionary<string, Dictionary<string, List<T>>>();
+        private Dictionary<string, Dictionary<string, T>> _uniqueIndexCollection = new Dictionary<string, Dictionary<string, T>>();
+        private ObservableCollection<T> _collection = new ObservableCollection<T>();
+        private Dictionary<string, PropInfo> _indexedProps;
 
         public IndexedCollection()
         {
-            _IndexedProps = typeof(T).GetPropertiesByAttribute<Indexed>().ToDictionary(k => k.Name, v => new PropInfo(v));
+            _indexedProps = typeof(T).GetPropertiesByAttribute<Indexed>().ToDictionary(k => k.Name, v => new PropInfo(v));
 
-            foreach (var prop in _IndexedProps)
+            foreach (var prop in _indexedProps)
             {
-                if (prop.Value.IsUnique) _UniqueIndexCollection.Add(prop.Key, new Dictionary<string, T>());
-                else _IndexCollection.Add(prop.Key, new Dictionary<string, List<T>>());
+                if (prop.Value.IsUnique) _uniqueIndexCollection.Add(prop.Key, new Dictionary<string, T>());
+                else _indexCollection.Add(prop.Key, new Dictionary<string, List<T>>());
             }
         }
 
@@ -52,11 +52,30 @@ namespace JMW.Collections
         /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged
         {
-            add { _Collection.CollectionChanged += value; }
-            remove { _Collection.CollectionChanged -= value; }
+            add { _collection.CollectionChanged += value; }
+            remove { _collection.CollectionChanged -= value; }
         }
 
         #region Public Methods
+
+        /// <summary>
+        /// Gets the object keyed by the <paramref name="key"/> for the index indicated by the <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">A string that identifies a property that has been indexed.</param>
+        /// <param name="key">The value in the index that the object is keyed to.</param>
+        /// <param name="value">The object identified by the <paramref name="key"/>.</param>
+        /// <returns>True if the operation succeeded.</returns>
+        public bool TryGetByIndex(string name, object key, out List<T> value)
+        {
+            if (!_indexCollection.ContainsKey(name))
+            {
+                value = null;
+                return false;
+            }
+
+            value = _indexCollection[name][key.ToString()];
+            return true;
+        }
 
         /// <summary>
         /// Gets the object keyed by the <paramref name="key"/> for the index indicated by the <paramref name="property_lambda"/>.
@@ -69,14 +88,21 @@ namespace JMW.Collections
         {
             var name = Linq.GetPropertyName(property_lambda);
 
-            if (!_IndexCollection.ContainsKey(name))
-            {
-                value = null;
-                return false;
-            }
+            return TryGetByIndex(name, key, out value);
+        }
 
-            value = _IndexCollection[name][key.ToString()];
-            return true;
+        /// <summary>
+        /// Gets the object keyed by the <paramref name="key"/> for the index indicated by the <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">A string that identifies a property that has been indexed.</param>
+        /// <param name="key">The value in the index that the object is keyed to.</param>
+        /// <returns>A <see cref="Maybe{T}"/> that holds the object.</returns>
+        public Maybe<List<T>> GetByIndex(string name, object key)
+        {
+            if (!_indexCollection.ContainsKey(name))
+                return new Maybe<List<T>>(new ArgumentException("Property does not have an index."));
+
+            return new Maybe<List<T>>(_indexCollection[name][key.ToString()]);
         }
 
         /// <summary>
@@ -89,10 +115,26 @@ namespace JMW.Collections
         {
             var name = Linq.GetPropertyName(property_lambda);
 
-            if (!_IndexCollection.ContainsKey(name))
-                return new Maybe<List<T>>(new ArgumentException("Property does not have an index."));
+            return GetByIndex(name, key);
+        }
 
-            return new Maybe<List<T>>(_IndexCollection[name][key.ToString()]);
+        /// <summary>
+        /// Gets the object keyed by the <paramref name="key"/> for the index indicated by the <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">A string that identifies a property that has been indexed.</param>
+        /// <param name="key">The value in the index that the object is keyed to.</param>
+        /// <param name="value">The object identified by the <paramref name="key"/>.</param>
+        /// <returns>True if the operation succeeded.</returns>
+        public bool TryGetByUniqueIndex(string name, object key, out T value)
+        {
+            if (!_uniqueIndexCollection.ContainsKey(name))
+            {
+                value = null;
+                return false;
+            }
+
+            value = _uniqueIndexCollection[name][key.ToString()];
+            return true;
         }
 
         /// <summary>
@@ -106,14 +148,21 @@ namespace JMW.Collections
         {
             var name = Linq.GetPropertyName(property_lambda);
 
-            if (!_UniqueIndexCollection.ContainsKey(name))
-            {
-                value = null;
-                return false;
-            }
+            return TryGetByUniqueIndex(name, key, out value);
+        }
 
-            value = _UniqueIndexCollection[name][key.ToString()];
-            return true;
+        /// <summary>
+        /// Gets the object keyed by the <paramref name="key"/> for the index indicated by the <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">A string that identifies a property that has been indexed.</param>
+        /// <param name="key">The value in the index that the object is keyed to.</param>
+        /// <returns>A <see cref="Maybe{T}"/> that holds the object.</returns>
+        public Maybe<T> GetByUniqueIndex(string name, object key)
+        {
+            if (!_uniqueIndexCollection.ContainsKey(name))
+                return new Maybe<T>(new ArgumentException("Property does not have an index."));
+
+            return new Maybe<T>(_uniqueIndexCollection[name][key.ToString()]);
         }
 
         /// <summary>
@@ -126,10 +175,22 @@ namespace JMW.Collections
         {
             var name = Linq.GetPropertyName(property_lambda);
 
-            if (!_UniqueIndexCollection.ContainsKey(name))
-                return new Maybe<T>(new ArgumentException("Property does not have an index."));
+            return GetByUniqueIndex(name, key);
+        }
 
-            return new Maybe<T>(_UniqueIndexCollection[name][key.ToString()]);
+        /// <summary>
+        /// This function returns a copy of the dictionary index for a given uniquely indexed property.
+        /// The values themselves are not
+        /// copied, but the Dictionary is, and can be modified without damaging the IndexedCollection.
+        /// </summary>
+        /// <param name="name">a string that indicates an indexed property name</param>
+        /// <returns>A <see cref="Maybe{T}"/> with a copy of the dictionary.</returns>
+        public Maybe<Dictionary<string, T>> GetUniqueIndex(string name)
+        {
+            if (_uniqueIndexCollection.ContainsKey(name))
+                return new Maybe<Dictionary<string, T>>(_uniqueIndexCollection[name].ToDictionary(k => k.Key, v => v.Value));
+            else
+                return new Maybe<Dictionary<string, T>>(new ArgumentException("Property \"" + name + "\" does not exist."));
         }
 
         /// <summary>
@@ -142,10 +203,21 @@ namespace JMW.Collections
         public Maybe<Dictionary<string, T>> GetUniqueIndex(Expression<Func<T, object>> property_lambda)
         {
             var name = Linq.GetPropertyName(property_lambda);
-            if (_UniqueIndexCollection.ContainsKey(name))
-                return new Maybe<Dictionary<string, T>>(_UniqueIndexCollection[name].ToDictionary(k => k.Key, v => v.Value));
+            return GetUniqueIndex(name);
+        }
+
+        /// <summary>
+        /// This function returns a copy of the dictionary index for a given property.  The values themselves are not
+        /// copied, but the Dictionary is, and can be modified without damaging the IndexedCollection.
+        /// </summary>
+        /// <param name="name">a string that indicates an indexed property name</param>
+        /// <returns>A <see cref="Maybe{T}"/> with a copy of the dictionary.</returns>
+        public Maybe<Dictionary<string, List<T>>> GetIndex(string name)
+        {
+            if (_indexCollection.ContainsKey(name))
+                return new Maybe<Dictionary<string, List<T>>>(_indexCollection[name].ToDictionary(k => k.Key, v => v.Value.ToList()));
             else
-                return new Maybe<Dictionary<string, T>>(new ArgumentException("Property \"" + name + "\" does not exist."));
+                return new Maybe<Dictionary<string, List<T>>>(new ArgumentException("Property \"" + name + "\" does not exist."));
         }
 
         /// <summary>
@@ -158,10 +230,7 @@ namespace JMW.Collections
         {
             var name = Linq.GetPropertyName(propertyLambda);
 
-            if (_IndexCollection.ContainsKey(name))
-                return new Maybe<Dictionary<string, List<T>>>(_IndexCollection[name].ToDictionary(k => k.Key, v => v.Value));
-            else
-                return new Maybe<Dictionary<string, List<T>>>(new ArgumentException("Property \"" + name + "\" does not exist."));
+            return GetIndex(name);
         }
 
         /// <summary>
@@ -169,9 +238,9 @@ namespace JMW.Collections
         /// </summary>
         public void RefreshIndices()
         {
-            foreach (var idx in _IndexCollection) idx.Value.Clear();
-            foreach (var idx in _UniqueIndexCollection) idx.Value.Clear();
-            foreach (var item in _Collection)
+            foreach (var idx in _indexCollection) idx.Value.Clear();
+            foreach (var idx in _uniqueIndexCollection) idx.Value.Clear();
+            foreach (var item in _collection)
             {
                 item.IndexedPropertyChanged -= onIndexedPropertyChanged;
                 addToDictionaries(item);
@@ -199,7 +268,7 @@ namespace JMW.Collections
             if (!addToDictionaries(obj))
                 return false;
 
-            _Collection.Add(obj);
+            _collection.Add(obj);
             obj.IndexedPropertyChanged += onIndexedPropertyChanged;
             return true;
         }
@@ -212,7 +281,7 @@ namespace JMW.Collections
         public bool Remove(T item)
         {
             var r = removeFromDictionaries(item);
-            _Collection.Remove(item);
+            _collection.Remove(item);
             item.IndexedPropertyChanged -= onIndexedPropertyChanged;
 
             return r;
@@ -225,7 +294,7 @@ namespace JMW.Collections
         /// <returns>True if the operation succeeds.</returns>
         public bool Remove(Func<T, bool> predicate)
         {
-            var items = _Collection.Where(predicate).ToList();
+            var items = _collection.Where(predicate).ToList();
             foreach (T o in items)
                 Remove(o);
             return true;
@@ -237,7 +306,7 @@ namespace JMW.Collections
         /// <param name="index">The index to remove the item from.</param>
         public void RemoveAt(int index)
         {
-            var item = _Collection[index];
+            var item = _collection[index];
             Remove(item);
         }
 
@@ -252,12 +321,12 @@ namespace JMW.Collections
         /// <param name="e">Arguments that give you the name of the property, the value of the property before and after the change.</param>
         private void onIndexedPropertyChanged(object sender, IndexedPropertyChangedEventArgs e)
         {
-            if (!_IndexedProps.ContainsKey(e.PropertyName)) return; // don't update the index if the property isn't indexed
-            var prop = _IndexedProps[e.PropertyName];
+            if (!_indexedProps.ContainsKey(e.PropertyName)) return; // don't update the index if the property isn't indexed
+            var prop = _indexedProps[e.PropertyName];
 
             if (prop.IsUnique)
             {
-                var alter = _UniqueIndexCollection[e.PropertyName];
+                var alter = _uniqueIndexCollection[e.PropertyName];
 
                 if (prop.IsCollection)
                 {
@@ -282,7 +351,7 @@ namespace JMW.Collections
             }
             else
             {
-                var alter = _IndexCollection[e.PropertyName];
+                var alter = _indexCollection[e.PropertyName];
 
                 if (prop.IsCollection)
                 {
@@ -313,7 +382,7 @@ namespace JMW.Collections
         /// <param name="sender">The value/object being added.</param>
         /// <param name="curr">The current value of the property</param>
         /// <param name="alter">The altered value.</param>
-        private void removeFromIndex(object sender, object curr, IDictionary<string, List<T>> alter)
+        private static void removeFromIndex(object sender, object curr, IDictionary<string, List<T>> alter)
         {
             if (alter.ContainsKey(curr.ToString()))
             {
@@ -330,7 +399,7 @@ namespace JMW.Collections
         /// <param name="sender">The value/object being added.</param>
         /// <param name="curr">The current value of the property</param>
         /// <param name="alter">The altered value.</param>
-        private void addToIndex(object sender, object curr, IDictionary<string, List<T>> alter)
+        private static void addToIndex(object sender, object curr, IDictionary<string, List<T>> alter)
         {
             if (alter.ContainsKey(curr.ToString()))
                 alter[curr.ToString()].Add((T)sender);
@@ -345,7 +414,7 @@ namespace JMW.Collections
         /// <returns>True if the operation succeeded.</returns>
         private bool addToDictionaries(T val)
         {
-            foreach (var prop in _IndexedProps.Values)
+            foreach (var prop in _indexedProps.Values)
             {
                 var p = prop.Info;
 
@@ -360,7 +429,7 @@ namespace JMW.Collections
                             foreach (object o in objs)
                             {
                                 string key = o.ToString();
-                                if (!_UniqueIndexCollection[p.Name].AddIfNotPresent(key, val))
+                                if (!_uniqueIndexCollection[p.Name].AddIfNotPresent(key, val))
                                     return false;
                             }
                         }
@@ -368,7 +437,7 @@ namespace JMW.Collections
                     else
                     {
                         var key = p.GetValue(val, null).ToString();
-                        if (!_UniqueIndexCollection[p.Name].AddIfNotPresent(key, val))
+                        if (!_uniqueIndexCollection[p.Name].AddIfNotPresent(key, val))
                             return false;
                     }
                 }
@@ -382,14 +451,14 @@ namespace JMW.Collections
                             foreach (object o in objs)
                             {
                                 string key = (prop.IsDict) ? o.GetType().GetProperty("Value").GetValue(o).ToString() : o.ToString();
-                                _IndexCollection[p.Name].SafeAdd(key, val);
+                                _indexCollection[p.Name].SafeAdd(key, val);
                             }
                         }
                     }
                     else
                     {
                         var key = p.GetValue(val).ToString();
-                        _IndexCollection[p.Name].SafeAdd(key, val);
+                        _indexCollection[p.Name].SafeAdd(key, val);
                     }
                 }
             }
@@ -404,7 +473,7 @@ namespace JMW.Collections
         /// <returns>True if the operation succeeded.</returns>
         private bool removeFromDictionaries(T val)
         {
-            foreach (var prop in _IndexedProps.Values)
+            foreach (var prop in _indexedProps.Values)
             {
                 var p = prop.Info;
 
@@ -419,7 +488,7 @@ namespace JMW.Collections
                             foreach (object o in objs)
                             {
                                 string key = o.ToString();
-                                if (!_UniqueIndexCollection[p.Name].Remove(key))
+                                if (!_uniqueIndexCollection[p.Name].Remove(key))
                                     return false;
                             }
                         }
@@ -427,7 +496,7 @@ namespace JMW.Collections
                     else
                     {
                         var key = p.GetValue(val, null).ToString();
-                        if (!_UniqueIndexCollection[p.Name].Remove(key))
+                        if (!_uniqueIndexCollection[p.Name].Remove(key))
                             return false;
                     }
                 }
@@ -441,7 +510,7 @@ namespace JMW.Collections
                             foreach (object o in objs)
                             {
                                 string key = (prop.IsDict) ? o.GetType().GetProperty("Value").GetValue(o).ToString() : o.ToString();
-                                var idx = _IndexCollection[p.Name];
+                                var idx = _indexCollection[p.Name];
                                 if (idx[key].Count > 1)
                                     idx[key].Remove(val);
                                 else
@@ -452,7 +521,7 @@ namespace JMW.Collections
                     else
                     {
                         var key = p.GetValue(val).ToString();
-                        var idx = _IndexCollection[p.Name];
+                        var idx = _indexCollection[p.Name];
                         if (idx[key].Count > 1)
                             idx[key].Remove(val);
                         else
@@ -472,7 +541,8 @@ namespace JMW.Collections
         private static bool isUnique(PropertyInfo prop)
         {
             var attrs = prop.GetCustomAttributes(typeof(Indexed), false);
-            return attrs.Length > 0 && (attrs[0] as Indexed).IsUnique;
+            var indexed = attrs[0] as Indexed;
+            return indexed != null && attrs.Length > 0 && indexed.IsUnique;
         }
 
         #endregion Private Methods
@@ -481,42 +551,42 @@ namespace JMW.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            return _Collection.GetEnumerator();
+            return _collection.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _Collection.GetEnumerator(); ;
+            return _collection.GetEnumerator();
         }
 
         public void Clear()
         {
-            foreach (T obj in _Collection) obj.IndexedPropertyChanged -= onIndexedPropertyChanged;
+            foreach (T obj in _collection) obj.IndexedPropertyChanged -= onIndexedPropertyChanged;
 
-            _Collection.Clear();
+            _collection.Clear();
 
-            foreach (var p in _IndexedProps.Values)
+            foreach (var p in _indexedProps.Values)
             {
                 if (p.IsUnique)
-                    _UniqueIndexCollection[p.Name].Clear();
+                    _uniqueIndexCollection[p.Name].Clear();
                 else
-                    _IndexCollection[p.Name].Clear();
+                    _indexCollection[p.Name].Clear();
             }
         }
 
         public bool Contains(T item)
         {
-            return _Collection.Contains(item);
+            return _collection.Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            _Collection.CopyTo(array, arrayIndex);
+            _collection.CopyTo(array, arrayIndex);
         }
 
         public int IndexOf(T item)
         {
-            return ((IList<T>)_Collection).IndexOf(item);
+            return ((IList<T>)_collection).IndexOf(item);
         }
 
         public void Insert(int index, T item)
@@ -524,29 +594,29 @@ namespace JMW.Collections
             item.IndexedPropertyChanged -= onIndexedPropertyChanged;
             addToDictionaries(item);
 
-            ((IList<T>)_Collection).Insert(index, item);
+            ((IList<T>)_collection).Insert(index, item);
             item.IndexedPropertyChanged += onIndexedPropertyChanged;
         }
 
-        public int Count => ((ICollection<T>)_Collection).Count;
+        public int Count => ((ICollection<T>)_collection).Count;
 
-        public bool IsReadOnly => ((ICollection<T>)_Collection).IsReadOnly;
+        public bool IsReadOnly => ((ICollection<T>)_collection).IsReadOnly;
 
         public T this[int index]
         {
             get
             {
-                return _Collection[index];
+                return _collection[index];
             }
 
             set
             {
-                var item = _Collection[index];
+                var item = _collection[index];
 
                 removeFromDictionaries(item);
                 item.IndexedPropertyChanged -= onIndexedPropertyChanged;
 
-                _Collection[index] = value;
+                _collection[index] = value;
 
                 addToDictionaries(value);
                 value.IndexedPropertyChanged += onIndexedPropertyChanged;
@@ -559,17 +629,17 @@ namespace JMW.Collections
 
         public T First()
         {
-            return _Collection.First();
+            return _collection.First();
         }
 
         public T First(Func<T, bool> predicate)
         {
-            return _Collection.First(predicate);
+            return _collection.First(predicate);
         }
 
-        public void ForEach(Action<T> action)
+        public void Each(Action<T> action)
         {
-            foreach (var item in _Collection) action(item);
+            foreach (var item in _collection) action(item);
         }
 
         #endregion Linq
@@ -584,8 +654,6 @@ namespace JMW.Collections
                 IsUnique = isUnique(info);
                 IsCollection = info.PropertyType.HasInterface<ICollection>();
                 IsDict = info.PropertyType.HasInterface<IDictionary>();
-
-                PropertyType = info.PropertyType;
             }
 
             public PropertyInfo Info { get; }
@@ -593,8 +661,6 @@ namespace JMW.Collections
             public bool IsUnique { get; }
 
             public string Name => Info.Name;
-
-            public Type PropertyType { get; }
 
             public bool IsDict { get; }
 

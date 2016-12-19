@@ -13,6 +13,7 @@ namespace JMW.Collections.Tests
                 buff.Add(i);
 
             Assert.AreEqual(10, buff.Count);
+            Assert.AreEqual(14, buff.Last());
 
             var c = 5;
             foreach (var i in buff)
@@ -22,6 +23,7 @@ namespace JMW.Collections.Tests
             Assert.IsTrue(buff.Contains(11));
             buff.Clear();
             Assert.AreEqual(0, buff.Count);
+            Assert.IsFalse(buff.IsReadOnly);
         }
 
         [Test]
@@ -59,6 +61,22 @@ namespace JMW.Collections.Tests
                 Assert.AreEqual(c--, i);
             Assert.AreEqual(2, c);
             Assert.AreEqual(10, buff.Count);
+        }
+
+        [Test]
+        public void RingBufferTest4()
+        {
+            var buff = new RingBuffer<int>(new[] { 3, 4, 5});
+            Assert.AreEqual(5, buff.Last());
+            buff = new RingBuffer<int>(new[] { 3, 4, 5 }, true);
+            Assert.AreEqual(3, buff.Last());
+
+            buff = new RingBuffer<int>(10, new[] { 3, 4, 5 });
+            Assert.AreEqual(5, buff.Last());
+            Assert.AreEqual(3, buff.Count);
+
+            buff = new RingBuffer<int>(10, new[] { 3, 4, 5 }, true);
+            Assert.AreEqual(3, buff.Last());
         }
     }
 }

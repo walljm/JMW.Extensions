@@ -47,6 +47,8 @@
     <Compile Include="Collections\RingBuffer.cs" />
     <Compile Include="Extensions\Conversions.cs" />
     <Compile Include="Extensions\Enumerable.cs" />
+    <Compile Include="Extensions\IO.cs" />
+    <Compile Include="Extensions\Numbers.cs" />
     <Compile Include="Functional\Maybe.cs" />
     <Compile Include="Differerential.cs" />
     <Compile Include="Extensions\Object.cs" />

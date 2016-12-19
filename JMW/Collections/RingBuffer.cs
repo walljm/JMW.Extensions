@@ -8,6 +8,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,6 +47,22 @@ namespace JMW.Collections
             ReverseIteration = reverse;
         }
 
+        public RingBuffer(int size, T[] array)
+        {
+            if (size < array.Length)
+                size = array.Length;
+
+            _array = new T[size];
+            Array.Copy(array, _array, array.Length);
+            _index = 0;
+            _length = array.Length;
+        }
+
+        public RingBuffer(int size, T[] array, bool reverse) : this(size, array)
+        {
+            ReverseIteration = reverse;
+        }
+
         public int Count => _length;
         public bool IsReadOnly => false;
         public bool ReverseIteration { get; set; } = false;
@@ -69,6 +86,14 @@ namespace JMW.Collections
 
             _length = _length >= _array.Length ? _array.Length : ++_length;
             _index = _index < _array.Length - 1 ? ++_index : 0;
+        }
+
+        public T Last()
+        {
+            if (ReverseIteration)
+                return _array[_index];
+
+            return _index > 0 ? _array[_index - 1] : _array[_length - 1];
         }
 
         public void Clear()

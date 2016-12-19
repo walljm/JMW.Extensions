@@ -145,7 +145,7 @@ namespace JMW.Collections.Tests
             idx.CollectionChanged -= Idx_CollectionChanged;
             Assert.That(idx.IsReadOnly == false);
 
-            idx.ForEach(item => Assert.That(item.GetType() == typeof(Foo)));
+            idx.Each(item => Assert.That(item.GetType() == typeof(Foo)));
 
             f1.PropertyChanged += F1_PropertyChanged;
             f1.PropertyChanging += F1_PropertyChanging;
