@@ -15,7 +15,6 @@ namespace JMW.Types
 
         public WeakEventSource()
         {
-
             _handlers = new List<WeakDelegate>();
         }
 
@@ -71,6 +70,9 @@ namespace JMW.Types
 
             private static OpenEventHandler CreateOpenHandler(MethodInfo method)
             {
+                if (method == null)
+                    throw new ArgumentNullException(nameof(method));
+
                 var target = Expression.Parameter(typeof(object), "target");
                 var sender = Expression.Parameter(typeof(object), "sender");
                 var e = Expression.Parameter(typeof(TEventArgs), "e");
@@ -86,6 +88,9 @@ namespace JMW.Types
                 }
                 else
                 {
+                    if (method.DeclaringType == null)
+                        throw new ArgumentNullException(nameof(method.DeclaringType));
+
                     var expr = Expression.Lambda<OpenEventHandler>(
                         Expression.Call(
                             Expression.Convert(target, method.DeclaringType),
@@ -129,7 +134,8 @@ namespace JMW.Types
                 {
                     return handler.Method.Equals(_method);
                 }
-                return ReferenceEquals(handler.Target, _weakTarget.Target)
+
+                return ReferenceEquals(handler.Target, _weakTarget?.Target)
                     && handler.Method.Equals(_method);
             }
         }

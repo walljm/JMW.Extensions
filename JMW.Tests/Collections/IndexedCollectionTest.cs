@@ -47,23 +47,23 @@ namespace JMW.Collections.Tests
             Assert.That(idx.First() == f1);
             Assert.That(idx.IndexOf(f2) == 1);
 
-            var indices = idx.GetUniqueIndex(p => p.Bar);
-            var indices2 = idx.GetIndex(p => p.BarCollection);
+            var indices = idx.MaybeGetUniqueIndex(p => p.Bar);
+            var indices2 = idx.MaybeGetIndex(p => p.BarCollection);
 
             indices.Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
             indices2.Do(if_success: d => Assert.That(d.Count == 3), if_exception: null);
 
             // make sure the indices can be modified without modifying the original.
             indices.Do(if_success: d => d.Remove("jeremy"), if_exception: null);
-            idx.GetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
 
             Assert.That(idx.First() == f1);
             Assert.That(idx.First(d => d.Bar == "jeremy") == f1);
-            idx.GetByUniqueIndex(p => p.Bar, "jeremy").Do(if_success: d => Assert.That(d == f1), if_exception: null);
-            idx.GetByIndex(p => p.BarCollection, "two").Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.MaybeGetByUniqueIndex(p => p.Bar, "jeremy").Do(if_success: d => Assert.That(d == f1), if_exception: null);
+            idx.MaybeGetByIndex(p => p.BarCollection, "two").Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
 
-            idx.GetByUniqueIndex(p => p.BarCollection, "jeremy").Do(if_success: null, if_exception: d => Assert.That(d.GetType() == typeof(ArgumentException)));
-            idx.GetByIndex(p => p.Bar, "two").Do(if_success: null, if_exception: d => Assert.That(d.GetType() == typeof(ArgumentException)));
+            idx.MaybeGetByUniqueIndex(p => p.BarCollection, "jeremy").Do(if_success: null, if_exception: d => Assert.That(d.GetType() == typeof(ArgumentException)));
+            idx.MaybeGetByIndex(p => p.Bar, "two").Do(if_success: null, if_exception: d => Assert.That(d.GetType() == typeof(ArgumentException)));
 
             var en = idx.GetEnumerator();
             while (en.MoveNext())
@@ -71,12 +71,12 @@ namespace JMW.Collections.Tests
                 Assert.That(typeof(Foo) == en.Current.GetType());
             }
 
-            idx.GetUniqueIndex(p => p.BarCollection).Do(if_success: null, if_exception: ex => Assert.That(ex.GetType() == typeof(ArgumentException)));
-            idx.GetIndex(p => p.Bar).Do(if_success: null, if_exception: ex => Assert.That(ex.GetType() == typeof(ArgumentException)));
+            idx.MaybeGetUniqueIndex(p => p.BarCollection).Do(if_success: null, if_exception: ex => Assert.That(ex.GetType() == typeof(ArgumentException)));
+            idx.MaybeGetIndex(p => p.Bar).Do(if_success: null, if_exception: ex => Assert.That(ex.GetType() == typeof(ArgumentException)));
 
             idx.Remove(f1);
-            idx.GetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
-            idx.GetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
+            idx.MaybeGetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
             idx.Add(f1);
 
             Foo t1;
@@ -90,13 +90,13 @@ namespace JMW.Collections.Tests
             Assert.That(!idx.TryGetByIndex(p => p.Bar, "one", out t2));
 
             idx.Remove(p => p.Bar == "jeremy");
-            idx.GetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
-            idx.GetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
+            idx.MaybeGetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
             idx.Add(f1);
 
             idx.RemoveAt(0);
-            idx.GetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
-            idx.GetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
+            idx.MaybeGetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
             idx.Insert(0, f1);
 
             try
@@ -138,7 +138,7 @@ namespace JMW.Collections.Tests
 
             idx.Clear();
             Assert.That(idx.Count == 0);
-            idx.GetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 0), if_exception: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 0), if_exception: null);
 
             idx.CollectionChanged += Idx_CollectionChanged;
             idx.Add(f1);

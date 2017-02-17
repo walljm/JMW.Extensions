@@ -13,7 +13,7 @@ namespace JMW.Differentials.Tests
             var lstA = new List<string> { "b", "c", "d" };
             var lstB = new List<string> { "A", "B", "c" };
 
-            var diff = Differerential.RunnCollectionDifferential<string, MyDiff>(
+            var diff = Differerential.DiffCollections<string, MyDiff>(
                 lstA,
                 lstB,
                 (k, lst) =>

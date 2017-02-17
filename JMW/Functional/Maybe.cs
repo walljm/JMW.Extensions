@@ -20,14 +20,13 @@ namespace JMW.Functional
     /// <typeparam name="T">The type of value</typeparam>
     public class Maybe<T> : IEquatable<T>
     {
-        
-        private T _value;
-        private Exception _exception;
+        private readonly T _value;
+        private readonly Exception _exception;
 
         /// <summary>
         /// Indicates if the conversion was successful.
         /// </summary>
-        public bool Success { get; } = false;
+        public bool Success { get; }
 
         /// <summary>
         /// Constructor if the conversion failed.
@@ -47,7 +46,7 @@ namespace JMW.Functional
             if (val == null)
             {
                 Success = false;
-                _exception = new ArgumentException("Value was null.");
+                _exception = new ArgumentNullException(nameof(val));
             }
             else
             {
@@ -78,6 +77,15 @@ namespace JMW.Functional
         /// This function allows you to use the converted value.  Functions are not executed if they are null.
         /// </summary>
         /// <param name="if_success">The Action to execute on the successfully converted value.</param>
+        public void Do(Action<T> if_success)
+        {
+            IfSuccess(if_success);
+        }
+
+        /// <summary>
+        /// This function allows you to use the converted value.  Functions are not executed if they are null.
+        /// </summary>
+        /// <param name="if_success">The Action to execute on the successfully converted value.</param>
         /// <param name="if_exception">The Action to execute on the Exception produced by the conversion.</param>
         public void Do(Action<T> if_success, Action<Exception> if_exception)
         {
@@ -94,14 +102,12 @@ namespace JMW.Functional
         {
             if (Success)
             {
-                if (if_success == null) throw new ArgumentException("if_success parameter cannot be null.");
+                if (if_success == null) throw new ArgumentException("if_success parameter cannot be null.", nameof(if_success));
                 return if_success(_value);
             }
-            else
-            {
-                if (if_exception == null) throw new ArgumentException("if_exception parameter cannot be null.");
-                return if_exception(_exception);
-            }
+
+            if (if_exception == null) throw new ArgumentException("if_exception parameter cannot be null.", nameof(if_exception));
+            return if_exception(_exception);
         }
 
         /// <summary>
@@ -113,11 +119,11 @@ namespace JMW.Functional
         {
             if (Success)
             {
-                if (if_success == null) throw new ArgumentException("if_success parameter cannot be null.");
+                if (if_success == null) throw new ArgumentException("if_success parameter cannot be null.", nameof(if_success));
                 return new Maybe<T>(if_success(_value));
             }
 
-            if (if_exception == null) throw new ArgumentException("if_exception parameter cannot be null.");
+            if (if_exception == null) throw new ArgumentException("if_exception parameter cannot be null.", nameof(if_exception));
             return new Maybe<T>(if_exception(_exception));
         }
 

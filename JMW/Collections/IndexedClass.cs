@@ -106,7 +106,7 @@ namespace JMW.Collections
 
         #region Events
 
-        private WeakEventSource<IndexedPropertyChangedEventArgs> _IndexedPropertyChanged = new WeakEventSource<IndexedPropertyChangedEventArgs>();
+        private readonly WeakEventSource<IndexedPropertyChangedEventArgs> _IndexedPropertyChanged = new WeakEventSource<IndexedPropertyChangedEventArgs>();
         /// <summary>
         /// Fires when a property has changed.  This event will give you the before and after value of the
         /// property, as well as the property name.
@@ -121,7 +121,7 @@ namespace JMW.Collections
             remove { _IndexedPropertyChanged.Unsubscribe(value.CastDelegate<EventHandler<IndexedPropertyChangedEventArgs>>()); }
         }
 
-        private WeakEventSource<PropertyChangingEventArgs> _PropertyChanging = new WeakEventSource<PropertyChangingEventArgs>();
+        private readonly WeakEventSource<PropertyChangingEventArgs> _PropertyChanging = new WeakEventSource<PropertyChangingEventArgs>();
         /// <summary>
         /// The <see cref="INotifyPropertyChanging"/> event.  Gives you the property name before
         /// the value is changed.
@@ -136,7 +136,7 @@ namespace JMW.Collections
             remove { _PropertyChanging.Unsubscribe(value.CastDelegate<EventHandler<PropertyChangingEventArgs>>()); }
         }
 
-        private WeakEventSource<PropertyChangedEventArgs> _PropertyChanged = new WeakEventSource<PropertyChangedEventArgs>();
+        private readonly WeakEventSource<PropertyChangedEventArgs> _PropertyChanged = new WeakEventSource<PropertyChangedEventArgs>();
         /// <summary>
         /// The <see cref="INotifyPropertyChanged"/> event.  Gives you the property name after
         /// the value has changed.
@@ -164,8 +164,11 @@ namespace JMW.Collections
         /// <returns>true/false indicating the success of the operation.  false if the field is null or the value is the same</returns>
         protected bool Set<T>(ref T field, T value, [CallerMemberName]string property_name = "")
         {
+            // if the value and the field are the same, then don't bother.
+            if (EqualityComparer<T>.Default.Equals(field, value))
+                return false;
+
             raisePropertyChanging(property_name);
-            if (field == null || EqualityComparer<T>.Default.Equals(field, value)) { return false; }
             raiseIndexedPropertyChanging(property_name, field, value);
             field = value;
             raisePropertyChanged(property_name);

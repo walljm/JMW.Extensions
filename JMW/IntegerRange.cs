@@ -68,8 +68,7 @@ namespace JMW.Types
 
         public bool IsInRange(int num)
         {
-            if (num >= Start && num <= Stop) return true;
-            return false;
+            return num >= Start && num <= Stop;
         }
 
         public bool IsInRange(string num)
@@ -80,7 +79,7 @@ namespace JMW.Types
 
         public string RangeToString()
         {
-            var r = "";
+            string r;
 
             if (Start == Stop) r = Start.ToString();
             else r = Start + "-" + Stop;

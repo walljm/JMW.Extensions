@@ -16,7 +16,7 @@ namespace JMW.Differentials
         /// <param name="retriever">A function that takes an object and list of objects and returns an object from the list that matches the supplied object or returns null if no matching object exists in the supplied list.</param>
         /// <param name="comparer">A function that compares two objects found in both lists and returns an <seealso cref="ObjectDifferential{T, M}"/></param>
         /// <returns></returns>
-        public static CollectionDifferential<T, M> RunnCollectionDifferential<T, M>(
+        public static CollectionDifferential<T, M> DiffCollections<T, M>(
             IList<T> lstA,
             IList<T> lstB,
             Func<T, IList<T>, T> retriever,
@@ -27,9 +27,8 @@ namespace JMW.Differentials
             var same = new List<Tuple<T, T>>();
 
             // loop through all the objects in lstA and see if there is an equivalent object in lstB
-            for (int i = 0; i < lstA.Count; i++)
+            foreach (var a_item in lstA)
             {
-                var a_item = lstA[i];
                 var b_item = retriever(a_item, lstB);
                 if (b_item != null)
                 {
@@ -41,9 +40,8 @@ namespace JMW.Differentials
             }
 
             // loop through all the objects in lstB and see if there is an equivalent in lstA
-            for (int i = 0; i < lstB.Count; i++)
+            foreach (var b_item in lstB)
             {
-                var b_item = lstB[i];
                 var a_item = retriever(b_item, lstA);
 
                 // you only store the ones that fail because you've already stored the items that are the same

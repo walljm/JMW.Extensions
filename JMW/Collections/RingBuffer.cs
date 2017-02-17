@@ -18,15 +18,14 @@ namespace JMW.Collections
 {
     public class RingBuffer<T> : IEnumerable<T>
     {
-        private T[] _array;
+        private readonly T[] _array;
         private int _index;
-        private int _length;
 
         public RingBuffer(int size)
         {
             _array = new T[size];
             _index = 0;
-            _length = 0;
+            Count = 0;
         }
 
         public RingBuffer(int size, bool reverse) : this(size)
@@ -39,7 +38,7 @@ namespace JMW.Collections
             _array = new T[array.Length];
             Array.Copy(array, _array, array.Length);
             _index = 0;
-            _length = array.Length;
+            Count = array.Length;
         }
 
         public RingBuffer(T[] array, bool reverse) : this(array)
@@ -55,7 +54,7 @@ namespace JMW.Collections
             _array = new T[size];
             Array.Copy(array, _array, array.Length);
             _index = 0;
-            _length = array.Length;
+            Count = array.Length;
         }
 
         public RingBuffer(int size, T[] array, bool reverse) : this(size, array)
@@ -63,7 +62,8 @@ namespace JMW.Collections
             ReverseIteration = reverse;
         }
 
-        public int Count => _length;
+        public int Count { get; private set; }
+
         public bool IsReadOnly => false;
         public bool ReverseIteration { get; set; } = false;
 
@@ -84,7 +84,7 @@ namespace JMW.Collections
         {
             _array[_index] = item;
 
-            _length = _length >= _array.Length ? _array.Length : ++_length;
+            Count = Count >= _array.Length ? _array.Length : ++Count;
             _index = _index < _array.Length - 1 ? ++_index : 0;
         }
 
@@ -93,15 +93,15 @@ namespace JMW.Collections
             if (ReverseIteration)
                 return _array[_index];
 
-            return _index > 0 ? _array[_index - 1] : _array[_length - 1];
+            return _index > 0 ? _array[_index - 1] : _array[Count - 1];
         }
 
         public void Clear()
         {
-            for (int i = 0; i < _array.Length; i++)
+            for (var i = 0; i < _array.Length; i++)
                 _array[i] = default(T);
 
-            _length = 0;
+            Count = 0;
             _index = 0;
         }
 
@@ -109,14 +109,29 @@ namespace JMW.Collections
         {
             return _array.Contains(item);
         }
+
+        public T[] ToArray()
+        {
+            var arr = new T[this.Count];
+            var c = 0;
+            foreach (var i in this)
+                arr[c++] = i;
+
+            return arr;
+        }
+
+        public List<T> ToList()
+        {
+            return new List<T>(this);
+        }
     }
 
     public class RingReverseEnumerator<T> : IEnumerator<T>
     {
         private int _cnt = 0;
-        private int _origin;
+        private readonly int _origin;
         private int _idx;
-        private T[] _arr;
+        private readonly T[] _arr;
 
         public RingReverseEnumerator(int idx, T[] arr)
         {
@@ -150,9 +165,9 @@ namespace JMW.Collections
     public class RingEnumerator<T> : IEnumerator<T>
     {
         private int _cnt = 0;
-        private int _origin;
+        private readonly int _origin;
         private int _idx;
-        private T[] _arr;
+        private readonly T[] _arr;
 
         public RingEnumerator(int idx, T[] arr)
         {

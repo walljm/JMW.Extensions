@@ -7,10 +7,10 @@ namespace JMW.Reflection
     {
         public static string GetPropertyName<T>(Expression<Func<T, object>> propertyLambda)
         {
-            MemberExpression member = propertyLambda.Body as MemberExpression;
+            var member = propertyLambda.Body as MemberExpression;
             if (member == null)
                 throw new ArgumentException(
-                    $"Expression '{propertyLambda.ToString()}' refers to a method, not a property.");
+                    $"Expression '{propertyLambda}' refers to a method, not a property.");
 
             return member.Member.Name;
         }

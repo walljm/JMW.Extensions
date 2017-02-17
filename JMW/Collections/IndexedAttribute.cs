@@ -21,25 +21,13 @@ namespace JMW.Collections
     {
         public Indexed(bool is_unique = false)
         {
-            _IsUnique = is_unique;
+            IsUnique = is_unique;
         }
 
-        private bool _IsUnique;
         /// <summary>
         /// Indicates if the property will be indexed uniquely.  When true, an exception will be thrown if two of the
         /// same value are added to the <see cref="IndexedCollection{T}"/>.
         /// </summary>
-        public bool IsUnique
-        {
-            get
-            {
-                return _IsUnique;
-            }
-
-            set
-            {
-                _IsUnique = value;
-            }
-        }
+        public bool IsUnique { get; set; }
     }
 }

@@ -7,11 +7,22 @@ namespace JMW.Extensions.Numbers
     public static class Numbers
     {
         /// <summary>
-        /// Indicates if the string is an <see cref="long"/>
+        /// Indicates if the string is an <see cref="int"/>
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
         public static bool IsInt(this string s)
+        {
+            int t;
+            return int.TryParse(s, out t);
+        }
+
+        /// <summary>
+        /// Indicates if the string is an <see cref="long"/>
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static bool IsLong(this string s)
         {
             long t;
             return long.TryParse(s, out t);
@@ -71,6 +82,56 @@ namespace JMW.Extensions.Numbers
         }
 
         /// <summary>
+        /// Converts a Decimal to an Int32
+        /// </summary>
+        public static long ToLong(this decimal d)
+        {
+            return Convert.ToInt64(d);
+        }
+
+        /// <summary>
+        /// Converts a Double to an Int32
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static long ToLong(this double d)
+        {
+            return Convert.ToInt64(d);
+        }
+
+        /// <summary>
+        /// Converts a string to an integer using int.Parse
+        /// </summary>
+        public static long ToLong(this string i)
+        {
+            return long.Parse(i);
+        }
+
+        /// <summary>
+        /// Converts a string to an integer using int.Parse
+        /// </summary>
+        public static double ToDouble(this string i)
+        {
+            return double.Parse(i);
+        }
+
+        /// <summary>
+        /// Converts a string to an integer using int.Parse
+        /// </summary>
+        public static double ToDouble(this int i)
+        {
+            return Convert.ToDouble(i);
+        }
+
+        /// <summary>
+        /// Converts a string to an integer using int.Parse
+        /// </summary>
+        public static double ToDouble(this long i)
+        {
+            return Convert.ToDouble(i);
+        }
+        
+        /// <summary>
         /// Safely converts a string to a integer. If the string is not an integer, returns -1 as a default.
         /// </summary>
         /// <param name="s">A string to convert to an Integer.</param>
@@ -106,7 +167,7 @@ namespace JMW.Extensions.Numbers
             return -1;
         }
 
-        private static Dictionary<string, long> _numAbbreviations = new Dictionary<string, long> { { "k", 1000 }, { "m", 1000000 }, { "g", 1000000000 }, { "t", 1000000000000 } };
+        private static readonly Dictionary<string, long> _numAbbreviations = new Dictionary<string, long> { { "k", 1000 }, { "m", 1000000 }, { "g", 1000000000 }, { "t", 1000000000000 } };
 
         /// <summary>
         /// Handles converting text to an Int64. Will properly deal with common abbreviations (1k, 2m)
@@ -116,12 +177,12 @@ namespace JMW.Extensions.Numbers
         public static long ToInt64(this string i)
         {
             var last = i.ToLower().ToCharArray().Last().ToString();
-            var prefex = i.ToLower().Substring(0, i.Length - 1);
+            var prefix = i.ToLower().Substring(0, i.Length - 1);
 
             // first, check if its abbreviated.
-            if (!_numAbbreviations.ContainsKey(last) || !prefex.IsDouble()) return long.Parse(i);
+            if (!_numAbbreviations.ContainsKey(last) || !prefix.IsDouble()) return long.Parse(i);
 
-            var n = prefex.ToDouble() * _numAbbreviations[last];
+            var n = prefix.ToDouble() * _numAbbreviations[last];
             return long.Parse(n.ToString());
         }
 
@@ -150,7 +211,7 @@ namespace JMW.Extensions.Numbers
             return -1;
         }
 
-        public static float? ToFloat(this string s)
+        public static float ToFloatOrNeg1(this string s)
         {
             float i;
             var r = float.TryParse(s, out i);
@@ -159,10 +220,10 @@ namespace JMW.Extensions.Numbers
             {
                 return i;
             }
-            return null;
+            return -1;
         }
 
-        public static double? ToDouble(this string s)
+        public static double ToDoubleOrNeg1(this string s)
         {
             double i;
             var r = double.TryParse(s, out i);
@@ -171,7 +232,7 @@ namespace JMW.Extensions.Numbers
             {
                 return i;
             }
-            return null;
+            return -1;
         }
 
         public static string CollapseIntsToRanges(this IEnumerable<string> ints)
@@ -202,10 +263,9 @@ namespace JMW.Extensions.Numbers
                         {
                             prev = current;
                             if (i < sorted.Count - 1)
-                            {
                                 current = sorted[++i];
-                            }
-                            else { break; }
+                            else
+                                break;
                         }
                         r += prev + ", ";
                     }
@@ -221,9 +281,60 @@ namespace JMW.Extensions.Numbers
             }
 
             if (prev != current)
-            {
                 r += sorted.Last();
+
+            r = r.Trim().Trim(',');
+
+            return r;
+        }
+
+        public static string CollapseLongsToRanges(this IEnumerable<string> ints)
+        {
+            return ints.Where(s => s.IsLong()).Select(s => s.ToLong()).CollapseLongsToRanges();
+        }
+
+        public static string CollapseLongsToRanges(this IEnumerable<long> ints)
+        {
+            var r = "";
+            long prev = -1;
+            long current = -1;
+
+            var sorted = ints.Distinct().OrderBy(i => i).ToList();
+
+            if (sorted.Count > 1)
+            {
+                for (var i = 1; i < sorted.Count; i++)
+                {
+                    prev = sorted[i - 1];
+                    current = sorted[i];
+
+                    if (prev + 1 == current) // you're at the start of a range.
+                    {
+                        r += prev + "-";
+
+                        while (prev + 1 == current)
+                        {
+                            prev = current;
+                            if (i < sorted.Count - 1)
+                                current = sorted[++i];
+                            else
+                                break;
+                        }
+                        r += prev + ", ";
+                    }
+                    else // its a single.
+                    {
+                        r += prev + ", ";
+                    }
+                }
             }
+            else if (sorted.Count == 1)
+            {
+                r = sorted[0].ToString();
+            }
+
+            if (prev != current)
+                r += sorted.Last();
 
             r = r.Trim().Trim(',');
 
@@ -232,21 +343,23 @@ namespace JMW.Extensions.Numbers
 
         public static bool NearlyEqual(this double a, double b, double epsilon)
         {
-            double absA = Math.Abs(a);
-            double absB = Math.Abs(b);
-            double diff = Math.Abs(a - b);
+            var absA = Math.Abs(a);
+            var absB = Math.Abs(b);
+            var diff = Math.Abs(a - b);
 
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (a == b)
             { // shortcut, handles infinities
                 return true;
             }
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (a == 0 || b == 0 || diff < double.Epsilon)
             {
                 // a or b is zero or both are extremely close to it
                 // relative error is less meaningful here
                 return diff < epsilon;
             }
-            
+
             // use relative error
             return diff / (absA + absB) < epsilon;
         }
