@@ -3,7 +3,7 @@ using System.IO;
 
 namespace JMW.Extensions.IO
 {
-    public static class IO
+    public static class Extensions
     {
         ///<summary>Returns the last <paramref name="lineCount"/> of lines from a <paramref name="reader"/>.</summary>
         ///<param name="reader">The reader to read from.</param>

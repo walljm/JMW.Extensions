@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace JMW.Extensions.Numbers
 {
-    public static class Numbers
+    public static class Extensions
     {
         /// <summary>
         /// Indicates if the string is an <see cref="int"/>

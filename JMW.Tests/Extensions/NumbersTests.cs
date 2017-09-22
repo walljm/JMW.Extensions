@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 
 namespace JMW.Extensions.Numbers.Tests
 {
@@ -11,7 +12,6 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.IsTrue("1".IsInt());
             Assert.IsTrue("11234".IsInt());
             Assert.IsTrue("4321341".IsInt());
-            Assert.IsTrue("1123412341234".IsInt());
             Assert.IsTrue("1431234121".IsInt());
             Assert.IsFalse("143.1234121".IsInt());
             Assert.IsFalse("14a".IsInt());
@@ -34,8 +34,8 @@ namespace JMW.Extensions.Numbers.Tests
         {
             string test = null;
 
-            Assert.IsFalse("blah".IsNotNull());
-            Assert.IsTrue(test.IsNotNull());
+            Assert.IsTrue("blah".IsNotNull());
+            Assert.IsFalse(test.IsNotNull());
         }
 
         [Test]
@@ -50,73 +50,18 @@ namespace JMW.Extensions.Numbers.Tests
         [Test]
         public void ToIntTest()
         {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void ToIntTest1()
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void ToIntTest2()
-        {
-            Assert.Fail();
+            Assert.AreEqual(1, "1".ToInt());
+            Assert.AreEqual(11234, "11234".ToInt());
+            Assert.AreEqual(4321341, "4321341".ToInt());
+            Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToInt());
+            Assert.AreEqual(1431234121, "1431234121".ToInt());
         }
 
         [Test]
         public void ToIntOrNeg1Test()
         {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void ToInt64OrNeg1Test()
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void ToInt64Test()
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void ToInt64orNeg1Test()
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void ToFloatTest()
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void ToDoubleTest()
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void CollapseIntsToRangesTest()
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void CollapseIntsToRangesTest1()
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void NearlyEqualTest()
-        {
-            Assert.Fail();
+            Assert.AreEqual(-1, "basdf".ToIntOrNeg1());
+            Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToIntOrNeg1());
         }
     }
 }

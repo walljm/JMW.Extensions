@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace JMW.Extensions
+namespace JMW.Extensions.DateAndTime
 {
-    public static class DateAndTime
+    public static class Extensions
     {
         public static string GetElapsedTime(this DateTime curr, DateTime time)
         {
