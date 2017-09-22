@@ -1,6 +1,6 @@
-﻿using System;
+﻿using JMW.Extensions.Numbers;
+using System;
 using System.Collections.Generic;
-using JMW.Extensions.Numbers;
 
 namespace JMW.Types
 {

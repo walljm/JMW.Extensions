@@ -10,17 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 using JMW.Extensions.Reflection;
+using JMW.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using JMW.Types;
 
 namespace JMW.Collections
 {
     /// <summary>
     /// The purpose of the class is to implement the <see cref="INotifyPropertyChanged"/> and
-    /// <see cref="INotifyPropertyChanging"/> interfaces and create helper methods for setting 
+    /// <see cref="INotifyPropertyChanging"/> interfaces and create helper methods for setting
     /// the value so that all the proper events are fired.
     /// </summary>
     public abstract class ObservableClass : INotifyPropertyChanged, INotifyPropertyChanging
@@ -36,7 +36,7 @@ namespace JMW.Collections
         /// The number of registered handlers for the event.
         /// </summary>
         public int PropertyChangedEventCount => _PropertyChanged.HandlerCount;
-        
+
         #endregion Properties
 
         #region Public Methods
@@ -51,7 +51,7 @@ namespace JMW.Collections
             _PropertyChanged.Clear();
             _PropertyChanging.Clear();
         }
-        
+
         /// <summary>
         /// Clears the PropertyChanged events.
         /// </summary>
@@ -71,7 +71,7 @@ namespace JMW.Collections
         #endregion Public Methods
 
         #region Events
-        
+
         private readonly WeakEventSource<PropertyChangingEventArgs> _PropertyChanging = new WeakEventSource<PropertyChangingEventArgs>();
         /// <summary>
         /// The <see cref="INotifyPropertyChanging"/> event.  Gives you the property name before
@@ -126,7 +126,7 @@ namespace JMW.Collections
         }
 
         #region Private Methods
-        
+
         private void raisePropertyChanged(string prop)
         {
             _PropertyChanged.Raise(this, new PropertyChangedEventArgs(prop));

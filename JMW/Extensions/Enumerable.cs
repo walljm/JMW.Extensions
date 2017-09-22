@@ -22,18 +22,21 @@ namespace JMW.Extensions.Enumerable
         /// <summary>
         /// Indicates if the given index is the last item in the list.
         /// </summary>
-        /// <param name="lst">List to check</param>
+        /// <param name="source">List to check</param>
         /// <param name="i">Index to check</param>
         /// <returns></returns>
         public static bool IsLast<T>(this IEnumerable<T> source, int i)
         {
-            if (source is T[])
+            var source1 = source as T[];
+            if (source1 != null)
             {
-                return (source as T[]).Length - 1 == i;
+                return source1.Length - 1 == i;
             }
-            if (source is ICollection<T>)
+
+            var collection = source as ICollection<T>;
+            if (collection != null)
             {
-                return (source as ICollection<T>).Count - 1 == i;
+                return collection.Count - 1 == i;
             }
 
             return source.ToArray().Length - 1 == i;
@@ -59,7 +62,6 @@ namespace JMW.Extensions.Enumerable
             // if the quatity requested is less than 1, return and empty list
             else if (qty < 1)
             {
-                yield break;
             }
             else
             {
@@ -235,11 +237,10 @@ namespace JMW.Extensions.Enumerable
         /// <param name="lst"></param>
         /// <param name="act"></param>
         /// <returns></returns>
-        public static void Each<T>(this IEnumerable<T> lst, Action<T> act) where T : class
+        public static void Each<T>(this IEnumerable<T> lst, Action<T> act)
         {
             foreach (var item in lst)
                 act(item);
-
         }
 
         private static class ThreadSafeRandom
@@ -306,11 +307,11 @@ namespace JMW.Extensions.Enumerable
             return lst.GetRange(start, length);
         }
 
-        /// <summary> This function allows you to create a histogram on any property of an
-        /// IEnumerable{T} list. </summary> <typeparam name="T">The type of object being examined in the
-        /// IEnumberable{T} <param name="items">The list of items being evaluated for the
-        /// histogram</param> <param name="get_key">a function that returns the value being tested in the
-        /// histogram</param> <returns>a histogram of the values returned by the get function</returns>
+        /// <summary> This function allows you to create a histogram on any property of an <see cref="IEnumerable{T}"/> list. </summary>
+        /// <typeparam name="T" />The type of object being examined in the <see cref="IEnumerable{T}"/>
+        /// <param name="items">The list of items being evaluated for the histogram</param>
+        /// <param name="get_key">a function that returns the value being tested in the histogram</param>
+        /// <returns>a histogram of the values returned by the get function</returns>
         public static Dictionary<string, List<T>> CreateHistogram<T>(this IEnumerable<T> items, Func<T, string> get_key)
         {
             var groups = new Dictionary<string, List<T>>();
@@ -329,15 +330,11 @@ namespace JMW.Extensions.Enumerable
             return groups;
         }
 
-
-        /// <summary> This function allows you to create a histogram on any property of an
-        /// IEnumerable{V} list. </summary> 
-        /// <typeparam name="V">The type of object being examined in the
-        /// IEnumberable{V} </typeparam>
-        /// <param name="items">The list of items being evaluated for the
-        /// histogram</param> 
-        /// <param name="key">a function that returns the value being tested in the
-        /// histogram</param> 
+        /// <summary> This function allows you to create a histogram on any property of an <see cref="IEnumerable{V}"/> list. </summary>
+        /// <typeparam name="V">The type of object being examined in the <see cref="IEnumerable{V}"/> </typeparam>
+        /// <typeparam name="K">Type of the Key</typeparam>
+        /// <param name="items">The list of items being evaluated for the histogram</param>
+        /// <param name="key">a function that returns the value being tested in the histogram</param>
         /// <returns>a histogram of the values returned by the get function</returns>
         public static Dictionary<K, List<V>> CreateHistogram<K, V>(this IEnumerable<V> items, Func<V, K> key)
         {
@@ -356,7 +353,6 @@ namespace JMW.Extensions.Enumerable
 
             return groups;
         }
-
 
         /// <summary>
         /// Wraps an object instance into an IEnumerable{T}; consisting of a single item.
@@ -395,6 +391,194 @@ namespace JMW.Extensions.Enumerable
                 if (hsh.TryAdd(get_key(item)))
                     yield return item;
             }
+        }
+
+        public static bool TryAdd<K, V>(this IDictionary<K, V> dict, K key, V val)
+        {
+            if (dict.ContainsKey(key))
+                return false;
+
+            dict.Add(key, val);
+            return true;
+        }
+
+        /// <summary>
+        /// Adds the item if the key is not present, or creates a new entry if it exists.
+        /// </summary>
+        /// <typeparam name="K">Key Type</typeparam>
+        /// <typeparam name="V">Value Type</typeparam>
+        /// <param name="dict">Dictionary to add items to</param>
+        /// <param name="key">Key Item</param>
+        /// <param name="val">Value Item</param>
+        public static void AddOrCreate<K, V>(this IDictionary<K, List<V>> dict, K key, V val)
+        {
+            if (dict.ContainsKey(key))
+                dict[key].Add(val);
+            else
+                dict.Add(key, new List<V> { val });
+        }
+
+        /// <summary>
+        /// Adds the item if the key is not present, or creates a new entry if it exists.
+        /// </summary>
+        /// <typeparam name="K">Key Type</typeparam>
+        /// <typeparam name="V">Value Type</typeparam>
+        /// <param name="dict">Dictionary to add items to</param>
+        /// <param name="key">Key Item</param>
+        /// <param name="val">Value Item</param>
+        public static void AddOrCreate<K, V>(this IDictionary<K, HashSet<V>> dict, K key, V val)
+        {
+            if (dict.ContainsKey(key))
+                dict[key].Add(val);
+            else
+                dict.Add(key, new HashSet<V> { val });
+        }
+
+        /// <summary>
+        /// Creates a <see>
+        ///         <cref>Dictionary{K, List{V}}</cref>
+        ///     </see>
+        /// </summary>
+        /// <typeparam name="K">Type of the key</typeparam>
+        /// <typeparam name="V">Type of the value</typeparam>
+        /// <param name="lst">List of items to index</param>
+        /// <param name="keySelector">function that takes an item of type <typeparamref name="V"/> and returns a key of type <see cref="K"/>.</param>
+        /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="keySelector"/></returns>
+        public static Dictionary<K, List<V>> ToDictionaryOfLists<K, V>(this IEnumerable<V> lst, Func<V, K> keySelector)
+        {
+            var ret = new Dictionary<K, List<V>>();
+            foreach (var item in lst)
+                ret.AddOrCreate(keySelector(item), item);
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Creates a <see>
+        ///         <cref>Dictionary{K, List{V}}</cref>
+        ///     </see>
+        ///     using multiple keys from each item.  This is patterned off of the .SelectMany function in Linq.
+        /// </summary>
+        /// <typeparam name="K">Type of the key</typeparam>
+        /// <typeparam name="V">Type of the value</typeparam>
+        /// <param name="lst">List of items to index</param>
+        /// <param name="keySelector">function that takes an item of type <typeparamref name="V"/> and returns an <see cref="IEnumerable{K}"/> of keys.</param>
+        /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="keySelector"/></returns>
+        public static Dictionary<K, List<V>> ToDictionaryOfListsOfMany<K, V>(this IEnumerable<V> lst, Func<V, IEnumerable<K>> keySelector)
+        {
+            var ret = new Dictionary<K, List<V>>();
+            foreach (var item in lst)
+            {
+                foreach (var key in keySelector(item))
+                    ret.AddOrCreate(key, item);
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Creates a <see>
+        ///         <cref>Dictionary{K, HashSet{V}}</cref>
+        ///     </see>
+        ///     using multiple keys from each item.  This is patterned off of the .SelectMany function in Linq.
+        /// </summary>
+        /// <typeparam name="K">Type of the key</typeparam>
+        /// <typeparam name="V">Type of the value</typeparam>
+        /// <param name="lst">List of items to index</param>
+        /// <param name="keySelector">function that takes an item of type <typeparamref name="V"/> and returns an <see cref="IEnumerable{K}"/> of keys.</param>
+        /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="keySelector"/></returns>
+        public static Dictionary<K, HashSet<V>> ToDictionaryOfHashSetsOfMany<K, V>(this IEnumerable<V> lst, Func<V, IEnumerable<K>> keySelector)
+        {
+            var ret = new Dictionary<K, HashSet<V>>();
+            foreach (var item in lst)
+            {
+                foreach (var key in keySelector(item))
+                    ret.AddOrCreate(key, item);
+            }
+            return ret;
+        }
+
+        /// <summary>
+        /// Creates a <see>
+        ///         <cref>Dictionary{K, HashSet{V}}</cref>
+        ///     </see>
+        /// </summary>
+        /// <typeparam name="K">Type of the key</typeparam>
+        /// <typeparam name="V">Type of the value</typeparam>
+        /// <param name="lst">List of items to index</param>
+        /// <param name="keySelector">function that takes an item of type <typeparamref name="V"/> and returns a key of type <see cref="K"/>.</param>
+        /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="keySelector"/></returns>
+        public static Dictionary<K, HashSet<V>> ToDictionaryOfHashSets<K, V>(this IEnumerable<V> lst, Func<V, K> keySelector)
+        {
+            var ret = new Dictionary<K, HashSet<V>>();
+            foreach (var item in lst)
+                ret.AddOrCreate(keySelector(item), item);
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Creates a <see>
+        ///         <cref>Dictionary{K, V}</cref>
+        ///     </see>
+        /// </summary>
+        /// <typeparam name="K">Type of the key</typeparam>
+        /// <typeparam name="V">Type of the value</typeparam>
+        /// <param name="lst">List of items to index</param>
+        /// <param name="get_keys">function that takes an item of type <typeparamref name="V"/> and returns a key of type <see cref="K"/>.</param>
+        /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="get_keys"/></returns>
+        public static Dictionary<K, V> ToDictionaryOfMany<K, V>(this IEnumerable<V> lst, Func<V, IEnumerable<K>> get_keys)
+        {
+            var dict = new Dictionary<K, V>();
+            foreach (var item in lst)
+            {
+                foreach (var key in get_keys(item))
+                    dict.TryAdd(key, item);
+            }
+            return dict;
+        }
+
+        /// <summary>
+        /// Checks to see if a key is present in the Dictionary and runs an action on the value if true.
+        /// </summary>
+        /// <typeparam name="K">Type of the key</typeparam>
+        /// <typeparam name="V">Type of the value</typeparam>
+        /// <param name="dict">Dictionary to check for the key</param>
+        /// <param name="key">Key to check for</param>
+        /// <param name="act">Action to run if the key is present.</param>
+        public static void IfHasKey<K, V>(this Dictionary<K, V> dict, K key, Action<V> act)
+        {
+            if (dict.ContainsKey(key))
+                act(dict[key]);
+        }
+
+        /// <summary>
+        /// Groups a list of sequential items into sets using a function to determine where a set begins.
+        /// </summary>
+        /// <param name="items">List of lines to group</param>
+        /// <param name="is_beginning"></param>
+        /// <returns></returns>
+        public static IEnumerable<List<T>> GroupIntoSets<T>(this IEnumerable<T> items, Func<T, bool> is_beginning)
+        {
+            var set = new List<T>();
+            var first = true;
+
+            foreach (var item in items)
+            {
+                if (is_beginning(item))
+                {
+                    // don't return the first set, it will always be junk.
+                    if (!first) yield return set;
+
+                    // you're past the first junk set, reset.
+                    first = false;
+                    set = new List<T>();
+                }
+
+                set.Add(item);
+            }
+
+            yield return set;
         }
     }
 }

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW", "JMW\JMW.csproj", "{0
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Tests", "JMW.Tests\JMW.Tests.csproj", "{B9EEEF0F-B6D4-41D1-9BCD-AD73C58EBA4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Templates", "JMW.Templates\JMW.Templates.csproj", "{E7A342B5-3191-422B-B2D1-8F23EAD701DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B9EEEF0F-B6D4-41D1-9BCD-AD73C58EBA4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9EEEF0F-B6D4-41D1-9BCD-AD73C58EBA4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9EEEF0F-B6D4-41D1-9BCD-AD73C58EBA4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7A342B5-3191-422B-B2D1-8F23EAD701DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7A342B5-3191-422B-B2D1-8F23EAD701DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7A342B5-3191-422B-B2D1-8F23EAD701DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7A342B5-3191-422B-B2D1-8F23EAD701DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

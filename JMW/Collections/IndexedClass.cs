@@ -10,11 +10,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 using JMW.Extensions.Reflection;
+using JMW.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using JMW.Types;
 
 namespace JMW.Collections
 {
@@ -28,10 +28,10 @@ namespace JMW.Collections
     /// <see cref="INotifyPropertyChanging"/> interfaces, to implement an <see cref="IndexedPropertyChanged"/>
     /// event and create helper methods for setting the value so that all the proper events are fired.
     /// </para>
-    /// 
+    ///
     /// <para>This class is used in conjunction with the <see cref="IndexedCollection{T}"/> class to allow for an in
     /// memory indexed lookup table.</para>
-    /// 
+    ///
     /// <para>The only caveat here is that you must add the <see cref="Indexed"/> attribute to the appropriate
     /// property and use the Set method to handle setting props to trigger the event.</para>
     /// </summary>

@@ -19,14 +19,14 @@ namespace JMW.Types
     /// </summary>
     public abstract class StringEnum<T> : IEquatable<StringEnum<T>>, IComparable, IComparable<StringEnum<T>> where T : StringEnum<T>
     {
-        protected static HashSet<StringEnum<T>> _values = new HashSet<StringEnum<T>>();
+        protected static readonly HashSet<StringEnum<T>> _values = new HashSet<StringEnum<T>>();
 
         #region Constructors
 
         public StringEnum(string value, long ordinal = -1)
         {
-            _Value = value;
-            _Ordinal = (ordinal > 0) ? ordinal : _values.Count;
+            Value = value;
+            Ordinal = ordinal > 0 ? ordinal : _values.Count;
 
             AddValue(this);
         }
@@ -35,23 +35,15 @@ namespace JMW.Types
 
         #region Properties
 
-        private string _Value = "";
         /// <summary>
         /// The Value of the enum.
         /// </summary>
-        public string Value
-        {
-            get { return _Value; }
-        }
+        public string Value { get; }
 
-        private long _Ordinal = -1;
         /// <summary>
         /// This provides an optional ordinal value for backwards compatibility.
         /// </summary>
-        public long Ordinal
-        {
-            get { return _Ordinal; }
-        }
+        public long Ordinal { get; }
 
         #endregion Properties
 
@@ -65,18 +57,15 @@ namespace JMW.Types
         /// <returns>true if both have the same value (case sensitive)</returns>
         public static bool operator ==(StringEnum<T> enum1, StringEnum<T> enum2)
         {
-            if (Object.ReferenceEquals(enum1, null) && Object.ReferenceEquals(enum2, null))
+            if (ReferenceEquals(enum1, null) && ReferenceEquals(enum2, null))
             {
                 return true;
             }
-            else if (Object.ReferenceEquals(enum1, null))
+            if (ReferenceEquals(enum1, null))
             {
                 return false; // the other reference isn't null because of the first if check
             }
-            else
-            {
-                return enum1.Equals(enum2);
-            }
+            return enum1.Equals(enum2);
         }
 
         /// <summary>
@@ -98,18 +87,15 @@ namespace JMW.Types
         /// <returns>true if enum1 and value match</returns>
         public static bool operator ==(StringEnum<T> enum1, string value)
         {
-            if (Object.ReferenceEquals(enum1, null) && Object.ReferenceEquals(value, null))
+            if (ReferenceEquals(enum1, null) && ReferenceEquals(value, null))
             {
                 return true;
             }
-            else if (Object.ReferenceEquals(enum1, null))
+            if (ReferenceEquals(enum1, null))
             {
                 return false;
             }
-            else
-            {
-                return enum1.Equals(value);
-            }
+            return enum1.Equals(value);
         }
 
         /// <summary>
@@ -120,14 +106,11 @@ namespace JMW.Types
         /// <returns>true if enum1 and value match</returns>
         public static bool operator ==(StringEnum<T> enum1, long value)
         {
-            if (Object.ReferenceEquals(enum1, null))
+            if (ReferenceEquals(enum1, null))
             {
                 return false;
             }
-            else
-            {
-                return enum1.Equals(value);
-            }
+            return enum1.Equals(value);
         }
 
         /// <summary>
@@ -189,7 +172,7 @@ namespace JMW.Types
         /// null if nothing is found</returns>
         public static StringEnum<T> GetValue(StringEnum<T> value)
         {
-            foreach (StringEnum<T> val in _values)
+            foreach (var val in _values)
             {
                 if (val == value)
                 {
@@ -209,7 +192,7 @@ namespace JMW.Types
 		public static StringEnum<T> GetValue(string value)
         {
             if (value == null) return null;
-            foreach (StringEnum<T> val in _values)
+            foreach (var val in _values)
             {
                 if (val.Value.ToUpper() == value.ToUpper())
                 {
@@ -228,8 +211,7 @@ namespace JMW.Types
         /// null if nothing is found</returns>
         public static StringEnum<T> GetValue(long ordinal)
         {
-            var type_name = typeof(T).FullName;
-            foreach (StringEnum<T> val in _values)
+            foreach (var val in _values)
             {
                 if (val.Ordinal == ordinal)
                 {
@@ -256,7 +238,7 @@ namespace JMW.Types
         /// </returns>
         public int CompareTo(object obj)
         {
-            return this.CompareTo(obj as StringEnum<T>);
+            return CompareTo(obj as StringEnum<T>);
         }
 
         /// <summary>
@@ -268,8 +250,8 @@ namespace JMW.Types
         /// </returns>
         public int CompareTo(StringEnum<T> other)
         {
-            if (Object.ReferenceEquals(other, null)) return 1;
-            return string.Compare(this.Value, other.Value);
+            if (ReferenceEquals(other, null)) return 1;
+            return string.CompareOrdinal(Value, other.Value);
         }
 
         /// <summary>
@@ -279,10 +261,9 @@ namespace JMW.Types
         /// <returns>
         /// A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other" /> parameter.Zero This object is equal to <paramref name="other" />. Greater than zero This object is greater than <paramref name="other" />.
         /// </returns>
-        public int CompareTo(String other)
+        public int CompareTo(string other)
         {
-            if (other == null) return 1;
-            return string.Compare(this.Value, other);
+            return string.CompareOrdinal(Value, other);
         }
 
         #endregion Functions
@@ -295,7 +276,7 @@ namespace JMW.Types
         /// <returns>The name of the OS</returns>
         public override string ToString()
         {
-            return _Value;
+            return Value;
         }
 
         /// <summary>
@@ -305,12 +286,12 @@ namespace JMW.Types
         /// <returns>false if os is null, true if the OS names are the same (case sensitive)</returns>
         public bool Equals(StringEnum<T> os)
         {
-            if (Object.ReferenceEquals(os, null))
+            if (ReferenceEquals(os, null))
             {
                 return false; // we know we aren't null
             }
 
-            return _Value == ((StringEnum<T>)os)._Value;
+            return Value == os.Value;
         }
 
         /// <summary>
@@ -320,12 +301,12 @@ namespace JMW.Types
         /// <returns>false if the string is null, true if the StringEnum.Name == name (case sensitive)</returns>
         public bool Equals(string name)
         {
-            if (Object.ReferenceEquals(name, null))
+            if (ReferenceEquals(name, null))
             {
                 return false; // we know we aren't null
             }
 
-            return _Value == name;
+            return Value == name;
         }
 
         /// <summary>
@@ -335,7 +316,7 @@ namespace JMW.Types
         /// <returns>false if the string is null, true if the StringEnum.Name == name (case sensitive)</returns>
         public bool Equals(long ordinal)
         {
-            return _Ordinal == ordinal;
+            return Ordinal == ordinal;
         }
 
         /// <summary>
@@ -346,22 +327,19 @@ namespace JMW.Types
         /// false if otherwise or if the other object isn't a StringEnum</returns>
         public override bool Equals(object o)
         {
-            if (Object.ReferenceEquals(o, null))
+            if (ReferenceEquals(o, null))
             {
                 return false; // we know we aren't null
             }
-            else if (o.GetType().IsInstanceOfType(this))
+            if (o.GetType().IsInstanceOfType(this))
             {
-                return this.Equals((StringEnum<T>)o);
+                return Equals((StringEnum<T>)o);
             }
-            else if (o.GetType() == typeof(string)) // don't want to create an instance of string
+            if (o is string) // don't want to create an instance of string
             {
-                return this.Equals((string)o);
+                return Equals((string)o);
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         /// <summary>
@@ -370,7 +348,7 @@ namespace JMW.Types
         /// <returns>the Names HashCode</returns>
         public override int GetHashCode()
         {
-            return this.Value.GetHashCode();
+            return Value.GetHashCode();
         }
 
         #endregion Overrides

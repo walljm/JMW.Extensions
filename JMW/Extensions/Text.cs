@@ -11,6 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 using JMW.Extensions.Object;
 using System;
+using System.IO;
 
 namespace JMW.Extensions.String
 {
@@ -275,6 +276,90 @@ namespace JMW.Extensions.String
 
         #endregion ParseAfterLastIndexOf_PlusLength
 
+        #region ParseAfterLastIndexOf
+
+        public static string ParseAfterLastIndexOf(this string s, params string[] parms)
+        {
+            return s.ParseAfterLastIndexOf(false, parms);
+        }
+
+        /// <summary>
+        ///   Returns a string starting after the last index of the first provided string parameter discovered to the end of the string
+        /// </summary>
+        /// <param name="s">The string to parse</param>
+        /// <param name="case_insensitive">Wheather to performs a case insensitive search or not</param>
+        /// <param name="parms">The strings to parse to</param>
+        public static string ParseAfterLastIndexOf(this string s, bool case_insensitive = false, params string[] parms)
+        {
+            // return empty if string is empty
+            if (s.Length == 0) return string.Empty;
+
+            // return full string if no params were provided
+            if (parms.Length == 0) return s;
+
+            // lowercase the string if we're working with case insensitive search
+            var str = case_insensitive ? s.ToLower() : s;
+
+            // look for earch parm, return first one found.
+            foreach (var p in parms)
+            {
+                int idx = IndexOf(str, p, case_insensitive, last: true);
+
+                // if its greater than 0, return it.
+                if (idx > -1)
+                {
+                    return s.SafeSubstring(idx);
+                }
+            }
+
+            // worst case, return the string as is.
+            return s;
+        }
+
+        #endregion ParseAfterLastIndexOf
+
+        #region ParseAfterLastIndexOf
+
+        public static string ParseAfterIndexOf(this string s, params string[] parms)
+        {
+            return s.ParseAfterIndexOf(false, parms);
+        }
+
+        /// <summary>
+        ///   Returns a string starting after the last index of the first provided string parameter discovered to the end of the string
+        /// </summary>
+        /// <param name="s">The string to parse</param>
+        /// <param name="case_insensitive">Wheather to performs a case insensitive search or not</param>
+        /// <param name="parms">The strings to parse to</param>
+        public static string ParseAfterIndexOf(this string s, bool case_insensitive = false, params string[] parms)
+        {
+            // return empty if string is empty
+            if (s.Length == 0) return string.Empty;
+
+            // return full string if no params were provided
+            if (parms.Length == 0) return s;
+
+            // lowercase the string if we're working with case insensitive search
+            var str = case_insensitive ? s.ToLower() : s;
+
+            // look for earch parm, return first one found.
+            foreach (var p in parms)
+            {
+                int idx = IndexOf(str, p, case_insensitive);
+
+                // if its greater than 0, return it.
+                if (idx > -1)
+                {
+                    return s.SafeSubstring(idx);
+                }
+            }
+
+            // worst case, return the string as is.
+            return s;
+        }
+
+        #endregion ParseAfterLastIndexOf
+
         /// <summary>
         /// Finds the index of a search string.  Optionally allows case insensitivity or option to search for last index.
         /// </summary>
@@ -338,6 +423,27 @@ namespace JMW.Extensions.String
         public static bool IsNotEmpty(this string str)
         {
             return !str.IsEmpty();
+        }
+
+        public static bool ContainsFast(this string str, char c)
+        {
+            for (var i = 0; i < str.Length; i++)
+                if (str[i] == c) return true;
+
+            return false;
+        }
+
+        public static string ToPascalCase(this string str)
+        {
+            var v = str;
+            foreach (var c in Path.GetInvalidFileNameChars())
+                v = v.Replace(c.ToString(), "");
+
+            var words = v.Split(' ');
+            var r = "";
+            foreach (var w in words)
+                r += w.Substring(0, 1) + w.Substring(1);
+            return r;
         }
     }
 }

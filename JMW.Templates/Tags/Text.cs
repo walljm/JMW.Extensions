@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace JMW.Template.Tags
+{
+    public class Text : TagHandlerBase
+    {
+        public override string TagName { get; } = "text";
+        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string>();
+
+        public override void Handler(Tag token, Interpreter interp)
+        {
+            interp.OutputStream.Write(token.TokenText);
+        }
+    }
+}

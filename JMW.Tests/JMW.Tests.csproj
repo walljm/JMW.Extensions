@@ -64,9 +64,14 @@
     <Compile Include="StringEnumTests.cs" />
     <Compile Include="ReflectionExtensions.cs" />
     <Compile Include="ObjectExtensionTests.cs" />
+    <Compile Include="Templates\TemplateTests.cs" />
     <Compile Include="TextExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JMW.Templates\JMW.Templates.csproj">
+      <Project>{e7a342b5-3191-422b-b2d1-8f23ead701dc}</Project>
+      <Name>JMW.Templates</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JMW\JMW.csproj">
       <Project>{09de972f-e558-4e4c-9a01-f31e8f99359c}</Project>
       <Name>JMW</Name>
@@ -74,6 +79,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Templates\testpathinclude.tmpl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Extensions\lines_long.txt" />

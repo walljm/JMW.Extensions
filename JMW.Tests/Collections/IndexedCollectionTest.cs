@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using JMW.Collections;
 
 namespace JMW.Collections.Tests
 {

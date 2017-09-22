@@ -52,5 +52,31 @@ namespace JMW.Extensions.Reflection
         {
             return (T)info.GetValue(obj, null);
         }
+
+        /// <summary>
+        /// Get the attribute of the specified type from an enum value.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute to get.</typeparam>
+        /// <param name="enumVal">The enum value.</param>
+        /// <returns>The first attribute of the given type that exists on the enum value.</returns>
+        public static TAttribute GetAttributeOfType<TAttribute>(this Enum enumVal)
+            where TAttribute : Attribute
+        {
+            var memInfo = enumVal.GetType().GetMember(enumVal.ToString());
+            return memInfo[0].GetAttributeOfType<TAttribute>();
+        }
+
+        /// <summary>
+        /// Get the attribute of the specified type from the given <paramref name="provider"/>.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute to get.</typeparam>
+        /// <param name="provider">The provider.</param>
+        /// <returns>The first attribute of the given type that exists on the provider.</returns>
+        public static TAttribute GetAttributeOfType<TAttribute>(this ICustomAttributeProvider provider)
+            where TAttribute : Attribute
+        {
+            var attributes = provider.GetCustomAttributes(typeof(TAttribute), true);
+            return attributes.Length > 0 ? attributes[0] as TAttribute : null;
+        }
     }
 }

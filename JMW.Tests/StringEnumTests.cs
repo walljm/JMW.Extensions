@@ -39,6 +39,7 @@ namespace JMW.Types.Tests
 
             Assert.IsFalse(val == t1);
             Assert.IsFalse(val == t2);
+            // ReSharper disable once EqualExpressionComparison
             Assert.That(t2 == t2);
             Assert.IsFalse(t2 == val);
             Assert.IsFalse(t2 == "One");
@@ -48,9 +49,9 @@ namespace JMW.Types.Tests
             Assert.IsTrue(t2 != val);
             Assert.IsTrue(t2 != "One");
 
-            Assert.That(val.CompareTo(ExampleEnum.TWO) == -1);
+            Assert.That(val.CompareTo(ExampleEnum.TWO) < 0);
             Assert.That(val.CompareTo((object)ExampleEnum.ONE) == 0);
-            Assert.That(val.CompareTo("Two") == -1);
+            Assert.That(val.CompareTo("Two") < 0);
             Assert.That(val.CompareTo((string)null) == 1);
             Assert.That(val.CompareTo(t2) == 1);
             Assert.That(ExampleEnum.GetValue(t1) == (string)null);
@@ -103,54 +104,17 @@ namespace JMW.Types.Tests
 
     public class bar1
     {
-        private string e1 = "One";
-        public string E1
-        {
-            get
-            {
-                return e1;
-            }
-
-            set
-            {
-                e1 = value;
-            }
-        }
+        public string E1 { get; set; } = "One";
     }
 
     public class bar2
     {
-        private int e1 = 0;
-        public int E1
-        {
-            get
-            {
-                return e1;
-            }
-
-            set
-            {
-                e1 = value;
-            }
-        }
+        public int E1 { get; set; } = 0;
     }
 
     public class foo
     {
-        private ExampleEnum e1 = ExampleEnum.ONE;
-
-        public ExampleEnum E1
-        {
-            get
-            {
-                return e1;
-            }
-
-            set
-            {
-                e1 = value;
-            }
-        }
+        public ExampleEnum E1 { get; set; } = ExampleEnum.ONE;
     }
 
     public class ExampleEnum : StringEnum<ExampleEnum>
@@ -159,23 +123,9 @@ namespace JMW.Types.Tests
         {
         }
 
-        private static ExampleEnum _One = new ExampleEnum("One");
-        public static ExampleEnum ONE
-        {
-            get
-            {
-                return _One;
-            }
-        }
+        public static ExampleEnum ONE { get; } = new ExampleEnum("One");
 
-        private static ExampleEnum _Two = new ExampleEnum("Two");
-        public static ExampleEnum TWO
-        {
-            get
-            {
-                return _Two;
-            }
-        }
+        public static ExampleEnum TWO { get; } = new ExampleEnum("Two");
 
         /// <summary>
         /// Implicitly converts string to ExampleEnum.
@@ -204,22 +154,8 @@ namespace JMW.Types.Tests
         {
         }
 
-        private static ExampleEnum2 _One = new ExampleEnum2("Three");
-        public static ExampleEnum2 ONE
-        {
-            get
-            {
-                return _One;
-            }
-        }
+        public static ExampleEnum2 ONE { get; } = new ExampleEnum2("Three");
 
-        private static ExampleEnum2 _Two = new ExampleEnum2("Four");
-        public static ExampleEnum2 TWO
-        {
-            get
-            {
-                return _Two;
-            }
-        }
+        public static ExampleEnum2 TWO { get; } = new ExampleEnum2("Four");
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JMW.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -82,6 +83,180 @@ namespace JMW.Extensions.Numbers
         }
 
         /// <summary>
+        /// A highly performant integer checking function.  Less robust than the default C# implementation.
+        /// </summary>
+        /// <param name="str">String to check</param>
+        /// <returns>If the string is a 32bit Integer, true, else false.</returns>
+        public static bool IsIntFast(this string str)
+        {
+            foreach (int c in str)
+            {
+                // ignore spaces
+                if (c < 33)
+                    continue;
+
+                // make sure the numbers are 1-9
+                if (c < 48 || c > 71)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static int ToIntFast(this string s)
+        {
+            if (s.Length == 0)
+                throw new ArgumentOutOfRangeException(nameof(s), "String: " + s + " is not a valid number.");
+
+            var result = 0;
+            var c = s[0];
+            var sign = 0;
+            var start = 0;
+            var end = s.Length;
+
+            for (; end > 0; end--)
+            {
+                if (!ignoreChar(s[end - 1]))
+                    break;
+            }
+
+            if (c == '-')
+            {
+                sign = -1;
+                start = 0 + 1;
+            }
+            else if (c > 57 || c < 48)
+            {
+                if (ignoreChar(c))
+                {
+                    do
+                    {
+                        ++start;
+                    }
+                    while (start < end && ignoreChar(c = s[start]));
+
+                    if (start >= end)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(s), "String: " + s + " is not a valid number.");
+                    }
+
+                    if (c == '-')
+                    {
+                        sign = -1;
+                        ++start;
+                    }
+                    else
+                    {
+                        sign = 1;
+                    }
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(s), "String: " + s + " is not a valid number.");
+                }
+            }
+            else
+            {
+                start = 0 + 1;
+                result = 10 * result + (c - 48);
+                sign = 1;
+            }
+
+            var i = start;
+
+            for (; i < end; ++i)
+            {
+                c = s[i];
+                if (c > 57 || c < 48)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(s), "String: " + s + " is not a valid number.");
+                }
+
+                result = 10 * result + (c - 48);
+            }
+
+            result *= sign;
+            return result;
+        }
+
+        public static int ToIntOrDefaultFast(this string s, int def = 0)
+        {
+            if (s.Length == 0)
+                return def;
+
+            var result = 0;
+            var c = s[0];
+            var sign = 0;
+            var start = 0;
+            var end = s.Length;
+
+            // handle trailing whitespace
+            for (; end > 0; end--)
+            {
+                if (!ignoreChar(s[end - 1]))
+                    break;
+            }
+
+            if (c == '-')
+            {
+                sign = -1;
+                start = 1;
+            }
+            else if (c > 57 || c < 48)
+            {
+                if (ignoreChar(c))
+                {
+                    do
+                    {
+                        ++start;
+                    }
+                    while (start < end && ignoreChar(c = s[start]));
+
+                    if (start >= end)
+                    {
+                        return def;
+                    }
+
+                    if (c == '-')
+                    {
+                        sign = -1;
+                        ++start;
+                    }
+                    else
+                    {
+                        sign = 1;
+                    }
+                }
+                else
+                {
+                    return def;
+                }
+            }
+            else
+            {
+                start = 0 + 1;
+                result = 10 * result + (c - 48);
+                sign = 1;
+            }
+
+            var i = start;
+
+            for (; i < end; ++i)
+            {
+                c = s[i];
+                if (c > 57 || c < 48)
+                {
+                    return def;
+                }
+
+                result = 10 * result + (c - 48);
+            }
+
+            result *= sign;
+            return result;
+        }
+
+        /// <summary>
         /// Converts a Decimal to an Int32
         /// </summary>
         public static long ToLong(this decimal d)
@@ -130,7 +305,7 @@ namespace JMW.Extensions.Numbers
         {
             return Convert.ToDouble(i);
         }
-        
+
         /// <summary>
         /// Safely converts a string to a integer. If the string is not an integer, returns -1 as a default.
         /// </summary>
@@ -167,7 +342,7 @@ namespace JMW.Extensions.Numbers
             return -1;
         }
 
-        private static readonly Dictionary<string, long> _numAbbreviations = new Dictionary<string, long> { { "k", 1000 }, { "m", 1000000 }, { "g", 1000000000 }, { "t", 1000000000000 } };
+        private static Dictionary<string, long> _numAbbreviations = new Dictionary<string, long> { { "k", 1000 }, { "m", 1000000 }, { "g", 1000000000 }, { "t", 1000000000000 } };
 
         /// <summary>
         /// Handles converting text to an Int64. Will properly deal with common abbreviations (1k, 2m)
@@ -209,6 +384,18 @@ namespace JMW.Extensions.Numbers
 
             if (long.TryParse(i, out val)) return val;
             return -1;
+        }
+
+        public static float? ToFloat(this string s)
+        {
+            float i;
+            var r = float.TryParse(s, out i);
+
+            if (r)
+            {
+                return i;
+            }
+            return null;
         }
 
         public static float ToFloatOrNeg1(this string s)
@@ -341,6 +528,55 @@ namespace JMW.Extensions.Numbers
             return r;
         }
 
+        public static List<IntegerRange> CollapseIntsToIntegerRanges(this IEnumerable<int> ints)
+        {
+            var r = new List<IntegerRange>();
+            var prev = -1;
+            var current = -1;
+
+            var sorted = ints.Distinct().OrderBy(i => i).ToList();
+
+            if (sorted.Count > 1)
+            {
+                for (var i = 1; i < sorted.Count; i++)
+                {
+                    prev = sorted[i - 1];
+                    current = sorted[i];
+
+                    if (prev + 1 == current) // you're at the start of a range.
+                    {
+                        var first = prev;
+
+                        while (prev + 1 == current)
+                        {
+                            prev = current;
+                            if (i < sorted.Count - 1)
+                            {
+                                current = sorted[++i];
+                            }
+                            else { break; }
+                        }
+                        r.Add(new IntegerRange(first, prev));
+                    }
+                    else // its a single.
+                    {
+                        r.Add(new IntegerRange(prev, prev));
+                    }
+                }
+            }
+            else if (sorted.Count == 1)
+            {
+                r.Add(new IntegerRange(sorted[0], sorted[0]));
+            }
+
+            if (prev != current)
+            {
+                r.Add(new IntegerRange(sorted.Last(), sorted.Last()));
+            }
+
+            return r;
+        }
+
         public static bool NearlyEqual(this double a, double b, double epsilon)
         {
             var absA = Math.Abs(a);
@@ -362,6 +598,11 @@ namespace JMW.Extensions.Numbers
 
             // use relative error
             return diff / (absA + absB) < epsilon;
+        }
+
+        private static bool ignoreChar(char c)
+        {
+            return c < 33;
         }
     }
 }
