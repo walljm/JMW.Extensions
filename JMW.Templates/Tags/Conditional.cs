@@ -101,60 +101,60 @@ namespace JMW.Template.Tags
                 {
                     case "eq":
                     case "equals":
-                        {
-                            if (actualValue == value)
-                                condition_met = true;
-                            break;
-                        }
+                    {
+                        if (actualValue == value)
+                            condition_met = true;
+                        break;
+                    }
                     case "neq":
                     case "notequals":
-                        {
-                            if (actualValue != value)
-                                condition_met = true;
-                            break;
-                        }
+                    {
+                        if (actualValue != value)
+                            condition_met = true;
+                        break;
+                    }
                     case "cnt":
                     case "contains":
-                        {
-                            if (actualValue.Contains(value))
-                                condition_met = true;
-                            break;
-                        }
+                    {
+                        if (actualValue.Contains(value))
+                            condition_met = true;
+                        break;
+                    }
                     case "ncnt":
                     case "notcontains":
-                        {
-                            if (!actualValue.Contains(value))
-                                condition_met = true;
-                            break;
-                        }
+                    {
+                        if (!actualValue.Contains(value))
+                            condition_met = true;
+                        break;
+                    }
                     case "strt":
                     case "startswith":
-                        {
-                            if (actualValue.StartsWith(value))
-                                condition_met = true;
-                            break;
-                        }
+                    {
+                        if (actualValue.StartsWith(value))
+                            condition_met = true;
+                        break;
+                    }
                     case "nstrt":
                     case "notstartswith":
-                        {
-                            if (!actualValue.StartsWith(value))
-                                condition_met = true;
-                            break;
-                        }
+                    {
+                        if (!actualValue.StartsWith(value))
+                            condition_met = true;
+                        break;
+                    }
                     case "ends":
                     case "endswith":
-                        {
-                            if (actualValue.EndsWith(value))
-                                condition_met = true;
-                            break;
-                        }
+                    {
+                        if (actualValue.EndsWith(value))
+                            condition_met = true;
+                        break;
+                    }
                     case "nends":
                     case "notendswith":
-                        {
-                            if (!actualValue.EndsWith(value))
-                                condition_met = true;
-                            break;
-                        }
+                    {
+                        if (!actualValue.EndsWith(value))
+                            condition_met = true;
+                        break;
+                    }
                 }
             }
 
@@ -168,6 +168,15 @@ namespace JMW.Template.Tags
         {
             TagHelpers.CheckAllowedAttributes(tag, ALLOWEDPROPS, token);
 
+            if (tag.Properties.ContainsKey(ATTR_TYPE) && !tag.Properties.ContainsKey(ATTR_VALUE))
+                throw new ParseException("Missing attribute: '" + ATTR_VALUE + "'", token);
+
+            if (!tag.Properties.ContainsKey(ATTR_TYPE) && tag.Properties.ContainsKey(ATTR_VALUE))
+                throw new ParseException("Missing attribute: '" + ATTR_TYPE + "'", token);
+
+            if (!tag.Properties.ContainsKey(ATTR_EXP) && !tag.Properties.ContainsKey(ATTR_TYPE) && !tag.Properties.ContainsKey(ATTR_VALUE))
+                throw new ParseException("Missing attribute.  You must have either a '" + ATTR_TYPE + "' and a '" + ATTR_VALUE + "' attribute or an '" + ATTR_EXP + "' attribute.", token);
+
             if (tag.Properties.ContainsKey(ATTR_TYPE))
             {
                 var type = tag.Properties[ATTR_TYPE].ToLower();
@@ -177,6 +186,11 @@ namespace JMW.Template.Tags
                     throw new ParseException("Invalid property value for \"type\" property on <if> tag. Allowed values: " + ALLOWEDPROPVALUES.ToDelimitedString(", "), token);
                 }
             }
+        }
+
+        public static bool IsConditional(Tag tag)
+        {
+            return tag.TagType == TagTypes.Tag && tag.Name == TAG;
         }
     }
 }

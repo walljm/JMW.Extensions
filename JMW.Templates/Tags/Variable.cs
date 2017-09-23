@@ -84,10 +84,10 @@ namespace JMW.Template.Tags
 
         public void AddVariable(string name, string value)
         {
-            if (_variables.ContainsKey(name))
+            if (_variables.ContainsKey(name.ToLower()))
                 throw new Exception("Variable: " + name + " already exists.");
 
-            _variables.Add(name, value);
+            _variables.Add(name.ToLower(), value);
         }
 
         public void ReplaceVariables(Tag token)
@@ -126,7 +126,6 @@ namespace JMW.Template.Tags
                         if (!_variables.ContainsKey(tag.Properties[ATTR_NAME].ToLower()))
                         {
                             AddVariable(tag.Properties[ATTR_NAME], tag.Properties[ATTR_VALUE]);
-                            interp.AddHandler(new Variable(TAG + ":" + tag.Properties[ATTR_NAME].ToLower()));
                         }
                         else
                         {
@@ -141,6 +140,11 @@ namespace JMW.Template.Tags
                 }
                 if (tag.Children.Count > 0) PopulateVariables(tag.Children, interp);
             }
+        }
+
+        public static bool IsVariable(Tag tag)
+        {
+            return tag.TagType == TagTypes.Tag && tag.Name == TAG;
         }
     }
 }

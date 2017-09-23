@@ -11,6 +11,7 @@ namespace JMW.Template.Tags
 
         public const string TAG = "table";
         public const string TAB_TAG = "tab";
+        public const string ANON_TABLE_NAME = "anon_table";
 
         public override string TagName { get; } = TAG;
         public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_NAME, ATTR_DISTINCT, ATTR_WHERE, ATTR_ORDERBY, ATTR_ORDER };

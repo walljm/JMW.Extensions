@@ -18,7 +18,7 @@ namespace JMW.Template
         #region Handlers
 
         private Variable _varHandler;
-        private Text _textHandler;
+        private Tags.Text _textHandler;
 
         #endregion Handlers
 
@@ -42,7 +42,7 @@ namespace JMW.Template
             OutputStream = output_stream;
 
             _varHandler = new Variable();
-            _textHandler = new Text();
+            _textHandler = new Tags.Text();
 
             AddHandler(new Conditional(Retrievers));
             AddHandler(_varHandler);
@@ -84,7 +84,7 @@ namespace JMW.Template
             var includes = tags.Where(o => o.TagType == TagTypes.Tag && o.Name == Include.TAG && o.Properties.ContainsKey(Include.ATTR_DEFINE))
                 .ToDictionary(k => k.Properties[Include.ATTR_DEFINE], v => v);
 
-            // includes should be handled first.  
+            // includes should be handled first.
             Include.ReplaceIncludes(tags, includes);
 
             // now populated the variables declared in the template using the <var name="varname" value="varvalue" /> syntax.
@@ -103,7 +103,12 @@ namespace JMW.Template
                         // tables are registered by their name attribute.  so if its a table tag,
                         //  then you need to get the name attribute.
                         if (tag.Name == Table.TAG || tag.Name == Table.TAB_TAG)
-                            tag_name = tag.Properties[Table.ATTR_NAME].ToLower();
+                        {
+                            if (tag.Properties.ContainsKey(Table.ATTR_NAME))
+                                tag_name = tag.Properties[Table.ATTR_NAME].ToLower();
+                            else
+                                tag_name = Table.ANON_TABLE_NAME;
+                        }
 
                         // Join tag handlers are built when they are found using table data
                         // from tables that have already been added. No need to make the user
@@ -150,8 +155,8 @@ namespace JMW.Template
                             {
                                 // we need to create the handler here using the data from the tables specified.
                                 if (!Handlers.ContainsKey(table_tag))
-                                    throw new System.Exception("Specified table: " + table_tag + " in \'" + Lookup.ATTR_TABLE+ "\" attribute does not exist.");
-                               
+                                    throw new System.Exception("Specified table: " + table_tag + " in \'" + Lookup.ATTR_TABLE + "\" attribute does not exist.");
+
                                 var table = (Table)Handlers[table_tag];
                                 AddHandler(new Lookup(table.TableData, this));
                             }
@@ -185,7 +190,13 @@ namespace JMW.Template
 
             // tables get registered as the table name.
             if (is_table)
-                name = ((Table)handler).TableData.Name;
+            {
+                var h = (Table)handler;
+                if (h.TableData.Name.IsEmpty())
+                    name = Table.ANON_TABLE_NAME;
+                else
+                    name = h.TableData.Name;
+            }
 
             // join tables get registered as the table name.
             else if (handler.TagName == Join.TAG)
@@ -203,7 +214,7 @@ namespace JMW.Template
                 // add the column tags to the parser
                 if (is_table)
                 {
-                    var h = (Table) handler;
+                    var h = (Table)handler;
 
                     // add the table_name tag.
                     Parser.AddTag(h.TableData.Name, h);
@@ -217,7 +228,7 @@ namespace JMW.Template
 
         public void AddVariable(string name, string value)
         {
-            _varHandler.AddVariable(name, value);
+            _varHandler.AddVariable(name.ToLower(), value);
         }
 
         #endregion Public Functions

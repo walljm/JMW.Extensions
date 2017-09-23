@@ -15,15 +15,20 @@ namespace JMW.Template.Tags
         {
             foreach (var tag in tags)
             {
-                if (tag.TagType == TagTypes.Tag && tag.Name == Conditional.TAG)
+                if (Conditional.IsConditional(tag))
                 {
                     PrefixIfColumns(tag, sheet_name);
                 }
-                else if (!Output.IsOutput(tag) && !Table.IsTable(tag) && !tag.Name.Contains(":"))
+                else if (tag.TagType == TagTypes.Tag && !Output.IsOutput(tag) && !Table.IsTable(tag) && !Variable.IsVariable(tag) && !tag.Name.Contains(":"))
                 {
                     PrefixTag(tag, sheet_name);
                 }
-                if (tag.Name == Output.TAG || tag.Name == Conditional.TAG) PrefixTags(tag.Children, sheet_name);
+
+                // handle children
+                if (Output.IsOutput(tag) || Conditional.IsConditional(tag))
+                {
+                    PrefixTags(tag.Children, sheet_name);
+                }
             }
         }
 
@@ -188,5 +193,6 @@ namespace JMW.Template.Tags
 
             return result;
         }
+
     }
 }
