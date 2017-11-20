@@ -9,9 +9,9 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-using JMW.Extensions.Object;
 using System;
 using System.IO;
+using JMW.Extensions.Object;
 
 namespace JMW.Extensions.String
 {
@@ -46,7 +46,7 @@ namespace JMW.Extensions.String
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                int idx = IndexOf(str, p, case_insensitive);
+                var idx = IndexOf(str, p, case_insensitive);
 
                 // if its greater than 0, return it.
                 if (idx > -1)
@@ -89,7 +89,7 @@ namespace JMW.Extensions.String
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                int idx = IndexOf(str, p, case_insensitive, last: true);
+                var idx = IndexOf(str, p, case_insensitive, last: true);
 
                 // if its greater than 0, return it.
                 if (idx > -1)
@@ -133,7 +133,7 @@ namespace JMW.Extensions.String
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                int idx = IndexOf(str, p, case_insensitive);
+                var idx = IndexOf(str, p, case_insensitive);
 
                 // if its greater than 0, return it.
                 if (idx > -1)
@@ -176,7 +176,42 @@ namespace JMW.Extensions.String
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                int idx = IndexOf(str, p, case_insensitive, last: true);
+                var idx = IndexOf(str, p, case_insensitive, last: true);
+
+                // if its greater than 0, return it.
+                if (idx > -1)
+                {
+                    return s.SafeSubstring(0, idx + p.Length);
+                }
+            }
+
+            // worst case, return the string as is.
+            return s;
+        }
+
+        /// <summary>
+        ///   Returns a string from the begining to the last index of one of the provided string parameters, plus the length of the found parameter
+        /// </summary>
+        /// <param name="s">The string to parse</param>
+        /// <param name="qty">The number of the search patter to parse after</param>
+        /// <param name="case_insensitive">Wheather to performs a case insensitive search or not</param>
+        /// <param name="parms">The strings to parse to</param>
+        public static string ParseToDesignatedIndexOf_PlusLength(this string s, int qty, bool case_insensitive = false, params string[] parms)
+        {
+            // return empty if string is empty
+            if (s.Length == 0) return string.Empty;
+
+            // return full string if no params were provided
+            if (parms.Length == 0) return s;
+
+            // lowercase the string if we're working with case insensitive search
+            var str = case_insensitive ? s.ToLower() : s;
+
+            // look for earch parm, return first one found.
+            foreach (var p in parms)
+            {
+                // get the index of our search parameter
+                var idx = IndexOf(str, p, case_insensitive, qty);
 
                 // if its greater than 0, return it.
                 if (idx > -1)
@@ -219,7 +254,7 @@ namespace JMW.Extensions.String
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                int idx = IndexOf(str, p, case_insensitive);
+                var idx = IndexOf(str, p, case_insensitive);
 
                 // if its greater than 0, return it.
                 if (idx > -1)
@@ -261,7 +296,41 @@ namespace JMW.Extensions.String
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
-                int idx = IndexOf(str, p, case_insensitive, last: true);
+                var idx = IndexOf(str, p, case_insensitive, last: true);
+
+                // if its greater than 0, return it.
+                if (idx > -1)
+                {
+                    return s.SafeSubstring(idx + p.Length);
+                }
+            }
+
+            // worst case, return the string as is.
+            return s;
+        }
+
+        /// <summary>
+        ///   Returns a string starting after the last index of the first provided string parameter discovered to the end of the string
+        /// </summary>
+        /// <param name="s">The string to parse</param>
+        /// <param name="qty">The number of the search patter to parse after</param>
+        /// <param name="case_insensitive">Wheather to performs a case insensitive search or not</param>
+        /// <param name="parms">The strings to parse to</param>
+        public static string ParseAfterDesignatedIndexOf_PlusLength(this string s, int qty, bool case_insensitive = false, params string[] parms)
+        {
+            // return empty if string is empty
+            if (s.Length == 0) return string.Empty;
+
+            // return full string if no params were provided
+            if (parms.Length == 0) return s;
+
+            // lowercase the string if we're working with case insensitive search
+            var str = case_insensitive ? s.ToLower() : s;
+
+            // look for earch parm, return first one found.
+            foreach (var p in parms)
+            {
+                var idx = IndexOf(str, p, case_insensitive, qty);
 
                 // if its greater than 0, return it.
                 if (idx > -1)
@@ -303,7 +372,7 @@ namespace JMW.Extensions.String
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
-                int idx = IndexOf(str, p, case_insensitive, last: true);
+                var idx = IndexOf(str, p, case_insensitive, last: true);
 
                 // if its greater than 0, return it.
                 if (idx > -1)
@@ -345,7 +414,7 @@ namespace JMW.Extensions.String
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
-                int idx = IndexOf(str, p, case_insensitive);
+                var idx = IndexOf(str, p, case_insensitive);
 
                 // if its greater than 0, return it.
                 if (idx > -1)
@@ -379,6 +448,38 @@ namespace JMW.Extensions.String
         }
 
         /// <summary>
+        /// Finds the index of a search string.  Optionally allows case insensitivity or option to search for specific index.
+        /// </summary>
+        /// <param name="str">String to search</param>
+        /// <param name="search_string">String to search for</param>
+        /// <param name="case_insensitive">Ignore case</param>
+        /// <param name="qty">Search for specific instance</param>
+        public static int IndexOf(this string str, string search_string, bool case_insensitive, int qty)
+        {
+            // get the index of our search parameter
+            var idx = -1;
+            if (case_insensitive)
+            {
+                var c = 0;
+                while (c != qty)
+                {
+                    idx = str.IndexOf(search_string.ToLower(), idx, StringComparison.Ordinal);
+                    c++;
+                }
+            }
+            else
+            {
+                var c = 0;
+                while (c != qty)
+                {
+                    idx = str.IndexOf(search_string, idx, StringComparison.Ordinal);
+                    c++;
+                }
+            }
+            return idx;
+        }
+
+        /// <summary>
         ///   Safely handles the cases where your start exceeds the length of the string, or your start+length exceeds the length of the string.
         /// </summary>
         /// <param name="s">The string to do the substring on</param>
@@ -396,7 +497,7 @@ namespace JMW.Extensions.String
             // if the length is 0 or less, the string should be empty.
             if (length < 1) return string.Empty;
 
-            int len = (int)length;
+            var len = (int)length;
             if (start + length > s.Length)
             {
                 len = s.Length - start;

@@ -4,9 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-
-//vae
-using JMW.Template.IO;
+using JMW.IO;
 
 [assembly: InternalsVisibleTo("JMW.Template.Tests")]
 

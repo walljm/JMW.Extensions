@@ -60,6 +60,7 @@
     <Compile Include="Extensions\NumbersTests.cs" />
     <Compile Include="IntegerRangeCollectionTests.cs" />
     <Compile Include="MaybeTests.cs" />
+    <Compile Include="Parsing\ParsingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringEnumTests.cs" />
     <Compile Include="ReflectionExtensions.cs" />
@@ -68,6 +69,10 @@
     <Compile Include="TextExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JMW.Parsing\JMW.Parsing.csproj">
+      <Project>{3aa49893-32b0-48d3-a486-c00cf709d276}</Project>
+      <Name>JMW.Parsing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JMW.Templates\JMW.Templates.csproj">
       <Project>{e7a342b5-3191-422b-b2d1-8f23ead701dc}</Project>
       <Name>JMW.Templates</Name>

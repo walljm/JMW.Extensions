@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NUnit.Framework;
 
 namespace JMW.Types.Tests
@@ -79,14 +80,14 @@ namespace JMW.Types.Tests
             //f.E1 = "One";
 
             var s1 = new JsonSerializerSettings();
-            s1.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-            s1.Converters.Add(new Newtonsoft.Json.Converters.KeyValuePairConverter());
+            s1.Converters.Add(new StringEnumConverter());
+            s1.Converters.Add(new KeyValuePairConverter());
             s1.NullValueHandling = NullValueHandling.Ignore;
             s1.ObjectCreationHandling = ObjectCreationHandling.Replace;
             var json = JsonConvert.SerializeObject(f, s1);
 
             var s2 = new JsonSerializerSettings();
-            s2.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+            s2.Converters.Add(new StringEnumConverter());
             s2.NullValueHandling = NullValueHandling.Ignore;
             s2.ObjectCreationHandling = ObjectCreationHandling.Replace;
             var f2 = JsonConvert.DeserializeObject<foo>(json, s2);
