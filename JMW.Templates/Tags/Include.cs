@@ -27,7 +27,7 @@ namespace JMW.Template.Tags
                 {
                     if (tag.Properties.ContainsKey(ATTR_PATH))
                     {
-                        var file_name = "";
+                        var file_name = string.Empty;
                         try
                         {
                             file_name = tag.Properties[ATTR_PATH];

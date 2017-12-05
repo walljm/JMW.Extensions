@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using JMW.Parsing.Expressions;
-using JMW.Parsing.Parsers;
+using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Handlers
 {
-    public class Property
+    public class Property : IProperty
     {
         public const string NAME = "name";
         public const string PARSERS = "parsers";
@@ -14,8 +13,8 @@ namespace JMW.Parsing.Handlers
         public const string SPLIT = "split";
 
         public string Name { get; set; }
-        public Stack<ParserBase> Parsers { get; set; } = new Stack<ParserBase>();
-        public IExpression Line { get; set; }
+        public Stack<Extractors.Base> Extractors { get; set; } = new Stack<Extractors.Base>();
+        public Expressions.IExpression Line { get; set; }
         public string Split { get; set; }
 
         public Property(Tag t)
@@ -29,14 +28,14 @@ namespace JMW.Parsing.Handlers
             {
                 var parsers = (Stack<Tag>)t.Properties[PARSERS].Value;
                 foreach (var p in parsers)
-                    Parsers.Push(ParserBase.InToParser(p));
+                    Extractors.Push(Parsing.Extractors.Base.InToParser(p));
             }
             else
                 throw new ParseException("Required Attribute Missing: " + PARSERS);
 
             if (t.Properties.ContainsKey(LINE))
             {
-                Line = ExpressionBase.ToExpression(t.Properties[LINE]);
+                Line = Expressions.Base.ToExpression(t.Properties[LINE]);
             }
             else
                 throw new ParseException("Required Attribute Missing: " + LINE);
@@ -45,9 +44,9 @@ namespace JMW.Parsing.Handlers
                 Split = t.Properties[SPLIT].Value.ToString();
         }
 
-        public object Eval(TextReader reader)
+        public object Parse(StreamReader reader)
         {
-            if (Parsers.Count > 0)
+            if (Extractors.Count > 0)
             {
                 if (Split != null)
                 {
@@ -61,6 +60,7 @@ namespace JMW.Parsing.Handlers
                         while ((c = reader.Read()) != -1)
                         {
                             test += (char)c;
+                            sb.Append((char)c);
 
                             if (test.Length > l)
                             {
@@ -68,10 +68,9 @@ namespace JMW.Parsing.Handlers
                             }
                             if (test == Split)
                             {
-                                line = sb.ToString(test.Length, sb.Length - test.Length);
+                                line = sb.ToString(0, sb.Length - test.Length);
                                 break;
                             }
-                            sb.Append((char)c);
                         }
 
                         // if its the last line, you need to set it.
@@ -87,7 +86,7 @@ namespace JMW.Parsing.Handlers
                             continue;
 
                         var r = line;
-                        foreach (var parser in Parsers)
+                        foreach (var parser in Extractors)
                             r = parser.Parse(r);
                         return r;
                     }
@@ -101,14 +100,14 @@ namespace JMW.Parsing.Handlers
                             continue;
 
                         var r = line;
-                        foreach (var parser in Parsers)
+                        foreach (var parser in Extractors)
                             r = parser.Parse(r);
                         return r;
                     }
                 }
             }
 
-            return "";
+            return string.Empty;
         }
     }
 }

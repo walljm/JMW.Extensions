@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 
 namespace JMW.Extensions.Enumerable.Tests
 {
@@ -8,11 +8,15 @@ namespace JMW.Extensions.Enumerable.Tests
     public class ExtensionsTests
     {
         [Test]
+        public void ReverseOrderTest()
+        {
+            CollectionAssert.AreEqual(new List<int> { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 }, new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }.ReverseOrder().ToList());
+        }
+
+        [Test]
         public void LastTest1()
         {
             var lst = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-
-            var t1 = lst.Last(-3);
 
             CollectionAssert.AreEqual(new List<int> { 6, 7, 8, 9, 10 }, lst.Last(5));
             CollectionAssert.AreEqual(new List<int> { 8, 9, 10 }, lst.Last(3));
@@ -47,14 +51,14 @@ namespace JMW.Extensions.Enumerable.Tests
 
             lst.Merge(lst2.ToList());
             Assert.AreEqual(16, lst.Count);
-            lst.Merge(new List<int> {3,5,18,19});
+            lst.Merge(new List<int> { 3, 5, 18, 19 });
             Assert.AreEqual(18, lst.Count);
         }
 
         [Test]
         public void CreateHistogramTest()
         {
-            var lst1 = new List<int> { 1, 1,1,2, 3,3, 4,4,4,4, 5,5,5, 6,6, 7, 8, 9,9, 10 };
+            var lst1 = new List<int> { 1, 1, 1, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 7, 8, 9, 9, 10 };
 
             var lst = lst1.CreateHistogram(i => i.ToString());
 
@@ -88,24 +92,26 @@ namespace JMW.Extensions.Enumerable.Tests
         [Test]
         public void ToDelimitedStringTest()
         {
-            var lst = new HashSet<int> { 1, 2, 3, 4};
+            var lst = new HashSet<int> { 1, 2, 3, 4 };
             Assert.AreEqual("1,2,3,4", lst.ToDelimitedString(','));
             Assert.AreEqual("1,2,3,4,", lst.ToDelimitedString(',', false));
 
             Assert.AreEqual("1,,2,,3,,4", lst.ToDelimitedString(",,"));
             Assert.AreEqual("1,,2,,3,,4,,", lst.ToDelimitedString(",,", false));
         }
+
         [Test]
         public void IslastTest()
         {
             Assert.AreEqual(true, new List<int> { 1, 2, 3, 4 }.IsLast(3));
             Assert.AreEqual(true, new[] { 1, 2, 3, 4 }.IsLast(3));
-            Assert.AreEqual(true, new[] { 1, 2, 3, 4 }.Select(i=>i).IsLast(3));
+            Assert.AreEqual(true, new[] { 1, 2, 3, 4 }.Select(i => i).IsLast(3));
 
             Assert.AreEqual(false, new List<int> { 1, 2, 3, 4 }.Select(i => i).IsLast(2));
             Assert.AreEqual(false, new List<int> { 1, 2, 3, 4 }.IsLast(2));
             Assert.AreEqual(false, new[] { 1, 2, 3, 4 }.IsLast(2));
         }
+
         [Test]
         public void ToListOfItemTest()
         {
@@ -123,7 +129,7 @@ namespace JMW.Extensions.Enumerable.Tests
         [Test]
         public void ShimTest()
         {
-            var lst = new List<object>{ 1}.Shim<int>();
+            var lst = new List<object> { 1 }.Shim<int>();
             Assert.AreEqual(1, lst.Count());
         }
 
@@ -143,10 +149,9 @@ namespace JMW.Extensions.Enumerable.Tests
             var lst = new List<Foo> { new Foo { Value = 1 }, new Foo { Value = 2 }, new Foo { Value = 3 }, new Foo { Value = 4 } };
             lst.Each(i => i.Value = i.Value * 2);
 
-            Assert.That(new List<int> { 2, 4, 6, 8 }, Is.EquivalentTo(lst.Select(i=>i.Value)));
-            
+            Assert.That(new List<int> { 2, 4, 6, 8 }, Is.EquivalentTo(lst.Select(i => i.Value)));
         }
 
-        private class Foo{public int Value { get; set; } = 0; }
+        private class Foo { public int Value { get; set; } = 0; }
     }
 }

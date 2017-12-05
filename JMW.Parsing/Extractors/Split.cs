@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+using JMW.Parsing.Compile;
 
-namespace JMW.Parsing.Parsers
+namespace JMW.Parsing.Extractors
 {
-    public class SplitParser : ParserBase
+    public class Split : Base
     {
         public const string NAME = "split";
 
@@ -18,7 +19,7 @@ namespace JMW.Parsing.Parsers
             string[] fields;
 
             if (Mods.Contains("i")) // case insensitive
-                fields = s.ToLower().Split(Search.Select(o=> o.ToLower()).ToArray(), r ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
+                fields = s.ToLower().Split(Search.Select(o => o.ToLower()).ToArray(), r ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
             else
                 fields = s.Split(Search.ToArray(), r ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
 
@@ -32,7 +33,7 @@ namespace JMW.Parsing.Parsers
             throw new IndexOutOfRangeException();
         }
 
-        public SplitParser(Tag t) : base(t)
+        public Split(Tag t) : base(t)
         {
         }
     }

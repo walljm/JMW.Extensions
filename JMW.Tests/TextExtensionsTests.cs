@@ -12,10 +12,10 @@ namespace JMW.Extensions.String.Tests
             Assert.That("This is a" == str.SafeSubstring(0, 9));
             Assert.That("This is a string" == str.SafeSubstring(0, 30));
             Assert.That("is a" == str.SafeSubstring(5, 4));
-            Assert.That("" == str.SafeSubstring(30));
-            Assert.That("" == str.SafeSubstring(30, 10));
-            Assert.That("" == str.SafeSubstring(0, -10));
-            Assert.That("" == str.SafeSubstring(0, 0));
+            Assert.That(string.Empty == str.SafeSubstring(30));
+            Assert.That(string.Empty == str.SafeSubstring(30, 10));
+            Assert.That(string.Empty == str.SafeSubstring(0, -10));
+            Assert.That(string.Empty == str.SafeSubstring(0, 0));
         }
 
         [Test]
@@ -26,7 +26,7 @@ namespace JMW.Extensions.String.Tests
             Assert.That("This is a " == str.ParseToIndexOf(true, "Str"));
             Assert.That(str == str.ParseToIndexOf("blah"));
             Assert.That(str == str.ParseToIndexOf("Str"));
-            Assert.That("" == "".ParseToIndexOf("Str"));
+            Assert.That(string.Empty == string.Empty.ParseToIndexOf("Str"));
             Assert.That("that" == "that".ParseToIndexOf());
         }
 
@@ -38,7 +38,7 @@ namespace JMW.Extensions.String.Tests
             Assert.That("This is a string a " == str.ParseToLastIndexOf(true, "Str"));
             Assert.That(str == str.ParseToLastIndexOf("blah"));
             Assert.That(str == str.ParseToLastIndexOf("Str"));
-            Assert.That("" == "".ParseToLastIndexOf("Str"));
+            Assert.That(string.Empty == string.Empty.ParseToLastIndexOf("Str"));
             Assert.That("that" == "that".ParseToLastIndexOf());
         }
 
@@ -50,7 +50,7 @@ namespace JMW.Extensions.String.Tests
             Assert.That("This is a str" == str.ParseToIndexOf_PlusLength(true, "Str"));
             Assert.That(str == str.ParseToIndexOf_PlusLength("blah"));
             Assert.That(str == str.ParseToIndexOf_PlusLength("Str"));
-            Assert.That("" == "".ParseToIndexOf_PlusLength("Str"));
+            Assert.That(string.Empty == string.Empty.ParseToIndexOf_PlusLength("Str"));
             Assert.That("that" == "that".ParseToIndexOf_PlusLength());
         }
 
@@ -62,7 +62,7 @@ namespace JMW.Extensions.String.Tests
             Assert.That("This is a string a str" == str.ParseToLastIndexOf_PlusLength(true, "Str"));
             Assert.That(str == str.ParseToLastIndexOf_PlusLength("blah"));
             Assert.That(str == str.ParseToLastIndexOf_PlusLength("Str"));
-            Assert.That("" == "".ParseToLastIndexOf_PlusLength("Str"));
+            Assert.That(string.Empty == string.Empty.ParseToLastIndexOf_PlusLength("Str"));
             Assert.That("that" == "that".ParseToLastIndexOf_PlusLength());
         }
 
@@ -74,7 +74,7 @@ namespace JMW.Extensions.String.Tests
             Assert.That(" is a string" == str.ParseAfterIndexOf_PlusLength(true, "this"));
             Assert.That(str == str.ParseAfterIndexOf_PlusLength("blah"));
             Assert.That(str == str.ParseAfterIndexOf_PlusLength("Str"));
-            Assert.That("" == "".ParseAfterIndexOf_PlusLength("Str"));
+            Assert.That(string.Empty == string.Empty.ParseAfterIndexOf_PlusLength("Str"));
             Assert.That("that" == "that".ParseAfterIndexOf_PlusLength());
         }
 
@@ -86,7 +86,7 @@ namespace JMW.Extensions.String.Tests
             Assert.That(" is a string a string" == str.ParseAfterLastIndexOf_PlusLength(true, "this"));
             Assert.That(str == str.ParseAfterLastIndexOf_PlusLength("blah"));
             Assert.That(str == str.ParseAfterLastIndexOf_PlusLength("Str"));
-            Assert.That("" == "".ParseAfterLastIndexOf_PlusLength("Str"));
+            Assert.That(string.Empty == string.Empty.ParseAfterLastIndexOf_PlusLength("Str"));
             Assert.That("that" == "that".ParseAfterLastIndexOf_PlusLength());
         }
     }

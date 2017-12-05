@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using JMW.Extensions.String;
+using JMW.Parsing.Compile;
 using JMW.Types;
 
 namespace JMW.Parsing.Expressions
 {
-    public class CountExpression : IExpression
+    public class Count : IExpression
     {
         public const string NAME = "count";
         public const string SEARCH = "s";
@@ -15,7 +16,7 @@ namespace JMW.Parsing.Expressions
         public List<string> Search { get; set; } = new List<string>();
         public IntegerRangeCollection Rng { get; set; }
 
-        public CountExpression(Tag t)
+        public Count(Tag t)
         {
             if (t.Properties.ContainsKey(SEARCH))
             {

@@ -1,8 +1,9 @@
 ﻿using JMW.Extensions.String;
+using JMW.Parsing.Compile;
 
-namespace JMW.Parsing.Parsers
+namespace JMW.Parsing.Extractors
 {
-    public class ToParser : ParserBase
+    public class To : Base
     {
         public const string NAME = "to";
 
@@ -14,7 +15,7 @@ namespace JMW.Parsing.Parsers
             if (Mods.Contains("w")) // include search item
             {
                 if (Mods.Contains("l")) // make it the last item
-                    return t ? s.ParseToLastIndexOf_PlusLength(i, Search.ToArray()).Trim() 
+                    return t ? s.ParseToLastIndexOf_PlusLength(i, Search.ToArray()).Trim()
                              : s.ParseToLastIndexOf_PlusLength(i, Search.ToArray());
 
                 if (Quantifier > 0) // parse to a specific number of the item
@@ -29,7 +30,7 @@ namespace JMW.Parsing.Parsers
                      : s.ParseToIndexOf(i, Search.ToArray());
         }
 
-        public ToParser(Tag t) : base(t)
+        public To(Tag t) : base(t)
         {
         }
     }

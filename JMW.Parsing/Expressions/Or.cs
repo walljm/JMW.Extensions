@@ -1,19 +1,20 @@
 ﻿using System.Collections.Generic;
+using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Expressions
 {
-    public class OrExpression : IExpression
+    public class Or : IExpression
     {
         public const string NAME = "or";
 
         public Stack<IExpression> Expressions = new Stack<IExpression>();
 
-        public OrExpression(Tag t)
+        public Or(Tag t)
         {
             if (t.Value is Stack<Tag> tags)
             {
                 foreach (var tag in tags)
-                    Expressions.Push(ExpressionBase.ToExpression(tag));
+                    Expressions.Push(Base.ToExpression(tag));
             }
         }
 

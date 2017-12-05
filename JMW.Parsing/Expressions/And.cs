@@ -1,19 +1,20 @@
 ﻿using System.Collections.Generic;
+using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Expressions
 {
-    public class AndExpression : IExpression
+    public class And : IExpression
     {
         public const string NAME = "and";
 
         public Stack<IExpression> Expressions = new Stack<IExpression>();
 
-        public AndExpression(Tag t)
+        public And(Tag t)
         {
             if (t.Value is Stack<Tag> tags)
             {
                 foreach (var tag in tags)
-                    Expressions.Push(ExpressionBase.ToExpression(tag));
+                    Expressions.Push(Base.ToExpression(tag));
             }
         }
 

@@ -81,7 +81,7 @@ namespace JMW.Types
 
         public string RangeToString()
         {
-            var r = "";
+            var r = string.Empty;
 
             if (Start == Stop) r = Start.ToString();
             else r = Start + "-" + Stop;

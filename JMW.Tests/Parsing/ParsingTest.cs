@@ -1,8 +1,7 @@
-﻿using System.IO;
-using JMW.Parsing;
+﻿using JMW.Parsing.Compile;
 using NUnit.Framework;
 
-namespace JMW.Types.Tests
+namespace JMW.Parsing.Tests
 {
     [TestFixture]
     public class ParsingTest
@@ -16,11 +15,11 @@ namespace JMW.Types.Tests
                     start: startswith {s:[""foo""]}
                     stop: startswith {s:[""bar""]}
                 }
-                start: contains {s:[""start""] m:""i""} #this is a comment
+                start: contains {s:[""start""]i} #this is a comment
                 props:[
                     prop {
                         name:""jason""
-                        line: contains {s:[""is""] m:""i""} #this is a comment
+                        line: contains {s:[""is""]i} #this is a comment
                         parsers:[
                             after {
                                 s:[""is""]
@@ -33,11 +32,11 @@ namespace JMW.Types.Tests
                     }
                     prop {
                         name:""wall""
-                        line: contains {s:[""an""] m:""i""} #this is a comment
+                        line: contains {s:[""an"" ""more""]i} #this is a comment
                         split:""foo""
                         parsers:[
                             to {
-                                s:[""is""]
+                                s:[""is"", ""more""]w
                             }
                         ]
                     }
@@ -54,16 +53,33 @@ start
  this is another line
 start
  this is foo
- this is more foo
+ this is 1 more foo
+start
+ this is foo
+ this is 2 more foo
+start
+ this is foo
+ this is 3 more foo
+start
+ this is foo
+ this is 4 more foo
+start
+ this is foo
+ this is 5 more foo
 bar
 start
  this is foo
- this is more foo
+ this is 6 more foo
 ";
-            var i = new Interpreter(new StringReader(text));
-            foreach (var o in i.Eval(json))
+            var i = Compiler.Compile(json);
+            var output = string.Empty;
+
+            foreach (var o in i.Parse(text))
             {
+                output += o[0] + "|" + o[1] + ";";
             }
+
+            Assert.AreEqual("is is a |start\n this;is is foo|\n this is 1 more;is is foo|\n this is 2 more;is is foo|\n this is 3 more;is is foo|\n this is 4 more;", output);
         }
     }
 }

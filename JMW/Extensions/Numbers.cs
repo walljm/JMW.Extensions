@@ -429,7 +429,7 @@ namespace JMW.Extensions.Numbers
 
         public static string CollapseIntsToRanges(this IEnumerable<int> ints)
         {
-            var r = "";
+            var r = string.Empty;
             var prev = -1;
             var current = -1;
 
@@ -482,7 +482,7 @@ namespace JMW.Extensions.Numbers
 
         public static string CollapseLongsToRanges(this IEnumerable<long> ints)
         {
-            var r = "";
+            var r = string.Empty;
             long prev = -1;
             long current = -1;
 

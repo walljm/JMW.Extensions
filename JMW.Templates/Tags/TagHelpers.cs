@@ -45,7 +45,7 @@ namespace JMW.Template.Tags
             var columns = tag.Properties[Conditional.ATTR_COLUMN].Split(',').ToList();
             if (columns.Count > 1)
             {
-                tag.Properties[Conditional.ATTR_COLUMN] = "";
+                tag.Properties[Conditional.ATTR_COLUMN] = string.Empty;
                 for (var i = 0; i < columns.Count; i++)
                 {
                     var column = columns[i].Trim();
@@ -112,7 +112,7 @@ namespace JMW.Template.Tags
 
             split[int.Parse(octet) - 1] = octet_result.ToString(CultureInfo.InvariantCulture);
 
-            data = "";
+            data = string.Empty;
             for (var i = 0; i < split.Length; i++)
             {
                 data += split[i];

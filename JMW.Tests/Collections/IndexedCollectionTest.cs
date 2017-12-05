@@ -186,7 +186,7 @@ namespace JMW.Collections.Tests
 
         private class Foo : IndexedClass
         {
-            private string _Bar = "";
+            private string _Bar = string.Empty;
             [Indexed(IsUnique = true)]
             public string Bar
             {
@@ -216,7 +216,7 @@ namespace JMW.Collections.Tests
                 }
             }
 
-            private string _Baz = "";
+            private string _Baz = string.Empty;
             [Indexed]
             public string Baz
             {

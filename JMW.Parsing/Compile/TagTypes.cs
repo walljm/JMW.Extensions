@@ -1,4 +1,4 @@
-namespace JMW.Parsing
+namespace JMW.Parsing.Compile
 {
     public enum TagTypes
     {

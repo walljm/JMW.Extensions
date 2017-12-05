@@ -19,6 +19,14 @@ namespace JMW.Extensions.Enumerable
 {
     public static class Extensions
     {
+        public static IEnumerable<T> ReverseOrder<T>(this IList<T> lst)
+        {
+            for (var i = lst.Count-1; i >= 0; i--)
+            {
+                yield return lst[i];
+            }
+        }
+
         /// <summary>
         /// Indicates if the given index is the last item in the list.
         /// </summary>
@@ -27,16 +35,13 @@ namespace JMW.Extensions.Enumerable
         /// <returns></returns>
         public static bool IsLast<T>(this IEnumerable<T> source, int i)
         {
-            var source1 = source as T[];
-            if (source1 != null)
+            switch (source)
             {
-                return source1.Length - 1 == i;
-            }
+                case T[] source1:
+                    return source1.Length - 1 == i;
 
-            var collection = source as ICollection<T>;
-            if (collection != null)
-            {
-                return collection.Count - 1 == i;
+                case ICollection<T> collection:
+                    return collection.Count - 1 == i;
             }
 
             return source.ToArray().Length - 1 == i;
@@ -205,7 +210,7 @@ namespace JMW.Extensions.Enumerable
         /// <returns></returns>
         public static string ToDelimitedString(this IEnumerable Ss, string delimiter, bool trimend = true)
         {
-            var r = "";
+            var r = string.Empty;
             var o = new StringBuilder();
             foreach (var s in Ss)
             {

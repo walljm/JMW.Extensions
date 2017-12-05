@@ -41,7 +41,7 @@ namespace JMW.Differentials.Tests
 
         private class MyDiff
         {
-            public string Difference { get; set; } = "";
+            public string Difference { get; set; } = string.Empty;
         }
     }
 
@@ -111,7 +111,7 @@ namespace JMW.Differentials.Tests
 
     internal class T1
     {
-        public string Foo { get; set; } = "";
+        public string Foo { get; set; } = string.Empty;
 
         public int Bar { get; set; } = -1;
 
@@ -120,7 +120,7 @@ namespace JMW.Differentials.Tests
 
     internal class T2
     {
-        public string Foo { get; set; } = "";
+        public string Foo { get; set; } = string.Empty;
 
         public List<int> Jason { get; set; } = new List<int>();
 

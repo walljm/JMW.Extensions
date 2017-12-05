@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using JMW.Extensions.Numbers;
+using JMW.Parsing.Compile;
 
-namespace JMW.Parsing.Parsers
+namespace JMW.Parsing.Extractors
 {
-    public abstract class ParserBase
+    public abstract class Base
     {
         public const string SEARCH = "s";
         public const string MODS = "m";
         public const string QUANTIFIER = "q";
         public const string INDEX = "i";
 
-        public ParserBase(Tag t)
+        public Base(Tag t)
         {
             if (t.Properties.ContainsKey(MODS))
                 Mods = t.Properties[MODS].Value.ToString();
@@ -46,18 +47,18 @@ namespace JMW.Parsing.Parsers
 
         public abstract string Parse(string s);
 
-        public static ParserBase InToParser(Tag t)
+        public static Base InToParser(Tag t)
         {
             switch (t.Name)
             {
-                case ToParser.NAME:
-                    return new ToParser(t);
+                case To.NAME:
+                    return new To(t);
 
-                case AfterParser.NAME:
-                    return new AfterParser(t);
+                case After.NAME:
+                    return new After(t);
 
-                case SplitParser.NAME:
-                    return new SplitParser(t);
+                case Split.NAME:
+                    return new Split(t);
             }
 
             throw new ArgumentException("Unsupported Expression Tag", nameof(t));

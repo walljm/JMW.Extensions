@@ -1,12 +1,18 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Expressions
 {
-    public class StartsWithExpression : ExpressionBase
+    public class StartsWith : Base
     {
         public const string NAME = "startswith";
 
-        public StartsWithExpression(Tag t) : base(t)
+        public StartsWith(Tag t) : base(t)
+        {
+        }
+
+        public StartsWith(List<string> search, string mods) : base(search, mods)
         {
         }
 

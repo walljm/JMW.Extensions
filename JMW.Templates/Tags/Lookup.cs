@@ -6,7 +6,7 @@ namespace JMW.Template.Tags
     public class Lookup : TagHandlerBase
     {
         private bool _hasBeenIndexed = false;
-        private string _indexDetails = "";
+        private string _indexDetails = string.Empty;
 
         public const string TAG = "lookup";
         public override string TagName { get; } = TAG;
@@ -43,8 +43,8 @@ namespace JMW.Template.Tags
         {
             TagHelpers.PrefixTags(tag.Children, Name);
 
-            var index_details = (tag.Properties.ContainsKey(ATTR_KEY_EXP) ? tag.Properties[ATTR_KEY_EXP] : "") +
-                               (tag.Properties.ContainsKey(ATTR_KEY_COL) ? tag.Properties[ATTR_KEY_COL] : "");
+            var index_details = (tag.Properties.ContainsKey(ATTR_KEY_EXP) ? tag.Properties[ATTR_KEY_EXP] : string.Empty) +
+                               (tag.Properties.ContainsKey(ATTR_KEY_COL) ? tag.Properties[ATTR_KEY_COL] : string.Empty);
 
             if (!_hasBeenIndexed || index_details != _indexDetails)
             {

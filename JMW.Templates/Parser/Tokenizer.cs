@@ -80,7 +80,7 @@ namespace JMW.Template
                 {
                     _inTag = false;
                     Token.Type = TokenType.SINGLEClOSE;
-                    Token.Value = "";
+                    Token.Value = string.Empty;
                     return Token.Type;
                 }
                 else if (_inTag) // if we are in a tag then we expect to start reading parameters.

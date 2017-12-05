@@ -44,7 +44,7 @@ If the `exp` attribute is present, the `value` and `type` attributes, if present
 | `define` | **conditional**: Allows you to define a named include to use elsewhere in the template |
 
 When an `<include>` is used with the `name` attribute, there must be corresponding
-`<include define="">` tag somewhere in the template.
+`<include define=string.Empty>` tag somewhere in the template.
 
 Only one of the attributes can be used at a time.
  

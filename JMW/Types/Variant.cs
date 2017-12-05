@@ -140,7 +140,7 @@ namespace JMW.Types
             if (IsList) return "(List) Count:" + _listValue.Count;
             if (IsDict) return "(Dict) Count:" + _dictValue.Count;
 
-            return "";
+            return string.Empty;
         }
 
         public bool Equals(Variant val)

@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
-using JMW.Extensions.String;
 
-namespace JMW.Parsing
+namespace JMW.Parsing.Compile
 {
     /// <summary>
     ///   Parses template tags for a simple generic templating engine.
@@ -10,25 +9,9 @@ namespace JMW.Parsing
     public class Parser
     {
         private readonly Stack<Tag> _stack = new Stack<Tag>();
-        private readonly Dictionary<string, ITagHandler> _tags = new Dictionary<string, ITagHandler>();
-
-        public void AddTag(string tag_name, ITagHandler tag)
-        {
-            _tags.Add(tag_name, tag);
-        }
-
-        public void AddTag(ITagHandler tag)
-        {
-            _tags.Add(tag.Name, tag);
-        }
 
         public Parser()
         {
-        }
-
-        public Parser(Dictionary<string, ITagHandler> tags) : this()
-        {
-            _tags = tags;
         }
 
         /// <summary>
@@ -80,7 +63,6 @@ namespace JMW.Parsing
                         }
                     case TokenType.ObjectStop:
                         {
-                            
                             var curr = _stack.Pop();
                             if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Array)
                             {
@@ -105,7 +87,14 @@ namespace JMW.Parsing
                         tag.Name = token.Value.ToLower().Trim();
                         tag.TagType = TagTypes.Property;
                         _stack.Push(tag);
-                        
+
+                        break;
+
+                    case TokenType.Options:
+                        tag.Name = "m";
+                        tag.Value = token.Value;
+                        tag.TagType = TagTypes.Property;
+                        _stack.Peek().Properties.Add("m", tag);
                         break;
 
                     case TokenType.Value:
@@ -125,6 +114,7 @@ namespace JMW.Parsing
                             var o = (Stack<Tag>)_stack.Peek().Value;
                             tag.TagType = TagTypes.Word;
                             tag.Name = string.Empty;
+                            tag.Value = token.Value;
                             o.Push(tag);
                         }
                         break;

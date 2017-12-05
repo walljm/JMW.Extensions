@@ -1,8 +1,9 @@
 ﻿using JMW.Extensions.String;
+using JMW.Parsing.Compile;
 
-namespace JMW.Parsing.Parsers
+namespace JMW.Parsing.Extractors
 {
-    public class AfterParser : ParserBase
+    public class After : Base
     {
         public const string NAME = "after";
 
@@ -29,7 +30,7 @@ namespace JMW.Parsing.Parsers
                      : s.ParseAfterIndexOf(i, Search.ToArray());
         }
 
-        public AfterParser(Tag t) : base(t)
+        public After(Tag t) : base(t)
         {
         }
     }

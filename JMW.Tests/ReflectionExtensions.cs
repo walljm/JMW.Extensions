@@ -85,11 +85,11 @@ namespace JMW.Extensions.String.Tests
         public void CastDelegateTest1()
         {
             Jason d1 =
-                s => "";
+                s => string.Empty;
 
             var d2 = d1.CastDelegate<Jason>();
             
-            Assert.That(d1("") == d2(""));
+            Assert.That(d1(string.Empty) == d2(string.Empty));
         }
 
         private delegate string Jason(string one);
@@ -102,7 +102,7 @@ namespace JMW.Extensions.String.Tests
         private class Test1 : ITest
         {
             [Indexed]
-            public string Prop1 { get; set; } = "";
+            public string Prop1 { get; set; } = string.Empty;
         }
     }
 }

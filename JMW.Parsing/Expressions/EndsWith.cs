@@ -1,12 +1,13 @@
 ﻿using System.Linq;
+using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Expressions
 {
-    public class EndsWithExpression : ExpressionBase
+    public class EndsWith : Base
     {
         public const string NAME = "endswith";
 
-        public EndsWithExpression(Tag t) : base(t)
+        public EndsWith(Tag t) : base(t)
         {
         }
 

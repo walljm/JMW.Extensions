@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Expressions
 {
-    public abstract class ExpressionBase : IExpression
+    public abstract class Base : IExpression
     {
-        public ExpressionBase(Tag t)
+        public Base(List<string> search, string mods)
+        {
+            Mods = mods;
+            Search = search;
+        }
+
+        public Base(Tag t)
         {
             if (t.Properties.ContainsKey(MODS))
                 Mods = t.Properties[MODS].Value.ToString();
@@ -28,29 +35,29 @@ namespace JMW.Parsing.Expressions
         {
             switch (t.Name)
             {
-                case ContainsExpression.NAME:
-                    return new ContainsExpression(t);
+                case Contains.NAME:
+                    return new Contains(t);
 
-                case StartsWithExpression.NAME:
-                    return new StartsWithExpression(t);
+                case StartsWith.NAME:
+                    return new StartsWith(t);
 
-                case EndsWithExpression.NAME:
-                    return new EndsWithExpression(t);
+                case EndsWith.NAME:
+                    return new EndsWith(t);
 
-                case RegexExpression.NAME:
-                    return new RegexExpression(t);
+                case Regex.NAME:
+                    return new Regex(t);
 
-                case AndExpression.NAME:
-                    return new AndExpression(t);
+                case And.NAME:
+                    return new And(t);
 
-                case OrExpression.NAME:
-                    return new OrExpression(t);
+                case Or.NAME:
+                    return new Or(t);
 
-                case CountExpression.NAME:
-                    return new CountExpression(t);
+                case Count.NAME:
+                    return new Count(t);
 
-                case LookExpression.NAME:
-                    return new LookExpression(t);
+                case Look.NAME:
+                    return new Look(t);
             }
 
             throw new ArgumentException("Unsupported Expression Tag", nameof(t));

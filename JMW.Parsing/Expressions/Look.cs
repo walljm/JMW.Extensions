@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using JMW.Extensions.String;
+using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Expressions
 {
-    public class LookExpression : IExpression
+    public class Look : IExpression
     {
         public const string NAME = "look";
         public const string SEARCH = "s";
         public const string AHEAD = "a";
         public const string BEHIND = "b";
 
-
         public List<string> Search { get; set; } = new List<string>();
         public List<string> Ahead { get; set; } = new List<string>();
         public List<string> Behind { get; set; } = new List<string>();
 
-        public LookExpression(Tag t)
+        public Look(Tag t)
         {
             if (t.Properties.ContainsKey(SEARCH))
             {

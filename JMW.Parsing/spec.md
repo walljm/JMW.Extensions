@@ -2,6 +2,12 @@
 Record types take a string[] and return an object (either a string, or string[]) to be stored
 ```coffeescript
 para {
+    
+    # if present, overrides the default line delimiter.
+    #  this allows you to index the document
+    #  by any character or set of characters.
+    split:"val" #optional
+
     # sets boundaries on the whole document, not on
     #  each paragraph
     include: section{} #optional
@@ -18,7 +24,32 @@ para {
 }
 
 table {
-    header:exp{} #required
+    
+    # if present, overrides the default line delimiter.
+    #  this allows you to index the document
+    #  by any character or set of characters.
+    split:"val" #optional
+
+    # sets boundaries on the whole document, not on
+    #  each paragraph
+    include: section{} #optional
+    
+    # identifies a header line.
+    # this is used to figure out the location
+    #  of columns.  This is required if the
+    #  column parser is used.
+    header:exp{} #optional
+    
+    # i == validate the columns with data
+    m: "i"
+
+    # identifies which lines have rows in them.
+    row:exp{}
+
+    # the list of propery parsers.
+    # you can include any Record type
+    props: [ record{} record{} ... ] #required.
+
 }
 
 prop {
@@ -31,7 +62,7 @@ prop {
     split:"val" #optional
     
     # the list of parsers to apply to the string
-    parsers: [ parser{} parser{} ... ] #required
+    parsers: [ Extractor{} Extractor{} ... ] #required
 }
 
 ```
@@ -46,21 +77,19 @@ section {
 
 ```
 
-### Parser types
+### Extractor types
 ```coffeescript
 to {
     # array of strings to search for.
     #  parses to instance of first item 
     #  in array found.
-    s:["val"] #required
-    
     # i == ignore case
     # w == include search pattern length in index
     # t == trim the returned value
     # l == to last instance of search pattern
-    m:"iwtl" #optional
+    s:["val"]iwtl #required
     
-    # to specific instance of s value
+    # quantifier: after specific instance of s value
     q:"2" #optional, if populated, l is ignored
 }
 
@@ -68,66 +97,64 @@ after {
     # array of strings to search for.
     #  parses after instance of first item 
     #  in array found.
-    s:["val"] #required
-    
     # i == ignore case
     # w == include search pattern length in index
     # t == trim the returned value
     # l == after last instance of search pattern
-    m:"iwtl" #optional
-    
-    # after specific instance of s value
+    s:["val"]iwtl #required
+
+    # quantifier: after specific instance of s value
     q:"2" #optional, if populated, l is ignored
 }
 
 split {
     # split the string on the provided values
-    s:["val"] #required
-    
     # i == ignore case
     # r == remove empty entries
     # t == trim the returned value
-    m:"irt" #optional
+    s:["val"]irt #required
     
     # index of item to return
     i:"2"  #required
 }
 
+# this only works with the table parser
+#  either the i or the n option must be used.
+col {
+    i:"3" #optional
+    n:"column_name" #optional
+}
 ```
 
 
 ### Exp types
 ```coffeescript
 regex {
-    s:["val"] #required
-    
+    # The search parameter
     # i == ignore case
     # n == negate
-    m:"i" #optional
+    s:["val"]ni #required
 }
 
 contains {
-    s:["val"] #required
-    
+    # The search parameter
     # i == ignore case
     # n == negate
-    m:"ni"  #optional
+    s:["val"]ni #required
 }
 
 startswith {
-    s:["val"] #required
-    
+    # The search parameter
     # i == ignore case
     # n == negate
-    m:"ni" #optional
+    s:["val"]ni #required
 }
 
 endswith {
-    s:["val"] #required
-    
+    # The search parameter
     # i == ignore case
     # n == negate
-    m:"ni" #optional
+    s:["val"]ni #required
 }
 
 # classic boolean and

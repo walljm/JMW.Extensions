@@ -7,7 +7,7 @@ namespace JMW.Template.Tags
     public class Join : TagHandlerBase
     {
         private bool _hasBeenJoined = false;
-        private string _joinDetails = "";
+        private string _joinDetails = string.Empty;
 
         private TableData _leftTableData;
         private TableData _rightTableData;
@@ -65,12 +65,12 @@ namespace JMW.Template.Tags
         {
             TagHelpers.PrefixTags(tag.Children, Name);
 
-            var join_details = (tag.Properties.ContainsKey(ATTR_LEFT_KEY_EXP) ? tag.Properties[ATTR_LEFT_KEY_EXP] : "") +
-                               (tag.Properties.ContainsKey(ATTR_LEFT_KEY) ? tag.Properties[ATTR_LEFT_KEY] : "") +
-                               (tag.Properties.ContainsKey(ATTR_LEFT_WHERE) ? tag.Properties[ATTR_LEFT_WHERE] : "") +
-                               (tag.Properties.ContainsKey(ATTR_RIGHT_KEY) ? tag.Properties[ATTR_RIGHT_KEY] : "") +
-                               (tag.Properties.ContainsKey(ATTR_RIGHT_KEY_EXP) ? tag.Properties[ATTR_RIGHT_KEY_EXP] : "") +
-                               (tag.Properties.ContainsKey(ATTR_RIGHT_WHERE) ? tag.Properties[ATTR_RIGHT_WHERE] : "");
+            var join_details = (tag.Properties.ContainsKey(ATTR_LEFT_KEY_EXP) ? tag.Properties[ATTR_LEFT_KEY_EXP] : string.Empty) +
+                               (tag.Properties.ContainsKey(ATTR_LEFT_KEY) ? tag.Properties[ATTR_LEFT_KEY] : string.Empty) +
+                               (tag.Properties.ContainsKey(ATTR_LEFT_WHERE) ? tag.Properties[ATTR_LEFT_WHERE] : string.Empty) +
+                               (tag.Properties.ContainsKey(ATTR_RIGHT_KEY) ? tag.Properties[ATTR_RIGHT_KEY] : string.Empty) +
+                               (tag.Properties.ContainsKey(ATTR_RIGHT_KEY_EXP) ? tag.Properties[ATTR_RIGHT_KEY_EXP] : string.Empty) +
+                               (tag.Properties.ContainsKey(ATTR_RIGHT_WHERE) ? tag.Properties[ATTR_RIGHT_WHERE] : string.Empty);
 
             if (!_hasBeenJoined || join_details != _joinDetails)
             {

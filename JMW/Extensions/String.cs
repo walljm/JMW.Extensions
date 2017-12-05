@@ -10,6 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using JMW.Extensions.Object;
 
@@ -538,13 +539,62 @@ namespace JMW.Extensions.String
         {
             var v = str;
             foreach (var c in Path.GetInvalidFileNameChars())
-                v = v.Replace(c.ToString(), "");
+                v = v.Replace(c.ToString(), string.Empty);
 
             var words = v.Split(' ');
-            var r = "";
+            var r = string.Empty;
             foreach (var w in words)
                 r += w.Substring(0, 1) + w.Substring(1);
             return r;
+        }
+
+        /// <summary>
+        /// Counts the numbers of instances of the <paramref name="c"/> param in the <paramref
+        /// name="test"/> string.
+        /// </summary>
+        /// <param name="test">string to search</param>
+        /// <param name="c">char to search for</param>
+        /// <param name="respect_word_boundaries">doesn't count "port" the same as "portindex"</param>
+        /// <returns>int</returns>
+        public static int CountInstances(this string test, string c, bool respect_word_boundaries = false)
+        {
+            var s = test + " "; // to avoid geriatrics with strings not ending in a word boundary.
+            var cnt = 0;
+            if (respect_word_boundaries) c = c + " ";
+            while (s.IndexOf(c, StringComparison.Ordinal) != -1)
+            {
+                s = s.Substring(s.IndexOf(c, StringComparison.Ordinal) + c.Length);
+                cnt++;
+            }
+            return cnt;
+        }
+
+        public static Dictionary<char, int> GetCharHistogram(this string line, bool collapse_whitespace = true)
+        {
+            var hist = new Dictionary<char, int>();
+
+            var prev_char_is_ws = false;
+
+            foreach (var c in line)
+            {
+                var my_char = c;
+                if (collapse_whitespace && char.IsWhiteSpace(c))
+                {
+                    my_char = ' ';
+                    if (prev_char_is_ws)
+                        continue;
+                }
+
+                // Only the first whitespace counts we ignore the rest
+                if (hist.ContainsKey(my_char))
+                    hist[my_char]++;
+                else
+                    hist[my_char] = 1;
+
+                prev_char_is_ws = char.IsWhiteSpace(c);
+            }
+
+            return hist;
         }
     }
 }

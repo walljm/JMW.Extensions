@@ -14,15 +14,9 @@ namespace JMW.Template.Tags
 
         #region Properties
 
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_EXCEL, ATTR_FILENAME, ATTR_MODE };
+        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_FILENAME, ATTR_MODE };
 
         public const string ATTR_FILENAME = "filename";
-
-        public const string ATTR_EXCEL = VALUE_EXCEL_COLUMN;
-        public const string VALUE_EXCEL_SHEET = "sheet";
-        public const string VALUE_EXCEL_COLUMN = "column";
-
-        public const string ATTR_EXCEL_NAME = "excel_name";
 
         public const string ATTR_MODE = "mode";
         public const string VALUE_MODE_NEW = "new";
@@ -41,26 +35,11 @@ namespace JMW.Template.Tags
             var stream = interp.OutputStream;
 
             // create new stream and handle properties.
-            var is_excel = tag.Properties.ContainsKey(ATTR_EXCEL);
             var mode = tag.Properties.ContainsKey(ATTR_MODE) ? tag.Properties[ATTR_MODE] : VALUE_MODE_APPEND;
 
-            if (is_excel)
+            switch (mode)
             {
-                var type = tag.Properties[ATTR_EXCEL];
-                switch (type)
-                {
-                    case VALUE_EXCEL_COLUMN:
-                        break;
-
-                    case VALUE_EXCEL_SHEET:
-                        break;
-                }
-            }
-            else
-            {
-                switch (mode)
-                {
-                    case VALUE_MODE_NEW:
+                case VALUE_MODE_NEW:
                     {
                         var file = tag.Properties[ATTR_FILENAME];
                         var ext = Path.GetExtension(file);
@@ -84,7 +63,7 @@ namespace JMW.Template.Tags
                         _iteration[file]++;
                         break;
                     }
-                    case VALUE_MODE_APPEND:
+                case VALUE_MODE_APPEND:
                     {
                         if (RedirectOutputs)
                         {
@@ -99,9 +78,8 @@ namespace JMW.Template.Tags
                         }
                         break;
                     }
-                    default:
-                        throw new Exception("Unknown attribute file for " + ATTR_MODE + ".  Allowed values are: " + VALUE_MODE_NEW + " and " + VALUE_MODE_APPEND);
-                }
+                default:
+                    throw new Exception("Unknown attribute file for " + ATTR_MODE + ".  Allowed values are: " + VALUE_MODE_NEW + " and " + VALUE_MODE_APPEND);
             }
 
             interp.HandleChildren(tag);
@@ -114,12 +92,5 @@ namespace JMW.Template.Tags
         {
             return tag.TagType == TagTypes.Tag && tag.Name == TAG;
         }
-    }
-
-    public enum ExcelOutputTypes
-    {
-        FILE,
-        SHEET,
-        COLUMN
     }
 }

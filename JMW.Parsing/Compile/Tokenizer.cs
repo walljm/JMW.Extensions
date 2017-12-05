@@ -4,39 +4,8 @@ using System.IO;
 using System.Linq;
 using JMW.IO;
 
-namespace JMW.Parsing
+namespace JMW.Parsing.Compile
 {
-    public enum TokenType
-    {
-        PropertyName,
-        ObjectStop,
-        ObjectStart,
-        ArrayStop,
-        ArrayStart,
-        Word,
-        Value,
-        Comment,
-        Error
-    }
-
-    public class Token
-    {
-        public string Value;
-        public TokenType Type;
-        public int Line;
-        public int Column;
-
-        public string LocationToString()
-        {
-            return "Line: " + (Line + 1) + " Column: " + (Column + 1);
-        }
-
-        public override string ToString()
-        {
-            return Value + " " + LocationToString();
-        }
-    }
-
     public class Tokenizer
     {
         private readonly string _objectStart = @"{";
@@ -98,11 +67,15 @@ namespace JMW.Parsing
                     {
                         return consumeObjectStart();
                     }
-                   
+
                     if (maybeReadPropertyStart())
                     {
                         return consumePropertyName();
                     }
+
+                    // if its not a prop and its not an object, then its a set of options.
+                    Token.Type = TokenType.Options;
+                    return Token.Type;
                 }
 
                 if (maybeReadArrayStart())
@@ -194,7 +167,7 @@ namespace JMW.Parsing
                 _eof = true;
                 return setupErrorToken("EOF");
             }
-            _reader.PushBack(new[] {(char) c});
+            _reader.PushBack(new[] { (char)c });
 
             consumeUntil('\n', TokenType.Comment);
             Token.Value = Token.Value.TrimEnd('\r', '\n');
@@ -284,7 +257,7 @@ namespace JMW.Parsing
         internal TokenType consumeWhitespace()
         {
             var c = _reader.Read();
-            while (c != -1 && (Char.IsWhiteSpace((char)c) || c == ';')) // ignore the ';', its optional.
+            while (c != -1 && (Char.IsWhiteSpace((char)c) || c == ';') || c == ',') // ignore the ';', its optional.
             {
                 c = _reader.Read();
                 // This is the unicode invalid character. If we encounter this it means we parsed the

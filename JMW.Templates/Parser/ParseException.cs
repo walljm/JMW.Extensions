@@ -5,8 +5,8 @@ namespace JMW.Template
     [Serializable]
     public class ParseException : Exception
     {
-        public string Location { get; } = "";
-        public string ErrorText { get; } = "";
+        public string Location { get; } = string.Empty;
+        public string ErrorText { get; } = string.Empty;
 
         public ParseException(string message)
             : base(message)

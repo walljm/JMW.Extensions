@@ -68,7 +68,7 @@ namespace JMW.Template
         {
             var tokenizer = new Tokenizer(reader);
             var ast = new List<Tag>();
-            var currParam = "";
+            var currParam = string.Empty;
             while (tokenizer.Next() != TokenType.ERROR)
             {
                 var tag = new Tag();
@@ -127,7 +127,7 @@ namespace JMW.Template
                     case TokenType.PARAMNAME:
                         if (currParam.IsNotEmpty())
                         {
-                            _stack.Peek().Properties[currParam] = "";
+                            _stack.Peek().Properties[currParam] = string.Empty;
                         }
                         currParam = token.Value.ToLower();
                         break;
@@ -138,7 +138,7 @@ namespace JMW.Template
                             _stack.Peek().Properties[currParam] = token.Value;
                         }
                         // reset currParam since we found a value for it.
-                        currParam = "";
+                        currParam = string.Empty;
                         break;
 
                     case TokenType.TEXT:
@@ -170,7 +170,7 @@ namespace JMW.Template
 
         private static string handleNewLines(string current_template)
         {
-            current_template = current_template.Replace("\r\n", "");
+            current_template = current_template.Replace("\r\n", string.Empty);
             current_template = current_template.Replace("\\n", "\r\n");
             return current_template;
         }
