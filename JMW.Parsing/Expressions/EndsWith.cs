@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Expressions
@@ -11,16 +11,13 @@ namespace JMW.Parsing.Expressions
         {
         }
 
+        public EndsWith(List<string> search, string mods) : base(search, mods)
+        {
+        }
+
         public override bool Test(string s)
         {
-            bool v;
-
-            if (Mods.Contains("i"))
-                v = Search.Any(sr => s.ToLower().EndsWith(sr.ToLower()));
-            else
-                v = Search.Any(s.EndsWith);
-
-            return Mods.Contains("n") ? !v : v;
+            return base.Test(s, (str, sch) => str.EndsWith(sch));
         }
     }
 }

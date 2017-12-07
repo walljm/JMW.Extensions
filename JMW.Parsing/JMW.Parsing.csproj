@@ -44,6 +44,7 @@
     <Compile Include="Compile\IProperty.cs" />
     <Compile Include="Compile\Token.cs" />
     <Compile Include="Compile\TokenType.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Expressions\Look.cs" />
     <Compile Include="Expressions\Count.cs" />
     <Compile Include="Expressions\Or.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Compile\Tag.cs" />
     <Compile Include="Compile\TagTypes.cs" />
     <Compile Include="Compile\Tokenizer.cs" />
+    <Compile Include="Search.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JMW\JMW.csproj">

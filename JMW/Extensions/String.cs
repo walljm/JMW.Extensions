@@ -251,17 +251,30 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+            var l = 0;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                var idx = IndexOf(str, p, case_insensitive);
-
-                // if its greater than 0, return it.
-                if (idx > -1)
+                var tidx = IndexOf(str, p, case_insensitive);
+                if (idx == -1)
                 {
-                    return s.SafeSubstring(idx + p.Length);
+                    idx = tidx;
+                    l = p.Length;
                 }
+                else if (idx > tidx && tidx > -1)
+                {
+                    idx = tidx;
+                    l = p.Length;
+                }
+            }
+
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(idx + l);
             }
 
             // worst case, return the string as is.

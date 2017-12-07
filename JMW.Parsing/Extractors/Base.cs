@@ -7,20 +7,18 @@ namespace JMW.Parsing.Extractors
 {
     public abstract class Base
     {
-        public const string SEARCH = "s";
-        public const string MODS = "m";
         public const string QUANTIFIER = "q";
         public const string INDEX = "i";
 
         public Base(Tag t)
         {
-            if (t.Properties.ContainsKey(MODS))
-                Mods = t.Properties[MODS].Value.ToString();
-
-            if (t.Properties.ContainsKey(SEARCH))
+            if (t.Properties.ContainsKey(Search.SEARCH))
             {
-                foreach (var val in (Stack<Tag>)t.Properties[SEARCH].Value)
-                    Search.Add(val.Value.ToString());
+                foreach (var val in (Stack<Tag>)t.Properties[Search.SEARCH].Value)
+                    Search.Query.Add(val.Value.ToString());
+
+                if (t.Properties[Search.SEARCH].Properties.ContainsKey(Search.MODS))
+                    Search.Mods = t.Properties[Search.SEARCH].Properties[Search.MODS].Value.ToString();
             }
 
             if (t.Properties.ContainsKey(QUANTIFIER))
@@ -40,8 +38,7 @@ namespace JMW.Parsing.Extractors
             }
         }
 
-        public List<string> Search { get; set; } = new List<string>();
-        public string Mods { get; set; } = string.Empty;
+        public Search Search { get; set; } = new Search();
         public int Quantifier { get; set; } = -1;
         public int Index { get; set; } = -1;
 

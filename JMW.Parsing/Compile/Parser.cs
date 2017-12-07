@@ -28,7 +28,7 @@ namespace JMW.Parsing.Compile
         {
             var tokenizer = new Tokenizer(reader);
             var ast = new List<Tag>();
-
+            Tag last = null;
             while (tokenizer.Next() != TokenType.Error)
             {
                 var tag = new Tag();
@@ -52,6 +52,7 @@ namespace JMW.Parsing.Compile
                     case TokenType.ArrayStop:
                         {
                             var curr = _stack.Pop();
+                            last = curr;
                             if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Property)
                             {
                                 var t = _stack.Pop();
@@ -64,6 +65,7 @@ namespace JMW.Parsing.Compile
                     case TokenType.ObjectStop:
                         {
                             var curr = _stack.Pop();
+                            last = curr;
                             if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Array)
                             {
                                 var o = (Stack<Tag>)_stack.Peek().Value;
@@ -94,7 +96,7 @@ namespace JMW.Parsing.Compile
                         tag.Name = "m";
                         tag.Value = token.Value;
                         tag.TagType = TagTypes.Property;
-                        _stack.Peek().Properties.Add("m", tag);
+                        last?.Properties.Add(tag.Name, tag);
                         break;
 
                     case TokenType.Value:

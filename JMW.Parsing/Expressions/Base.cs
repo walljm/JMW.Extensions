@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Expressions
@@ -8,28 +9,42 @@ namespace JMW.Parsing.Expressions
     {
         public Base(List<string> search, string mods)
         {
-            Mods = mods;
-            Search = search;
+            Search.Mods = mods;
+            Search.Query = search;
         }
 
         public Base(Tag t)
         {
-            if (t.Properties.ContainsKey(MODS))
-                Mods = t.Properties[MODS].Value.ToString();
-            if (t.Properties.ContainsKey(SEARCH))
+            if (t.Properties.ContainsKey(Search.SEARCH))
             {
-                foreach (var val in (Stack<Tag>)t.Properties[SEARCH].Value)
-                    Search.Add(val.Value.ToString());
+                foreach (var val in (Stack<Tag>)t.Properties[Search.SEARCH].Value)
+                    Search.Query.Add(val.Value.ToString());
+
+                if (t.Properties[Search.SEARCH].Properties.ContainsKey(Search.MODS))
+                    Search.Mods = t.Properties[Search.SEARCH].Properties[Search.MODS].Value.ToString();
             }
         }
 
-        public const string MODS = "m";
-        public const string SEARCH = "s";
-
-        public List<string> Search { get; set; } = new List<string>();
-        public string Mods { get; set; } = string.Empty;
+        public Search Search { get; set; } = new Search();
 
         public abstract bool Test(string s);
+
+        /// <summary>
+        /// Uses a function to test against a provided string.
+        /// </summary>
+        /// <param name="s">String to search against</param>
+        /// <param name="func">Function that takes the String to test against and a value to test for and returns a boolean.</param>
+        public bool Test(string s, Func<string, string, bool> func)
+        {
+            bool v;
+
+            if (Search.Mods.Contains(Constants.CASE_INSENSITIVE)) // run case insensitive
+                v = Search.Query.Any(sr => func(s.ToLower(), sr.ToLower()));
+            else
+                v = Search.Query.Any(sr => func(s, sr));
+
+            return Search.Mods.Contains(Constants.NEGATE) ? !v : v;
+        }
 
         public static IExpression ToExpression(Tag t)
         {

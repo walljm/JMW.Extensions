@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using JMW.Parsing.Compile;
 
@@ -12,15 +13,19 @@ namespace JMW.Parsing.Expressions
         {
         }
 
+        public Regex(List<string> search, string mods) : base(search, mods)
+        {
+        }
+
         public override bool Test(string s)
         {
             bool v;
-            if (Mods.Contains("i"))
-                v = Search.Any(sr => System.Text.RegularExpressions.Regex.IsMatch(s, sr, RegexOptions.IgnoreCase));
+            if (Search.Mods.Contains(Constants.CASE_INSENSITIVE))
+                v = Search.Query.Any(sr => System.Text.RegularExpressions.Regex.IsMatch(s, sr, RegexOptions.IgnoreCase));
             else
-                v = Search.Any(sr => System.Text.RegularExpressions.Regex.IsMatch(s, sr));
+                v = Search.Query.Any(sr => System.Text.RegularExpressions.Regex.IsMatch(s, sr));
 
-            return Mods.Contains("n") ? !v : v;
+            return Search.Mods.Contains(Constants.NEGATE) ? !v : v;
         }
     }
 }

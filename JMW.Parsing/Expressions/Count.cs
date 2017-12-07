@@ -10,32 +10,51 @@ namespace JMW.Parsing.Expressions
     public class Count : IExpression
     {
         public const string NAME = "count";
-        public const string SEARCH = "s";
         public const string RNG = "rng";
 
-        public List<string> Search { get; set; } = new List<string>();
+        public Search Search { get; set; } = new Search();
         public IntegerRangeCollection Rng { get; set; }
 
         public Count(Tag t)
         {
-            if (t.Properties.ContainsKey(SEARCH))
+            if (t.Properties.ContainsKey(Search.SEARCH))
             {
-                foreach (var val in (Stack<Tag>)t.Properties[SEARCH].Value)
-                    Search.Add(val.Value.ToString());
+                foreach (var val in (Stack<Tag>)t.Properties[Search.SEARCH].Value)
+                    Search.Query.Add(val.Value.ToString());
+
+                if (t.Properties[Search.SEARCH].Properties.ContainsKey(Search.MODS))
+                    Search.Mods = t.Properties[Search.SEARCH].Properties[Search.MODS].Value.ToString();
             }
+            else
+                throw new ArgumentException("Required Property Missing: " + Search.SEARCH);
+
             if (t.Properties.ContainsKey(RNG))
                 Rng = new IntegerRangeCollection(t.Properties[RNG].Value.ToString());
             else
                 throw new ArgumentException("Required Property Missing: " + RNG);
         }
 
+        public Count(List<string> search, IntegerRangeCollection rng, string mods)
+        {
+            Rng = rng;
+            Search.Query = search;
+            Search.Mods = mods;
+        }
+
         public bool Test(string s)
         {
+            var i = Search.Mods.Contains(Constants.CASE_INSENSITIVE);
             var c = 0;
             var t = s;
-            while (Search.Any(t.Contains))
+            while (Search.Query.Any(sr =>
             {
-                t = t.ParseAfterIndexOf_PlusLength(Search.ToArray());
+                if (i) return t.ToLower().Contains(sr.ToLower());
+
+                return t.Contains(sr);
+            }))
+            {
+                c++;
+                t = t.ParseAfterIndexOf_PlusLength(i, Search.Query.ToArray());
             }
             return Rng.Contains(c);
         }

@@ -13,15 +13,15 @@ namespace JMW.Parsing.Extractors
             if (Index < 0)
                 throw new ArgumentException("Required Attribute Missing: " + INDEX);
 
-            var r = Mods.Contains("r"); // remove the empty entries
-            var t = Mods.Contains("t"); // trim the output
+            var r = Search.Mods.Contains(Constants.REMOVE_EMPTY_ENTRIES); // remove the empty entries
+            var t = Search.Mods.Contains(Constants.TRIM); // trim the output
 
             string[] fields;
 
-            if (Mods.Contains("i")) // case insensitive
-                fields = s.ToLower().Split(Search.Select(o => o.ToLower()).ToArray(), r ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
+            if (Search.Mods.Contains(Constants.CASE_INSENSITIVE)) // case insensitive
+                fields = s.ToLower().Split(Search.Query.Select(o => o.ToLower()).ToArray(), r ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
             else
-                fields = s.Split(Search.ToArray(), r ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
+                fields = s.Split(Search.Query.ToArray(), r ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
 
             if (fields.Length > Index)
             {

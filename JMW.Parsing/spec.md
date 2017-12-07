@@ -173,14 +173,18 @@ or {
 
 # is the string s behind string a and ahead of string b
 look {
-    a:["val"] # optional
-    s:["val"] #required
-    b:["val"] # optional
+    a:["val"]i # optional
+    # i == ignore case
+    # n == negate
+    s:["val"]ni #required
+    b:["val"]i # optional
 }
 
 # the number of times a string may be contained in test string.
 count { 
-    s:["val"] #required
+    # i == ignore case
+    # n == negate
+    s:["val"]ni #required
 
     # required.  as long as the number of instances of the val
     #  fall into the provided ranges, it returns true.
