@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JMW.Parsing.Compile;
 
@@ -34,6 +35,10 @@ namespace JMW.Parsing.Extractors
         }
 
         public Split(Tag t) : base(t)
+        {
+        }
+
+        public Split(List<string> search, string mods, int idx) : base(search, mods, -1, idx)
         {
         }
     }

@@ -1,4 +1,5 @@
-﻿using JMW.Extensions.String;
+﻿using System.Collections.Generic;
+using JMW.Extensions.String;
 using JMW.Parsing.Compile;
 
 namespace JMW.Parsing.Extractors
@@ -14,13 +15,13 @@ namespace JMW.Parsing.Extractors
 
             if (Search.Mods.Contains(Constants.WITH_VALUE)) // include search item
             {
-                if (Search.Mods.Contains(Constants.LAST)) // make it the last item
-                    return t ? s.ParseToLastIndexOf_PlusLength(i, Search.Query.ToArray()).Trim()
-                             : s.ParseToLastIndexOf_PlusLength(i, Search.Query.ToArray());
-
                 if (Quantifier > 0) // parse to a specific number of the item
                     return t ? s.ParseToDesignatedIndexOf_PlusLength(Quantifier, i, Search.Query.ToArray()).Trim()
                              : s.ParseToDesignatedIndexOf_PlusLength(Quantifier, i, Search.Query.ToArray());
+
+                if (Search.Mods.Contains(Constants.LAST)) // make it the last item
+                    return t ? s.ParseToLastIndexOf_PlusLength(i, Search.Query.ToArray()).Trim()
+                        : s.ParseToLastIndexOf_PlusLength(i, Search.Query.ToArray());
 
                 return t ? s.ParseToIndexOf_PlusLength(i, Search.Query.ToArray()).Trim()
                          : s.ParseToIndexOf_PlusLength(i, Search.Query.ToArray());
@@ -31,6 +32,10 @@ namespace JMW.Parsing.Extractors
         }
 
         public To(Tag t) : base(t)
+        {
+        }
+
+        public To(List<string> search, string mods, int q) : base(search, mods, q, -1)
         {
         }
     }

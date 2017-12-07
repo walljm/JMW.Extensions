@@ -18,6 +18,12 @@ namespace JMW.Parsing.Expressions
             }
         }
 
+        public And(IEnumerable<IExpression> expressions)
+        {
+            foreach (var exp in expressions)
+                Expressions.Push(exp);
+        }
+
         public bool Test(string s)
         {
             foreach (var exp in Expressions)

@@ -38,6 +38,14 @@ namespace JMW.Parsing.Extractors
             }
         }
 
+        public Base(List<string> search, string mods, int q, int idx)
+        {
+            Search.Query = search;
+            Search.Mods = mods;
+            Quantifier = q;
+            Index = idx;
+        }
+
         public Search Search { get; set; } = new Search();
         public int Quantifier { get; set; } = -1;
         public int Index { get; set; } = -1;

@@ -27,5 +27,9 @@ namespace JMW.Parsing.Extractors
         public Column(Tag t) : base(t)
         {
         }
+
+        public Column(int idx) : base(null, "", -1, idx)
+        {
+        }
     }
 }

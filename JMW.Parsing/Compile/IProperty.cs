@@ -4,6 +4,7 @@ namespace JMW.Parsing.Compile
 {
     public interface IProperty
     {
+        string Name { get; }
         object Parse(StreamReader reader);
     }
 }

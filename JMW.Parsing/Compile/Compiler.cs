@@ -25,7 +25,7 @@ namespace JMW.Parsing.Compile
                 }
             }
 
-            throw new NotSupportedException("Parsing Tags not supported.");
+            throw new NotSupportedException("Parsing Tag not supported. Top tag must be " + Paragraph.NAME + " or " + Table.NAME);
         }
     }
 }

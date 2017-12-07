@@ -43,17 +43,23 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                var idx = IndexOf(str, p, case_insensitive);
+                var tidx = IndexOf(str, p, case_insensitive);
+                if (idx == -1)
+                    idx = tidx;
+                else if (idx > tidx && tidx > -1)
+                    idx = tidx;
+            }
 
-                // if its greater than 0, return it.
-                if (idx > -1)
-                {
-                    return s.SafeSubstring(0, idx);
-                }
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(0, idx);
             }
 
             // worst case, return the string as is.
@@ -86,17 +92,23 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                var idx = IndexOf(str, p, case_insensitive, last: true);
+                var tidx = IndexOf(str, p, case_insensitive, last: true);
+                if (idx == -1)
+                    idx = tidx;
+                else if (idx > tidx && tidx > -1)
+                    idx = tidx;
+            }
 
-                // if its greater than 0, return it.
-                if (idx > -1)
-                {
-                    return s.SafeSubstring(0, idx);
-                }
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(0, idx);
             }
 
             // worst case, return the string as is.
@@ -130,17 +142,30 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+            var l = 0;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                var idx = IndexOf(str, p, case_insensitive);
-
-                // if its greater than 0, return it.
-                if (idx > -1)
+                var tidx = IndexOf(str, p, case_insensitive);
+                if (idx == -1)
                 {
-                    return s.SafeSubstring(0, idx + p.Length);
+                    idx = tidx;
+                    l = p.Length;
                 }
+                else if (idx > tidx && tidx > -1)
+                {
+                    idx = tidx;
+                    l = p.Length;
+                }
+            }
+
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(0, idx + l);
             }
 
             // worst case, return the string as is.
@@ -173,17 +198,30 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+            var l = 0;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                var idx = IndexOf(str, p, case_insensitive, last: true);
-
-                // if its greater than 0, return it.
-                if (idx > -1)
+                var tidx = IndexOf(str, p, case_insensitive, last: true);
+                if (idx == -1)
                 {
-                    return s.SafeSubstring(0, idx + p.Length);
+                    idx = tidx;
+                    l = p.Length;
                 }
+                else if (idx > tidx && tidx > -1)
+                {
+                    idx = tidx;
+                    l = p.Length;
+                }
+            }
+
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(0, idx + l);
             }
 
             // worst case, return the string as is.
@@ -208,17 +246,30 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+            var l = 0;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
                 // get the index of our search parameter
-                var idx = IndexOf(str, p, case_insensitive, qty);
-
-                // if its greater than 0, return it.
-                if (idx > -1)
+                var tidx = IndexOf(str, p, case_insensitive, qty);
+                if (idx == -1)
                 {
-                    return s.SafeSubstring(0, idx + p.Length);
+                    idx = tidx;
+                    l = p.Length;
                 }
+                else if (idx > tidx && tidx > -1)
+                {
+                    idx = tidx;
+                    l = p.Length;
+                }
+            }
+
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(0, idx + l);
             }
 
             // worst case, return the string as is.
@@ -307,16 +358,30 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+            var l = 0;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
-                var idx = IndexOf(str, p, case_insensitive, last: true);
-
-                // if its greater than 0, return it.
-                if (idx > -1)
+                // get the index of our search parameter
+                var tidx = IndexOf(str, p, case_insensitive, last: true);
+                if (idx == -1)
                 {
-                    return s.SafeSubstring(idx + p.Length);
+                    idx = tidx;
+                    l = p.Length;
                 }
+                else if (idx > tidx && tidx > -1)
+                {
+                    idx = tidx;
+                    l = p.Length;
+                }
+            }
+
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(idx + l);
             }
 
             // worst case, return the string as is.
@@ -341,16 +406,30 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+            var l = 0;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
-                var idx = IndexOf(str, p, case_insensitive, qty);
-
-                // if its greater than 0, return it.
-                if (idx > -1)
+                // get the index of our search parameter
+                var tidx = IndexOf(str, p, case_insensitive, qty);
+                if (idx == -1)
                 {
-                    return s.SafeSubstring(idx + p.Length);
+                    idx = tidx;
+                    l = p.Length;
                 }
+                else if (idx > tidx && tidx > -1)
+                {
+                    idx = tidx;
+                    l = p.Length;
+                }
+            }
+
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(idx + l);
             }
 
             // worst case, return the string as is.
@@ -383,16 +462,23 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
-                var idx = IndexOf(str, p, case_insensitive, last: true);
+                // get the index of our search parameter
+                var tidx = IndexOf(str, p, case_insensitive, last: true);
+                if (idx == -1)
+                    idx = tidx;
+                else if (idx > tidx && tidx > -1)
+                    idx = tidx;
+            }
 
-                // if its greater than 0, return it.
-                if (idx > -1)
-                {
-                    return s.SafeSubstring(idx);
-                }
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(idx);
             }
 
             // worst case, return the string as is.
@@ -425,16 +511,23 @@ namespace JMW.Extensions.String
             // lowercase the string if we're working with case insensitive search
             var str = case_insensitive ? s.ToLower() : s;
 
+            var idx = -1;
+
             // look for earch parm, return first one found.
             foreach (var p in parms)
             {
-                var idx = IndexOf(str, p, case_insensitive);
+                // get the index of our search parameter
+                var tidx = IndexOf(str, p, case_insensitive);
+                if (idx == -1)
+                    idx = tidx;
+                else if (idx > tidx && tidx > -1)
+                    idx = tidx;
+            }
 
-                // if its greater than 0, return it.
-                if (idx > -1)
-                {
-                    return s.SafeSubstring(idx);
-                }
+            // if its greater than 0, return it.
+            if (idx > -1)
+            {
+                return s.SafeSubstring(idx);
             }
 
             // worst case, return the string as is.
@@ -477,7 +570,7 @@ namespace JMW.Extensions.String
                 var c = 0;
                 while (c != qty)
                 {
-                    idx = str.IndexOf(search_string.ToLower(), idx, StringComparison.Ordinal);
+                    idx = str.IndexOf(search_string.ToLower(), idx < 0 ? 0 : idx + search_string.Length, StringComparison.Ordinal);
                     c++;
                 }
             }

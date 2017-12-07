@@ -95,6 +95,25 @@ namespace JMW.Parsing.Handlers
             }
         }
 
+        public IEnumerable<Dictionary<string, object>> ParseNamed(string text)
+        {
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(text)))
+            using (var sr = new StreamReader(ms))
+            {
+                foreach (var o in Parse(sr))
+                {
+                    var i = 0;
+                    var dict = new Dictionary<string, object>();
+                    foreach (var p in _props)
+                    {
+                        dict.Add(p.Name, o[i]);
+                        i++;
+                    }
+                    yield return dict;
+                }
+            }
+        }
+
         object IProperty.Parse(StreamReader reader)
         {
             return Parse(reader);

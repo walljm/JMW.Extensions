@@ -74,7 +74,10 @@ namespace JMW.Parsing.Handlers
                 started = true;
 
                 if (_stop != null && _stop.Test(line))
+                {
+                    yield return paragraph;
                     break;
+                }
 
                 paragraph.Add(line);
             }

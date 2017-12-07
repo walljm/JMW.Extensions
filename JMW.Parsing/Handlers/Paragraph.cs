@@ -68,7 +68,7 @@ namespace JMW.Parsing.Handlers
 
                 // process the properties
                 var line = lines.ToDelimitedString("\n");
-                foreach (var p in _props.ReverseOrder())
+                foreach (var p in _props)
                 {
                     using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(line)))
                     using (var sr = new StreamReader(ms))
@@ -87,6 +87,25 @@ namespace JMW.Parsing.Handlers
             {
                 foreach (var o in Parse(sr))
                     yield return o;
+            }
+        }
+
+        public IEnumerable<Dictionary<string, object>> ParseNamed(string text)
+        {
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(text)))
+            using (var sr = new StreamReader(ms))
+            {
+                foreach (var o in Parse(sr))
+                {
+                    var i = 0;
+                    var dict = new Dictionary<string, object>();
+                    foreach (var p in _props)
+                    {
+                        dict.Add(p.Name, o[i]);
+                        i++;
+                    }
+                    yield return dict;
+                }
             }
         }
 
