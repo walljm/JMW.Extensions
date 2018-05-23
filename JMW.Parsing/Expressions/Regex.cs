@@ -7,7 +7,8 @@ namespace JMW.Parsing.Expressions
 {
     public class Regex : Base
     {
-        public const string NAME = "regex";
+        public const string NAME1 = "regex";
+        public const string NAME2 = "reg";
 
         public Regex(Tag t) : base(t)
         {

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using JMW.Collections;
 using JMW.IO;
 
-namespace JMW.Parsing.Compile
+namespace JMW.Networking.Junos.Parser
 {
     public class Tokenizer
     {
@@ -12,8 +14,10 @@ namespace JMW.Parsing.Compile
         private readonly string _objectStop = @"}";
         private readonly string _arrayStart = @"[";
         private readonly string _arrayStop = @"]";
-        private readonly string _propertyStart = @":";
+        private readonly string _commentBlockStart = @"/*";
+        private readonly string _commentBlockStop = @"*/";
         private readonly string _commentStart = @"#";
+        private readonly string _LineStop = @";";
 
         internal LineTrackingReader _reader;
         public Token Token
@@ -68,19 +72,22 @@ namespace JMW.Parsing.Compile
                         return consumeObjectStart();
                     }
 
-                    if (maybeReadPropertyStart())
+                    // ignore empty words.
+                    if (Token.Value.Length > 0)
                     {
-                        return consumePropertyName();
+                        Token.Type = TokenType.Word;
+                        return Token.Type;
                     }
-
-                    // if its not a prop and its not an object, then its a set of options.
-                    Token.Type = TokenType.Options;
-                    return Token.Type;
                 }
 
                 if (maybeReadArrayStart())
                 {
                     return consumeArrayStart();
+                }
+
+                if (maybeReadCommentBlockStart())
+                {
+                    return consumeCommentBlockStart();
                 }
 
                 if (maybeReadCommentStart())
@@ -97,12 +104,10 @@ namespace JMW.Parsing.Compile
                 {
                     return consumeArrayStop();
                 }
-
-                if (maybeReadBeginPropertyValue())
+                if (maybeReadLineStop())
                 {
-                    return consumePropertyValue();
+                    return consumeLineStop();
                 }
-
                 if (maybeReadWord())
                 {
                     return consumeWord();
@@ -135,7 +140,7 @@ namespace JMW.Parsing.Compile
             Token.Type = type;
             var c = _reader.Read();
             var value = new List<char>();
-            while (c != cc && c != 0 && c != -1)
+            while (c != cc && c != 0)
             {
                 value.Add((char)c);
                 c = _reader.Read();
@@ -174,28 +179,6 @@ namespace JMW.Parsing.Compile
             return Token.Type;
         }
 
-        internal TokenType consumePropertyValue()
-        {
-            var c = _reader.Read();
-            if (c == -1)
-            {
-                _eof = true;
-                return setupErrorToken("EOF");
-            }
-            if (c == '"' || c == '\'')
-            {
-                return consumeUntil(c, TokenType.Value);
-            }
-            _reader.PushBack((char)c);
-            return Token.Type;
-        }
-
-        internal TokenType consumePropertyName()
-        {
-            Token.Type = TokenType.PropertyName;
-            return Token.Type;
-        }
-
         internal TokenType consumeObjectStart()
         {
             Token.Type = TokenType.ObjectStart;
@@ -215,20 +198,60 @@ namespace JMW.Parsing.Compile
             return Token.Type;
         }
 
+        internal TokenType consumeCommentBlockStart()
+        {
+            var text = new RingBuffer<char>(2);
+
+            var c = _reader.Read();
+            text.Add((char)c);
+
+            while (!(text[0] == '*' && text[1] == '/')) // ignore the ';', its optional.
+            {
+                c = _reader.Read();
+                // This is the unicode invalid character. If we encounter this it means we parsed the
+                // template with an invalid encoding. Or the template was stored with an invalid
+                // encoding.
+                if (c == '\uffff')
+                {
+                    return setupErrorToken(INVALID_UNICODE_ERROR);
+                }
+                text.Add((char)c);
+            }
+
+            if (c == -1)
+            {
+                _eof = true;
+            }
+
+            return Next();
+        }
         internal TokenType consumeArrayStop()
         {
             Token.Value = string.Empty;
             Token.Type = TokenType.ArrayStop;
             return Token.Type;
         }
-
+        internal TokenType consumeLineStop()
+        {
+            Token.Value = string.Empty;
+            Token.Type = TokenType.LineStop;
+            return Token.Type;
+        }
         internal TokenType consumeWord()
         {
-            var acceptable = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
+            
+            var unacceptable = "[]{}#;".ToCharArray();
 
             var identifier = new List<char>();
             var c = _reader.Read();
-            while (!Char.IsWhiteSpace((char)c) && acceptable.Contains((char)c))
+            if ((char) c == '"')
+            {
+                _inWord = true;
+                _reader.PushBack((char)c);
+                return consumeQuotedString();
+            }
+
+            while (!Char.IsWhiteSpace((char)c) && !unacceptable.Contains((char)c))
             {
                 identifier.Add((char)c);
                 c = _reader.Read();
@@ -248,16 +271,53 @@ namespace JMW.Parsing.Compile
             {
                 _reader.PushBack((char)c);
             }
+
             _inWord = true;
             Token.Type = TokenType.Word;
             Token.Value = new string(identifier.ToArray());
             return consumeWhitespace();
         }
 
+        internal TokenType consumeQuotedString()
+        {
+            var text = new StringBuilder();
+
+            var c = _reader.Read();
+            if (c == 34)
+                c = _reader.Read();
+            else
+            {
+                return Next();
+            }
+
+            text.Append((char) c);
+
+            while (c != 34) // ignore the ';', its optional.
+            {
+                c = _reader.Read();
+                // This is the unicode invalid character. If we encounter this it means we parsed the
+                // template with an invalid encoding. Or the template was stored with an invalid
+                // encoding.
+                if (c == '\uffff')
+                {
+                    return setupErrorToken(INVALID_UNICODE_ERROR);
+                }
+                text.Append((char)c);
+            }
+
+            if (c == -1)
+            {
+                _eof = true;
+            }
+            Token.Value = text.ToString().Trim('"');
+            Token.Type = TokenType.Word;
+            return Next();
+        }
+
         internal TokenType consumeWhitespace()
         {
             var c = _reader.Read();
-            while (c != -1 && (Char.IsWhiteSpace((char)c) || c == ';') || c == ',') // ignore the ';', its optional.
+            while (c != -1 && Char.IsWhiteSpace((char)c)) // ignore the ';', its optional.
             {
                 c = _reader.Read();
                 // This is the unicode invalid character. If we encounter this it means we parsed the
@@ -285,8 +345,8 @@ namespace JMW.Parsing.Compile
             _reader.PushBack(buf.Take(n).ToArray());
 
             var c = buf.First();
-            var acceptable = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
-            if (acceptable.Contains(c))
+            var unacceptable = "{}[]#;".ToCharArray();
+            if (!unacceptable.Contains(c))
                 return true;
 
             return false;
@@ -312,16 +372,18 @@ namespace JMW.Parsing.Compile
             return maybeReadText(_arrayStart);
         }
 
+        internal bool maybeReadCommentBlockStart()
+        {
+            return maybeReadText(_commentBlockStart);
+        }
         internal bool maybeReadArrayStop()
         {
             return maybeReadText(_arrayStop);
         }
-
-        internal bool maybeReadPropertyStart()
+        internal bool maybeReadLineStop()
         {
-            return maybeReadText(_propertyStart);
+            return maybeReadText(_LineStop);
         }
-
         internal bool maybeReadBeginPropertyValue()
         {
             var c = _reader.Read();

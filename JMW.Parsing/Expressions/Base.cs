@@ -53,13 +53,16 @@ namespace JMW.Parsing.Expressions
                 case Contains.NAME:
                     return new Contains(t);
 
-                case StartsWith.NAME:
+                case StartsWith.NAME1:
+                case StartsWith.NAME2:
                     return new StartsWith(t);
 
-                case EndsWith.NAME:
+                case EndsWith.NAME1:
+                case EndsWith.NAME2:
                     return new EndsWith(t);
 
-                case Regex.NAME:
+                case Regex.NAME1:
+                case Regex.NAME2:
                     return new Regex(t);
 
                 case And.NAME:

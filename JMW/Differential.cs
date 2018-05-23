@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace JMW
 {
-    public static class Differerential
+    public static class Differential
     {
         /// <summary>
         ///   Takes two indexed collections and performs a comparison.
@@ -406,7 +406,7 @@ namespace JMW
         /// <summary>
         /// The objects that were added
         /// </summary>
-        public List<T> Removals => OnlyInListA;
+        public List<T> Deletions => OnlyInListA;
 
         /// <summary>
         /// The objects that exist only in List A

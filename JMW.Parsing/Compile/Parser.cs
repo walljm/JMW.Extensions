@@ -79,6 +79,19 @@ namespace JMW.Parsing.Compile
                                 break;
                             }
 
+                            if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Object)
+                            {
+                                // its an object like an Or or and And that has a list of expressions.
+                                var o = _stack.Peek();
+                                if (o.Value.GetType() != typeof(Stack<Tag>))
+                                {
+                                    o.Value = new Stack<Tag>();
+                                }
+
+                                ((Stack<Tag>)o.Value).Push(curr);
+                                break;
+                            }
+
                             if (_stack.Count == 0)
                             {
                                 ast.Add(curr);

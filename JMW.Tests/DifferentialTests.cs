@@ -14,7 +14,7 @@ namespace JMW.Differentials.Tests
             var lstA = new List<string> { "b", "c", "d" };
             var lstB = new List<string> { "A", "B", "c" };
 
-            var diff = Differerential.RunCollectionDifferential(
+            var diff = Differential.RunCollectionDifferential(
                 lstA,
                 lstB,
                 (k, lst) =>
@@ -66,7 +66,7 @@ namespace JMW.Differentials.Tests
                 new T1 { Foo="6"}
             };
 
-            var diff = Differerential.RunCollectionDifferential(lst_a, lst_b, p => p.Foo);
+            var diff = Differential.RunCollectionDifferential(lst_a, lst_b, p => p.Foo);
             Assert.AreEqual(2, diff.OnlyInListA.Count);
             Assert.AreEqual(2, diff.OnlyInListB.Count);
             Assert.AreEqual(2, diff.Shared.Count);
@@ -90,7 +90,7 @@ namespace JMW.Differentials.Tests
                 new T2 { Foo="6"}
             };
 
-            var diff = Differerential.RunCollectionDifferential(lst_a, lst_b, p => p.Foo, p => p.Foo);
+            var diff = Differential.RunCollectionDifferential(lst_a, lst_b, p => p.Foo, p => p.Foo);
             Assert.AreEqual(2, diff.OnlyInListA.Count);
             Assert.AreEqual(2, diff.OnlyInListB.Count);
             Assert.AreEqual(2, diff.Shared.Count);

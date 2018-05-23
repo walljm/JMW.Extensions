@@ -56,6 +56,7 @@
     <Compile Include="Expressions\Contains.cs" />
     <Compile Include="Expressions\Regex.cs" />
     <Compile Include="Extractors\Column.cs" />
+    <Compile Include="Handlers\Base.cs" />
     <Compile Include="Handlers\Table.cs" />
     <Compile Include="Handlers\Paragraph.cs" />
     <Compile Include="Handlers\Include.cs" />

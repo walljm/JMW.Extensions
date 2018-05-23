@@ -7,41 +7,40 @@ namespace JMW.Parsing.Handlers
 {
     public class Property : IProperty
     {
-        public const string NAME = "name";
-        public const string PARSERS = "parsers";
-        public const string LINE = "line";
-        public const string SPLIT = "split";
+        public const string NAME = "prop";
+        public const string A_NAME = "name";
+        public const string A_PARSERS = "parsers";
+        public const string A_LINE = "line";
+        public const string A_SPLIT = "split";
 
         public string Name { get; set; }
         public Stack<Extractors.Base> Extractors { get; set; } = new Stack<Extractors.Base>();
         public Expressions.IExpression Line { get; set; }
         public string Split { get; set; }
 
-        public Property(Tag t)
+        public Property(Tag token)
         {
-            if (t.Properties.ContainsKey(NAME))
-                Name = t.Properties[NAME].Value.ToString();
+            if (token.Properties.ContainsKey(A_NAME))
+                Name = token.Properties[A_NAME].Value.ToString();
             else
-                throw new ParseException("Required Attribute Missing: " + NAME);
+                throw new ParseException("Required Attribute Missing: " + A_NAME);
 
-            if (t.Properties.ContainsKey(PARSERS))
+            if (token.Properties.ContainsKey(A_PARSERS))
             {
-                var parsers = (Stack<Tag>)t.Properties[PARSERS].Value;
+                var parsers = (Stack<Tag>)token.Properties[A_PARSERS].Value;
                 foreach (var p in parsers)
-                    Extractors.Push(Parsing.Extractors.Base.InToParser(p));
+                    Extractors.Push(Parsing.Extractors.Base.ToExtractor(p));
             }
             else
-                throw new ParseException("Required Attribute Missing: " + PARSERS);
+                throw new ParseException("Required Attribute Missing: " + A_PARSERS);
 
-            if (t.Properties.ContainsKey(LINE))
+            if (token.Properties.ContainsKey(A_LINE))
             {
-                Line = Expressions.Base.ToExpression(t.Properties[LINE]);
+                Line = Expressions.Base.ToExpression(token.Properties[A_LINE]);
             }
-            else
-                throw new ParseException("Required Attribute Missing: " + LINE);
-
-            if (t.Properties.ContainsKey(SPLIT))
-                Split = t.Properties[SPLIT].Value.ToString();
+            
+            if (token.Properties.ContainsKey(A_SPLIT))
+                Split = token.Properties[A_SPLIT].Value.ToString();
         }
 
         public object Parse(StreamReader reader)
@@ -96,7 +95,7 @@ namespace JMW.Parsing.Handlers
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        if (!Line.Test(line))
+                        if (Line != null && !Line.Test(line))
                             continue;
 
                         var r = line;

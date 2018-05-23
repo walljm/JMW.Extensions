@@ -52,7 +52,7 @@ namespace JMW.Parsing.Extractors
 
         public abstract string Parse(string s);
 
-        public static Base InToParser(Tag t)
+        public static Base ToExtractor(Tag t)
         {
             switch (t.Name)
             {
@@ -64,6 +64,9 @@ namespace JMW.Parsing.Extractors
 
                 case Split.NAME:
                     return new Split(t);
+
+                case Column.NAME:
+                    return new Column(t);
             }
 
             throw new ArgumentException("Unsupported Expression Tag", nameof(t));

@@ -40,22 +40,23 @@ table {
     #  column parser is used.
     header:exp{} #optional
     
-    # i == validate the columns with data
-    m: "i"
-
     # identifies which lines have rows in them.
     row:exp{}
 
     # the list of propery parsers.
     # you can include any Record type
-    props: [ record{} record{} ... ] #required.
+    parsers: [ Extractor{} Extractor{} ... ] #required.
 
+    # i == validate the columns with data
+    validate: "i" #currently unsupported
 }
 
 prop {
     name:"val" #required
     
-    line:exp{} #required
+    # if the parser is for a paragraph, then this is required.
+    # if the parser is for a table, then this is not needed.
+    line:exp{} #optional
     
     # if present, the string[] is combined and 
     #  split again using the provided delimiter
@@ -129,7 +130,7 @@ col {
 
 ### Exp types
 ```coffeescript
-regex {
+regex | reg {
     # The search parameter
     # i == ignore case
     # n == negate
@@ -143,14 +144,14 @@ contains {
     s:["val"]ni #required
 }
 
-startswith {
+startswith | starts {
     # The search parameter
     # i == ignore case
     # n == negate
     s:["val"]ni #required
 }
 
-endswith {
+endswith | ends {
     # The search parameter
     # i == ignore case
     # n == negate
@@ -159,16 +160,16 @@ endswith {
 
 # classic boolean and
 and {
-    exp1:{}
-    exp2:{}
-    ...
+    contains{}
+    startswith{}
+    # etc..  
 }
 
 # classic boolean or
 or {
-    exp1:{}
-    exp2:{}
-    ...
+    contains{}
+    startswith{}
+    # etc..  
 }
 
 # is the string s behind string a and ahead of string b
@@ -188,7 +189,7 @@ count {
 
     # required.  as long as the number of instances of the val
     #  fall into the provided ranges, it returns true.
-    qty:"1-5,7,8-10" #required
+    rng:"1-5,7,8-10" #required
 }
 ```
 

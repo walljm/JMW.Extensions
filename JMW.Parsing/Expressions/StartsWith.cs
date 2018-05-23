@@ -5,7 +5,8 @@ namespace JMW.Parsing.Expressions
 {
     public class StartsWith : Base
     {
-        public const string NAME = "startswith";
+        public const string NAME1 = "startswith";
+        public const string NAME2 = "starts";
 
         public StartsWith(Tag t) : base(t)
         {

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW", "JMW\JMW.csproj", "{09DE972F-E558-4E4C-9A01-F31E8F99359C}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Templates", "JMW.Templates\JMW.Templates.csproj", "{E7A342B5-3191-422B-B2D1-8F23EAD701DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Parsing", "JMW.Parsing\JMW.Parsing.csproj", "{3AA49893-32B0-48D3-A486-C00CF709D276}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Networking", "JMW.Networking\JMW.Networking.csproj", "{958EF8D4-69B5-4FB4-AB0D-A992451D5BE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,8 +35,15 @@ Global
 		{3AA49893-32B0-48D3-A486-C00CF709D276}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AA49893-32B0-48D3-A486-C00CF709D276}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AA49893-32B0-48D3-A486-C00CF709D276}.Release|Any CPU.Build.0 = Release|Any CPU
+		{958EF8D4-69B5-4FB4-AB0D-A992451D5BE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{958EF8D4-69B5-4FB4-AB0D-A992451D5BE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{958EF8D4-69B5-4FB4-AB0D-A992451D5BE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{958EF8D4-69B5-4FB4-AB0D-A992451D5BE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D21EF7F8-40C0-4635-B94B-1D7708021D49}
 	EndGlobalSection
 EndGlobal

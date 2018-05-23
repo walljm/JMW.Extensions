@@ -27,9 +27,9 @@ namespace JMW.Parsing.Handlers
         public Include(Tag t)
         {
             if (t.Properties.ContainsKey(START))
-                _start = Base.ToExpression(t.Properties[START]);
+                _start = Expressions.Base.ToExpression(t.Properties[START]);
             if (t.Properties.ContainsKey(STOP))
-                _stop = Base.ToExpression(t.Properties[STOP]);
+                _stop = Expressions.Base.ToExpression(t.Properties[STOP]);
         }
 
         public IEnumerable<string> GetNextRow(StreamReader reader, IExpression row)

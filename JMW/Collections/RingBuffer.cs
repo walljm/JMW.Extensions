@@ -96,6 +96,11 @@ namespace JMW.Collections
             return _index > 0 ? _array[_index - 1] : _array[Count - 1];
         }
 
+        public T First()
+        {
+            return _array[_index];
+        }
+
         public void Clear()
         {
             for (var i = 0; i < _array.Length; i++)
@@ -123,6 +128,26 @@ namespace JMW.Collections
         public List<T> ToList()
         {
             return new List<T>(this);
+        }
+
+        public T this[int index]
+        {
+            get
+            {
+                if (index >= Count)
+                    throw new IndexOutOfRangeException("Index: " + index + " is not less than " + Count);
+                var idx = _index + index < _array.Length ? _index + index : _index + index - _array.Length;
+                return _array[idx];
+            }
+
+            set
+            {
+                if (index >= Count)
+                    throw new IndexOutOfRangeException("Index: " + index + " is not less than " + Count);
+
+                var idx = _index + index < _array.Length ? _index + index : _index + index - _array.Length;
+                _array[idx] = value;
+            }
         }
     }
 

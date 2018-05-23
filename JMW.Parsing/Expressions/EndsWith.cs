@@ -5,7 +5,8 @@ namespace JMW.Parsing.Expressions
 {
     public class EndsWith : Base
     {
-        public const string NAME = "endswith";
+        public const string NAME1 = "endswith";
+        public const string NAME2 = "ends";
 
         public EndsWith(Tag t) : base(t)
         {

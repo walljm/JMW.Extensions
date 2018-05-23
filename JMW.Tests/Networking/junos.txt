@@ -1,0 +1,4806 @@
+﻿## Last commit: 2017-09-22 07:50:01 UTC by xxxxxxxx
+version 15.1R5-S2.3;
+groups {
+    re0 {
+        system {
+            host-name UJECALD030;
+            syslog {
+                host <*> {
+                    log-prefix UJECALD030;
+                }
+            }
+        }
+        interfaces {
+            fxp0 {
+                unit 0 {
+                    family inet {
+                        address 10.71.12.8/26 {
+                            master-only;
+                        }
+                        address 10.71.12.6/26;
+                    }
+                }
+            }
+        }
+    }
+    re1 {
+        system {
+            host-name UJECALD030;
+            syslog {
+                host <*> {
+                    log-prefix UJECALD030;
+                }
+            }
+        }
+        interfaces {
+            fxp0 {
+                unit 0 {
+                    family inet {
+                        address 10.71.12.8/26 {
+                            master-only;
+                        }
+                        address 10.71.12.7/26;
+                    }
+                }
+            }
+        }
+    }
+    global {
+        system {
+            root-authentication {
+                encrypted-password "<removed>"; ## SECRET-DATA
+            }
+        }
+    }
+    UNIQUE-PREFIX-LISTS {
+        policy-options {
+            prefix-list V4-LOOPBACK {
+                33.20.224.241/32;
+            }
+            prefix-list CUSTOMER-INTERFACE-LOCAL-PREFIX {
+                33.48.241.0/24;
+            }
+            prefix-list APPROVED-ICMP-HOSTS;
+            prefix-list FXP0-ADDRESS {
+                10.71.12.8/32;
+                10.71.12.6/32;
+                10.71.12.7/32;
+            }
+        }
+    }
+    COMMON-PREFIX-LISTS {
+        policy-options {
+            prefix-list ALL-ADDRESSES {
+                0.0.0.0/0;
+            }
+            prefix-list CUSTOMER-INTERFACE-AGGREGATE-PREFIX {
+                33.48.0.0/15;
+                214.68.0.0/16;
+            }
+            prefix-list LOOPBACK-ADDRESS {
+                apply-path "interfaces lo0 unit 0 family inet address <*>";
+            }
+            prefix-list BGP-NEIGHBOR-ADDRESSES {
+                apply-path "protocols bgp group <*> neighbor <*>";
+            }
+            prefix-list BGP-LOCAL-ADDRESSES {
+                apply-path "protocols bgp group <*> neighbor <*> local-address <*>";
+            }
+            prefix-list VPN-BGP-NEIGHBOR-ADDRESSES {
+                apply-path "routing-instances <*> protocols bgp group <*> neighbor <*>";
+            }
+            prefix-list VPN-BGP-LOCAL-ADDRESSES {
+                apply-path "routing-instances <*> protocols bgp group <*> neighbor <*> local-address <*>";
+            }
+            prefix-list RNOSC-SUBNETS {
+                10.30.0.0/16;
+                10.53.0.0/16;
+                10.67.0.0/16;
+                10.44.0.0/16;
+            }
+            prefix-list NGGN-INFRASTRUCTURE-SUBNETS {
+                214.20.0.0/16;
+                33.20.0.0/16;
+                214.68.0.0/16;
+                140.52.0.0/16;
+            }
+            prefix-list COMPLETE-DCN-SUBNETS {
+                10.20.0.0/14;
+                10.24.0.0/13;
+                10.32.0.0/11;
+                10.64.0.0/14;
+                10.68.0.0/15;
+                10.70.0.0/15;
+                10.73.0.0/16;
+                10.80.0.0/16;
+            }
+            prefix-list GCDN-ADDRESSES {
+                164.235.63.0/24;
+                164.235.127.0/24;
+                214.4.229.0/24;
+                214.4.230.0/24;
+                214.4.231.0/24;
+                214.24.240.0/24;
+                214.24.241.0/24;
+                214.24.243.0/24;
+                215.1.57.0/24;
+                215.65.47.0/24;
+                215.65.60.0/24;
+                215.65.61.0/24;
+                215.65.62.0/24;
+                215.65.63.0/24;
+                215.65.64.0/24;
+                215.65.65.0/24;
+                215.65.66.0/24;
+                215.65.67.0/24;
+                215.65.68.0/24;
+                164.235.95.0/24;
+                214.24.208.0/20;
+                214.24.240.0/20;
+                164.235.159.0/24;
+            }
+            prefix-list RFC1918 {
+                10.0.0.0/8;
+                172.16.0.0/12;
+                192.168.0.0/16;
+            }
+        }
+    }
+    SONET-RFC-2615 {
+        interfaces {
+            <so-*> {
+                sonet-options {
+                    rfc-2615;
+                }
+            }
+        }
+    }
+    IA-QOS-FILTERS {
+        interfaces {
+            fxp0 {
+                unit 0 {
+                    family inet {
+                        filter {
+                            input FXP0-INTERFACE-INGRESS;
+                            group 1;
+                        }
+                    }
+                }
+            }
+            lo0 {
+                unit 0 {
+                    family inet {
+                        filter {
+                            input RE-INGRESS;
+                        }
+                    }
+                }
+            }
+            ge-2/3/1 {
+                unit 0 {
+                    family inet;
+                }
+            }
+            ge-2/3/2 {
+                unit 0 {
+                    family inet;
+                }
+            }
+            ge-2/3/5 {
+                unit 0 {
+                    family inet;
+                }
+            }
+        }
+        firewall {
+            family inet {
+                filter LINE-INTERFACE-INGRESS-QOS {
+                    interface-specific;
+                    term SAMPLED {
+                        then {
+                            sample;
+                            next term;
+                        }
+                    }
+                    term SET-PLP-HIGH {
+                        from {
+                            dscp [ b001000 b011000 b101000 b111000 ];
+                        }
+                        then {
+                            loss-priority high;
+                            next term;
+                        }
+                    }
+                    term ALLOW-HAIPE-TRAFFIC {
+                        from {
+                            source-prefix-list {
+                                CUSTOMER-INTERFACE-LOCAL-PREFIX;
+                            }
+                            destination-prefix-list {
+                                CUSTOMER-INTERFACE-AGGREGATE-PREFIX;
+                            }
+                        }
+                        then accept;
+                    }
+                    term DENY-ALL {
+                        then {
+                            policer POLICER-32K;
+                            count DENY-ALL;
+                            syslog;
+                            discard;
+                        }
+                    }
+                }
+                filter RE-INGRESS {
+                    term DENY-FIRST-FRAGMENT {
+                        from {
+                            source-prefix-list {
+                                RNOSC-SUBNETS except;
+                                ALL-ADDRESSES;
+                                COMPLETE-DCN-SUBNETS except;
+                                NGGN-INFRASTRUCTURE-SUBNETS except;
+                            }
+                            first-fragment;
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count DENY-FIRST-FRAGMENT;
+                            syslog;
+                            discard;
+                        }
+                    }
+                    term ALLOW-FRAGMENTS {
+                        from {
+                            source-prefix-list {
+                                RNOSC-SUBNETS;
+                                COMPLETE-DCN-SUBNETS;
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                            is-fragment;
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-FRAGMENTS;
+                            accept;
+                        }
+                    }
+                    term DENY-FRAGMENTS {
+                        from {
+                            is-fragment;
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count DENY-FRAGMENTS;
+                            syslog;
+                            discard;
+                        }
+                    }
+                    term ALLOW-SSH {
+                        from {
+                            source-prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                            destination-prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                            protocol tcp;
+                            port ssh;
+                        }
+                        then {
+                            policer POLICER-30M;
+                            count ALLOW-SSH;
+                            accept;
+                        }
+                    }
+                    term ALLOW-SSH-OOB {
+                        from {
+                            interface-group 1;
+                            source-prefix-list {
+                                RNOSC-SUBNETS;
+                            }
+                            destination-prefix-list {
+                                FXP0-ADDRESS;
+                            }
+                            protocol tcp;
+                            port ssh;
+                        }
+                        then {
+                            policer POLICER-30M;
+                            count ALLOW-SSH-OOB;
+                            accept;
+                        }
+                    }
+                    term ALLOW-ICMP-FROM-CUSTOMERS {
+                        from {
+                            source-prefix-list {
+                                APPROVED-ICMP-HOSTS;
+                                CUSTOMER-INTERFACE-AGGREGATE-PREFIX;
+                            }
+                            destination-prefix-list {
+                                CUSTOMER-INTERFACE-LOCAL-PREFIX;
+                            }
+                            protocol icmp;
+                            icmp-type [ echo-request echo-reply ];
+                        }
+                        then {
+                            policer POLICER-10M;
+                            count ALLOW-ICMP-FROM-CUSTOMERS;
+                            accept;
+                        }
+                    }
+                    term ALLOW-ICMP-GCDN {
+                        from {
+                            source-prefix-list {
+                                GCDN-ADDRESSES;
+                            }
+                            destination-prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                                CUSTOMER-INTERFACE-AGGREGATE-PREFIX;
+                            }
+                            protocol icmp;
+                            icmp-type [ echo-request echo-reply unreachable time-exceeded ];
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-ICMP-GCDN;
+                            accept;
+                        }
+                    }
+                    term ALLOW-ICMP-MTU-TTL {
+                        from {
+                            destination-prefix-list {
+                                CUSTOMER-INTERFACE-LOCAL-PREFIX;
+                            }
+                            protocol icmp;
+                            icmp-type [ unreachable time-exceeded echo-reply ];
+                        }
+                        then {
+                            policer POLICER-250K;
+                            count ALLOW-ICMP-MTU-TTL;
+                            accept;
+                        }
+                    }
+                    term ALLOW-ICMP {
+                        from {
+                            source-prefix-list {
+                                RNOSC-SUBNETS;
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                                COMPLETE-DCN-SUBNETS;
+                            }
+                            destination-prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                                FXP0-ADDRESS;
+                            }
+                            protocol icmp;
+                            icmp-type [ echo-request echo-reply unreachable time-exceeded ];
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-ICMP;
+                            accept;
+                        }
+                    }
+                    term ALLOW-BGP {
+                        from {
+                            source-prefix-list {
+                                BGP-NEIGHBOR-ADDRESSES;
+                                VPN-BGP-NEIGHBOR-ADDRESSES;
+                            }
+                            destination-prefix-list {
+                                BGP-LOCAL-ADDRESSES;
+                                VPN-BGP-LOCAL-ADDRESSES;
+                            }
+                            protocol tcp;
+                            port bgp;
+                        }
+                        then {
+                            policer POLICER-10M;
+                            count ALLOW-BGP;
+                            accept;
+                        }
+                    }
+                    term ALLOW-SNMP {
+                        from {
+                            interface-group 1;
+                            source-prefix-list {
+                                RNOSC-SUBNETS;
+                            }
+                            destination-prefix-list {
+                                FXP0-ADDRESS;
+                            }
+                            protocol udp;
+                            destination-port snmp;
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-SNMP;
+                            accept;
+                        }
+                    }
+                    term ALLOW-RADIUS {
+                        from {
+                            interface-group 1;
+                            source-prefix-list {
+                                RNOSC-SUBNETS;
+                            }
+                            destination-prefix-list {
+                                FXP0-ADDRESS;
+                            }
+                            protocol udp;
+                            source-port 1645;
+                        }
+                        then {
+                            policer POLICER-250K;
+                            count ALLOW-RADIUS;
+                            accept;
+                        }
+                    }
+                    term ALLOW-DNS {
+                        from {
+                            interface-group 1;
+                            source-prefix-list {
+                                RNOSC-SUBNETS;
+                            }
+                            destination-prefix-list {
+                                FXP0-ADDRESS;
+                            }
+                            protocol udp;
+                            source-port domain;
+                        }
+                        then {
+                            policer POLICER-250K;
+                            count ALLOW-DNS;
+                            accept;
+                        }
+                    }
+                    term ALLOW-NTP {
+                        from {
+                            interface-group 1;
+                            source-prefix-list {
+                                RNOSC-SUBNETS;
+                            }
+                            destination-prefix-list {
+                                FXP0-ADDRESS;
+                            }
+                            protocol udp;
+                            source-port ntp;
+                        }
+                        then {
+                            policer POLICER-250K;
+                            count ALLOW-NTP;
+                            accept;
+                        }
+                    }
+                    term ALLOW-NTP-LOCAL {
+                        from {
+                            source-prefix-list {
+                                LOOPBACK-ADDRESS;
+                            }
+                            destination-prefix-list {
+                                LOOPBACK-ADDRESS;
+                            }
+                            protocol udp;
+                            port ntp;
+                        }
+                        then {
+                            policer POLICER-250K;
+                            count ALLOW-NTP-LOCAL;
+                            accept;
+                        }
+                    }
+                    term ALLOW-TRACEROUTE {
+                        from {
+                            source-prefix-list {
+                                RNOSC-SUBNETS;
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                            protocol udp;
+                            destination-port 33434-33523;
+                        }
+                        then {
+                            policer POLICER-250K;
+                            count ALLOW-TRACEROUTE;
+                            accept;
+                        }
+                    }
+                    term ALLOW-MPLS-PING-TRACEROUTE {
+                        from {
+                            prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                            protocol udp;
+                            port 3503;
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-MPLS-PING-TRACEROUTE;
+                            accept;
+                        }
+                    }
+                    term ALLOW-LDP {
+                        from {
+                            prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                            protocol [ tcp udp ];
+                            port 646;
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-LDP;
+                            accept;
+                        }
+                    }
+                    term ALLOW-RSVP {
+                        from {
+                            source-prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                            protocol rsvp;
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-RSVP;
+                            accept;
+                        }
+                    }
+                    term DENY-ALL {
+                        then {
+                            policer POLICER-32K;
+                            count DENY-ALL;
+                            syslog;
+                            discard;
+                        }
+                    }
+                }
+                filter FXP0-INTERFACE-INGRESS {
+                    term ALLOW-FXP0-TRAFFIC {
+                        from {
+                            destination-prefix-list {
+                                FXP0-ADDRESS;
+                            }
+                        }
+                        then {
+                            count ALLOW-FXP0-TRAFFIC;
+                            accept;
+                        }
+                    }
+                    term DENY-ALL {
+                        then {
+                            policer POLICER-32K;
+                            count DENY-ALL;
+                            syslog;
+                            discard;
+                        }
+                    }
+                }
+            }
+            policer POLICER-32K {
+                if-exceeding {
+                    bandwidth-limit 32k;
+                    burst-size-limit 3k;
+                }
+                then discard;
+            }
+            policer POLICER-250K {
+                if-exceeding {
+                    bandwidth-limit 250k;
+                    burst-size-limit 20k;
+                }
+                then discard;
+            }
+            policer POLICER-1M {
+                if-exceeding {
+                    bandwidth-limit 10m;
+                    burst-size-limit 3m;
+                }
+                then discard;
+            }
+            policer POLICER-5M {
+                if-exceeding {
+                    bandwidth-limit 5m;
+                    burst-size-limit 250k;
+                }
+                then discard;
+            }
+            policer POLICER-10M {
+                if-exceeding {
+                    bandwidth-limit 10m;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            policer POLICER-30M {
+                if-exceeding {
+                    bandwidth-limit 30m;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+        }
+    }
+    TRUNK-FILTERS {
+        firewall {
+            family inet {
+                filter TRUNK-ALLOW-ALL {
+                    term ALLOW-ALL {
+                        then accept;
+                    }
+                }
+                filter TRUNK-INGRESS {
+                    interface-specific;
+                    term DENY-ICMP {
+                        from {
+                            protocol icmp;
+                            icmp-type-except [ echo-request echo-reply unreachable time-exceeded ];
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count DENY-ICMP;
+                            syslog;
+                            discard;
+                        }
+                    }
+                    term ALLOW-MPLS-PING-TRACEROUTE {
+                        from {
+                            prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                            ip-options any;
+                            protocol udp;
+                            destination-port 3503;
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-MPLS-PING-TRACEROUTE;
+                            syslog;
+                            accept;
+                        }
+                    }
+                    term DENY-IP-OPTIONS-EXCEPT-RSVP {
+                        from {
+                            ip-options any;
+                            protocol-except rsvp;
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count DENY-IP-OPTIONS-EXCEPT-RSVP;
+                            syslog;
+                            discard;
+                        }
+                    }
+                    term NEXT {
+                        then next term;
+                    }
+                }
+                filter TRUNK-EGRESS {
+                    interface-specific;
+                    term ALLOW-CORE-EGRESS-FRAG {
+                        from {
+                            is-fragment;
+                            protocol icmp;
+                        }
+                        then {
+                            count ALLOW-CORE-EGRESS-FRAG;
+                            accept;
+                        }
+                    }
+                    term DENY-ICMP {
+                        from {
+                            protocol icmp;
+                            icmp-type-except [ echo-request echo-reply unreachable time-exceeded ];
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count DENY-ICMP;
+                            syslog;
+                            discard;
+                        }
+                    }
+                    term NEXT {
+                        then next term;
+                    }
+                }
+            }
+            family mpls {
+                filter MPLS-TRUNK-INGRESS-QOS {
+                    interface-specific;
+                    term TDM {
+                        from {
+                            exp 7;
+                        }
+                        then {
+                            count EXP-TDM;
+                            loss-priority low;
+                            forwarding-class TDM;
+                            next term;
+                        }
+                    }
+                    term NETWORK-CONTROL {
+                        from {
+                            exp 6;
+                        }
+                        then {
+                            count EXP-NETWORK-CONTROL;
+                            loss-priority low;
+                            forwarding-class NETWORK-CONTROL;
+                            next term;
+                        }
+                    }
+                    term NON-ASSURED-RT {
+                        from {
+                            exp 5;
+                        }
+                        then {
+                            count EXP-NON-ASSURED-RT;
+                            loss-priority low;
+                            forwarding-class NON-ASSURED-RT;
+                            next term;
+                        }
+                    }
+                    term ASSURED-RT {
+                        from {
+                            exp 4;
+                        }
+                        then {
+                            count EXP-ASSURED-RT;
+                            loss-priority low;
+                            forwarding-class ASSURED-RT;
+                            next term;
+                        }
+                    }
+                    term SIPR-PREF-ELASTIC {
+                        from {
+                            exp 3;
+                        }
+                        then {
+                            count EXP-SIPR-PREF-ELASTIC;
+                            loss-priority low;
+                            forwarding-class SIPR-PREF-ELASTIC;
+                            next term;
+                        }
+                    }
+                    term UNCLASS-PREF-ELASTIC {
+                        from {
+                            exp 2;
+                        }
+                        then {
+                            count EXP-UNCLASS-PREF-ELASTIC;
+                            loss-priority low;
+                            forwarding-class UNCLASS-PREF-ELASTIC;
+                            next term;
+                        }
+                    }
+                    term INTERNET {
+                        from {
+                            exp 1;
+                        }
+                        then {
+                            count EXP-INTERNET;
+                            loss-priority low;
+                            forwarding-class INTERNET;
+                            next term;
+                        }
+                    }
+                    term ELASTIC {
+                        from {
+                            exp 0;
+                        }
+                        then {
+                            count EXP-ELASTIC;
+                            loss-priority low;
+                            forwarding-class ELASTIC;
+                            next term;
+                        }
+                    }
+                }
+                filter MPLS-TRUNK-EGRESS-QOS {
+                    interface-specific;
+                    term TDM {
+                        from {
+                            exp 7;
+                        }
+                        then {
+                            count EXP-TDM;
+                            next term;
+                        }
+                    }
+                    term NETWORK-CONTROL {
+                        from {
+                            exp 6;
+                        }
+                        then {
+                            count EXP-NETWORK-CONTROL;
+                            next term;
+                        }
+                    }
+                    term NON-ASSURED-RT {
+                        from {
+                            exp 5;
+                        }
+                        then {
+                            count EXP-NON-ASSURED-RT;
+                            next term;
+                        }
+                    }
+                    term ASSURED-RT {
+                        from {
+                            exp 4;
+                        }
+                        then {
+                            count EXP-ASSURED-RT;
+                            next term;
+                        }
+                    }
+                    term SIPR-PREF-ELASTIC {
+                        from {
+                            exp 3;
+                        }
+                        then {
+                            count EXP-SIPR-PREF-ELASTIC;
+                            next term;
+                        }
+                    }
+                    term UNCLASS-PREF-ELASTIC {
+                        from {
+                            exp 2;
+                        }
+                        then {
+                            count EXP-UNCLASS-PREF-ELASTIC;
+                            next term;
+                        }
+                    }
+                    term INTERNET {
+                        from {
+                            exp 1;
+                        }
+                        then {
+                            count EXP-INTERNET;
+                            next term;
+                        }
+                    }
+                    term ELASTIC {
+                        from {
+                            exp 0;
+                        }
+                        then {
+                            count EXP-ELASTIC;
+                            next term;
+                        }
+                    }
+                }
+                filter MPLS-TRUNK-ALLOW-ALL {
+                    term ALLOW-ALL {
+                        then accept;
+                    }
+                }
+            }
+            filter TRUNK-INGRESS-QOS {
+                interface-specific;
+                term NETWORK-CONTROL {
+                    from {
+                        prefix-list {
+                            NGGN-INFRASTRUCTURE-SUBNETS;
+                        }
+                        dscp b110000;
+                    }
+                    then {
+                        count V4-NETWORK-CONTROL;
+                        loss-priority low;
+                        forwarding-class NETWORK-CONTROL;
+                        next term;
+                    }
+                }
+            }
+            filter TRUNK-EGRESS-QOS {
+                interface-specific;
+                term NETWORK-CONTROL {
+                    from {
+                        prefix-list {
+                            NGGN-INFRASTRUCTURE-SUBNETS;
+                        }
+                        dscp b110000;
+                    }
+                    then {
+                        count V4-NETWORK-CONTROL;
+                        loss-priority low;
+                        forwarding-class NETWORK-CONTROL;
+                        next term;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-FILTERS {
+        firewall {
+            family inet {
+                filter LINE-EGRESS-L3VPN {
+                    interface-specific;
+                    term BLOCK-INFRASTRUCTURE-SUBNETS {
+                        from {
+                            prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count BLOCK-INFRASTRUCTURE-SUBNETS;
+                            syslog;
+                            discard;
+                        }
+                    }
+                    term ALLOW-BGP-SYN-FIN-RST {
+                        from {
+                            source-prefix-list {
+                                VPN-BGP-LOCAL-ADDRESSES;
+                            }
+                            destination-prefix-list {
+                                VPN-BGP-NEIGHBOR-ADDRESSES;
+                            }
+                            protocol tcp;
+                            port bgp;
+                            tcp-flags "(syn&!ack)|fin|rst";
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count ALLOW-BGP-SYN-FIN-RST;
+                            accept;
+                        }
+                    }
+                    term ALLOW-BGP-ACK {
+                        from {
+                            source-prefix-list {
+                                VPN-BGP-LOCAL-ADDRESSES;
+                            }
+                            destination-prefix-list {
+                                VPN-BGP-NEIGHBOR-ADDRESSES;
+                            }
+                            protocol tcp;
+                            port bgp;
+                            tcp-flags ack;
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-BGP-ACK;
+                            accept;
+                        }
+                    }
+                    term NEXT {
+                        then next term;
+                    }
+                }
+                filter LINE-INGRESS-L3VPN {
+                    interface-specific;
+                    term BLOCK-INFRASTRUCTURE-SUBNETS {
+                        from {
+                            prefix-list {
+                                NGGN-INFRASTRUCTURE-SUBNETS;
+                            }
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count BLOCK-INFRASTRUCTURE-SUBNETS;
+                            syslog;
+                            discard;
+                        }
+                    }
+                    term DENY-IP-OPTIONS {
+                        from {
+                            ip-options any;
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count DENY-IP-OPTIONS;
+                            discard;
+                        }
+                    }
+                    term ALLOW-BGP-SYN-FIN-RST {
+                        from {
+                            source-prefix-list {
+                                VPN-BGP-NEIGHBOR-ADDRESSES;
+                            }
+                            destination-prefix-list {
+                                VPN-BGP-LOCAL-ADDRESSES;
+                            }
+                            protocol tcp;
+                            port bgp;
+                            tcp-flags "(syn&!ack)|fin|rst";
+                        }
+                        then {
+                            policer POLICER-32K;
+                            count ALLOW-BGP-SYN-FIN-RST;
+                            accept;
+                        }
+                    }
+                    term ALLOW-BGP-ACK {
+                        from {
+                            source-prefix-list {
+                                VPN-BGP-NEIGHBOR-ADDRESSES;
+                            }
+                            destination-prefix-list {
+                                VPN-BGP-LOCAL-ADDRESSES;
+                            }
+                            protocol tcp;
+                            port bgp;
+                            tcp-flags ack;
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count ALLOW-BGP-ACK;
+                            accept;
+                        }
+                    }
+                    term ALLOW-ICMP {
+                        from {
+                            protocol icmp;
+                            icmp-type [ echo-request echo-reply unreachable time-exceeded ];
+                        }
+                        then {
+                            policer POLICER-10M;
+                            count ALLOW-CUSTOMER-ICMP;
+                            accept;
+                        }
+                    }
+                    term DENY-ICMP {
+                        from {
+                            protocol icmp;
+                        }
+                        then {
+                            policer POLICER-1M;
+                            count DENY-ICMP;
+                            discard;
+                        }
+                    }
+                    term NEXT {
+                        then next term;
+                    }
+                }
+            }
+            family inet6 {
+                filter V6-LINE-INGRESS-QOS {
+                    interface-specific;
+                    term CUSTOMER-NC {
+                        from {
+                            traffic-class b110000;
+                        }
+                        then {
+                            count V6-CUSTOMER-NC;
+                            loss-priority low;
+                            forwarding-class UNCLASS-PREF-ELASTIC;
+                            next term;
+                        }
+                    }
+                    term NON-ASSURED-RT {
+                        from {
+                            traffic-class [ b011000 b011100 b011110 b100010 b100100 b100110 b101110 ];
+                        }
+                        then {
+                            count V6-NON-ASSURED-RT;
+                            loss-priority low;
+                            forwarding-class NON-ASSURED-RT;
+                            next term;
+                        }
+                    }
+                    term ASSURED-RT {
+                        from {
+                            traffic-class [ b101001 b101011 b101101 b101111 b110001 b100000 b100001 b100011 b100101 b100111 b110011 b101000 ];
+                        }
+                        then {
+                            count V6-ASSURED-RT;
+                            loss-priority low;
+                            forwarding-class ASSURED-RT;
+                            next term;
+                        }
+                    }
+                    term UNCLASS-PREF-ELASTIC {
+                        from {
+                            traffic-class [ b001001-b010111 b011001-b011011 b011101 b011111 ];
+                        }
+                        then {
+                            count V6-UNCLASS-PREF-ELASTIC;
+                            loss-priority low;
+                            forwarding-class UNCLASS-PREF-ELASTIC;
+                            next term;
+                        }
+                    }
+                    term INTERNET {
+                        from {
+                            traffic-class b001000;
+                        }
+                        then {
+                            count V6-UNCLASS-INTERNET;
+                            forwarding-class INTERNET;
+                            next term;
+                        }
+                    }
+                    term ELASTIC {
+                        from {
+                            forwarding-class-except [ NETWORK-CONTROL INTERNET UNCLASS-PREF-ELASTIC ASSURED-RT SIPR-PREF-ELASTIC NON-ASSURED-RT TDM ];
+                        }
+                        then {
+                            count V6-ELASTIC;
+                            loss-priority low;
+                            forwarding-class ELASTIC;
+                            next term;
+                        }
+                    }
+                    term NEXT {
+                        then next term;
+                    }
+                }
+                filter V6-LINE-EGRESS-QOS {
+                    interface-specific;
+                    term CUSTOMER-NC {
+                        from {
+                            traffic-class b110000;
+                        }
+                        then {
+                            count V6-CUSTOMER-NC;
+                            loss-priority low;
+                            forwarding-class NETWORK-CONTROL;
+                            next term;
+                        }
+                    }
+                    term NON-ASSURED-RT {
+                        from {
+                            traffic-class [ b011000 b011100 b011110 b100010 b100100 b100110 b101110 ];
+                        }
+                        then {
+                            count V6-NON-ASSURED-RT;
+                            loss-priority low;
+                            forwarding-class NON-ASSURED-RT;
+                            next term;
+                        }
+                    }
+                    term ASSURED-RT {
+                        from {
+                            traffic-class [ b101001 b101011 b101101 b101111 b110001 b100000 b100001 b100011 b100101 b100111 b110011 b101000 ];
+                        }
+                        then {
+                            count V6-ASSURED-RT;
+                            loss-priority low;
+                            forwarding-class ASSURED-RT;
+                            next term;
+                        }
+                    }
+                    term UNCLASS-PREF-ELASTIC {
+                        from {
+                            traffic-class [ b001001-b010111 b011001-b011011 b011101 b011111 ];
+                        }
+                        then {
+                            count V6-UNCLASS-PREF-ELASTIC;
+                            loss-priority low;
+                            forwarding-class UNCLASS-PREF-ELASTIC;
+                            next term;
+                        }
+                    }
+                    term INTERNET {
+                        from {
+                            traffic-class b001000;
+                        }
+                        then {
+                            count V6-UNCLASS-INTERNET;
+                            forwarding-class INTERNET;
+                            next term;
+                        }
+                    }
+                    term ELASTIC {
+                        from {
+                            forwarding-class-except [ NETWORK-CONTROL INTERNET UNCLASS-PREF-ELASTIC ASSURED-RT SIPR-PREF-ELASTIC NON-ASSURED-RT TDM ];
+                        }
+                        then {
+                            count V6-ELASTIC;
+                            loss-priority low;
+                            forwarding-class ELASTIC;
+                            next term;
+                        }
+                    }
+                    term NEXT {
+                        then next term;
+                    }
+                }
+                filter V6-LINE-ALLOW-ALL {
+                    term ALLOW-ALL {
+                        then accept;
+                    }
+                }
+            }
+            family vpls {
+                filter PFE-VPLS-UNKNOWN-UNICAST {
+                    term PFE-VPLS-UNKNOWN-UNICAST {
+                        from {
+                            traffic-type unknown-unicast;
+                        }
+                        then {
+                            policer PFE-VPLS-UNKNOWN-UNICAST;
+                            count PFE-VPLS-UNKNOWN-UNICAST;
+                            next term;
+                        }
+                    }
+                    term ACCEPT-ALL {
+                        then accept;
+                    }
+                }
+                filter VPLS-BM-FILTER-JTEN {
+                    interface-specific;
+                    term VPLS-MULTICAST-POLICER-JTEN {
+                        from {
+                            traffic-type multicast;
+                        }
+                        then {
+                            policer VPLS-MULTICAST-POLICER-JTEN;
+                            count VPLS-MULTICAST-POLICER-JTEN;
+                            next term;
+                        }
+                    }
+                    term VPLS-BROADCAST-JTEN {
+                        from {
+                            traffic-type broadcast;
+                        }
+                        then {
+                            policer VPLS-BROADCAST-POLICER-JTEN;
+                            count VPLS-BROADCAST-POLICER-JTEN;
+                            next term;
+                        }
+                    }
+                    term NEXT-TERM {
+                        then next term;
+                    }
+                }
+                filter VPLS-BM-FILTER-DEFAULT {
+                    interface-specific;
+                    term "VPLS-DEFAULT-BM-POLICER-2%" {
+                        from {
+                            traffic-type [ multicast broadcast ];
+                        }
+                        then {
+                            policer "VPLS-DEFAULT-BM-POLICER-2%";
+                            count "VPLS-DEFAULT-BM-POLICER-2%";
+                            next term;
+                        }
+                    }
+                    term NEXT-TERM {
+                        then next term;
+                    }
+                }
+            }
+            family ccc {
+                filter CCC-LINE-ALLOW-ALL {
+                    term ALLOW-ALL {
+                        then accept;
+                    }
+                }
+            }
+            policer PFE-VPLS-UNKNOWN-UNICAST {
+                if-exceeding {
+                    bandwidth-limit 10m;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            policer VPLS-MULTICAST-POLICER-JTEN {
+                if-exceeding {
+                    bandwidth-percent 15;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            policer VPLS-BROADCAST-POLICER-JTEN {
+                if-exceeding {
+                    bandwidth-percent 1;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            policer "VPLS-DEFAULT-BM-POLICER-2%" {
+                if-exceeding {
+                    bandwidth-percent 2;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            filter LINE-INGRESS-QOS {
+                interface-specific;
+                term CUSTOMER-NC {
+                    from {
+                        dscp b110000;
+                    }
+                    then {
+                        count V4-CUSTOMER-NC;
+                        loss-priority low;
+                        forwarding-class UNCLASS-PREF-ELASTIC;
+                        next term;
+                    }
+                }
+                term NON-ASSURED-RT {
+                    from {
+                        dscp [ b011000 b011100 b011110 b100010 b100100 b100110 b101110 ];
+                    }
+                    then {
+                        count V4-UNCLASS-NON-ASSURED-RT;
+                        loss-priority low;
+                        forwarding-class NON-ASSURED-RT;
+                        next term;
+                    }
+                }
+                term ASSURED-RT {
+                    from {
+                        dscp [ b101001 b101011 b101101 b101111 b110001 b100000 b100001 b100011 b100101 b100111 b110011 b101000 ];
+                    }
+                    then {
+                        count V4-UNCLASS-ASSURED-RT;
+                        loss-priority low;
+                        forwarding-class ASSURED-RT;
+                        next term;
+                    }
+                }
+                term UNCLASS-PREF-ELASTIC {
+                    from {
+                        dscp [ b001001-b010111 b011001-b011011 b011101 b011111 ];
+                    }
+                    then {
+                        count V4-UNCLASS-PREF-ELASTIC;
+                        loss-priority low;
+                        forwarding-class UNCLASS-PREF-ELASTIC;
+                        next term;
+                    }
+                }
+                term INTERNET {
+                    from {
+                        dscp b001000;
+                    }
+                    then {
+                        count V4-UNCLASS-INTERNET;
+                        loss-priority low;
+                        forwarding-class INTERNET;
+                        next term;
+                    }
+                }
+                term ELASTIC {
+                    from {
+                        dscp-except b110000;
+                        forwarding-class-except [ NETWORK-CONTROL INTERNET UNCLASS-PREF-ELASTIC ASSURED-RT SIPR-PREF-ELASTIC NON-ASSURED-RT TDM ];
+                    }
+                    then {
+                        count V4-ELASTIC;
+                        next term;
+                    }
+                }
+            }
+            filter LINE-EGRESS-QOS {
+                interface-specific;
+                term CUSTOMER-NC {
+                    from {
+                        dscp b110000;
+                    }
+                    then {
+                        count V4-CUSTOMER-NC;
+                        loss-priority low;
+                        forwarding-class NETWORK-CONTROL;
+                        next term;
+                    }
+                }
+                term NON-ASSURED-RT {
+                    from {
+                        dscp [ b011000 b011100 b011110 b100010 b100100 b100110 b101110 ];
+                    }
+                    then {
+                        count V4-NON-ASSURED-RT;
+                        loss-priority low;
+                        forwarding-class NON-ASSURED-RT;
+                        next term;
+                    }
+                }
+                term ASSURED-RT {
+                    from {
+                        dscp [ b101001 b101011 b101101 b101111 b110001 b100000 b100001 b100011 b100101 b100111 b110011 b101000 ];
+                    }
+                    then {
+                        count V4-ASSURED-RT;
+                        loss-priority low;
+                        forwarding-class ASSURED-RT;
+                        next term;
+                    }
+                }
+                term UNCLASS-PREF-ELASTIC {
+                    from {
+                        dscp [ b001001-b010111 b011001-b011011 b011101 b011111 ];
+                    }
+                    then {
+                        count V4-UNCLASS-PREF-ELASTIC;
+                        forwarding-class UNCLASS-PREF-ELASTIC;
+                        next term;
+                    }
+                }
+                term INTERNET {
+                    from {
+                        dscp b001000;
+                    }
+                    then {
+                        count V4-UNCLASS-INTERNET;
+                        loss-priority low;
+                        forwarding-class INTERNET;
+                        next term;
+                    }
+                }
+                term ELASTIC {
+                    from {
+                        dscp-except b110000;
+                        forwarding-class-except [ NETWORK-CONTROL INTERNET UNCLASS-PREF-ELASTIC ASSURED-RT SIPR-PREF-ELASTIC NON-ASSURED-RT TDM ];
+                    }
+                    then {
+                        count V4-ELASTIC;
+                        loss-priority low;
+                        next term;
+                    }
+                }
+            }
+            filter LINE-ALLOW-ALL {
+                term ALLOW-ALL {
+                    then accept;
+                }
+            }
+        }
+    }
+    RPM-COMMON-PARAMS {
+        services {
+            rpm {
+                probe IcmpCktLatency {
+                    test <*> {
+                        probe-type icmp-ping;
+                        probe-count 5;
+                        probe-interval 1;
+                        test-interval 60;
+                        data-size 333;
+                        thresholds {
+                            total-loss 1;
+                        }
+                        traps test-failure;
+                    }
+                }
+                probe IcmpLpbkLatency {
+                    test <*> {
+                        probe-type icmp-ping;
+                        probe-count 5;
+                        probe-interval 1;
+                        test-interval 60;
+                        data-size 333;
+                        thresholds {
+                            total-loss 1;
+                        }
+                        traps test-failure;
+                    }
+                }
+                probe IcmpCustLatency {
+                    test <*> {
+                        probe-type icmp-ping;
+                        probe-count 5;
+                        probe-interval 1;
+                        test-interval 60;
+                        data-size 333;
+                        thresholds {
+                            total-loss 1;
+                        }
+                        traps test-failure;
+                    }
+                }
+                probe-limit 500;
+            }
+        }
+    }
+    /* Script: custConfig v3.23 gulbront 20160728-202246 */
+    VPN-DKL300227-CONFIG {
+        policy-options {
+            policy-statement IMPORT-VPN-DKL300227 {
+                term ROUTE-TARGET {
+                    from community DKL300227-RT;
+                    then accept;
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            policy-statement EXPORT-VPN-DKL300227 {
+                term BGP-VPN-ROUTES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                    }
+                }
+                term STATIC-VPN-ROUTES {
+                    from {
+                        protocol static;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DKL300227-RT;
+                        community add SWA-STATIC-ROUTE;
+                    }
+                }
+                term AGGREGATE-VPN-ROUTES {
+                    from {
+                        protocol aggregate;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DKL300227-RT;
+                        community add SWA-AGGREGATE-ROUTE;
+                    }
+                }
+                term ACCEPT {
+                    from {
+                        community DKL300227-RT;
+                        tag 1000;
+                    }
+                    then {
+                        tag subtract 1000;
+                        community add UPE-LAYER;
+                        accept;
+                    }
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            community DKL300227-RT members target:27064:1999000227;
+            community UPE-LAYER members target:27064:99;
+            community SWA-STATIC-ROUTE members 1733:5000;
+            community SWA-AGGREGATE-ROUTE members 1733:5200;
+        }
+        routing-instances {
+            DKL300227 {
+                instance-type vrf;
+                route-distinguisher 27064:1999000227;
+                vrf-import IMPORT-VPN-DKL300227;
+                vrf-export EXPORT-VPN-DKL300227;
+                vrf-table-label;
+                routing-options {
+                    aggregate {
+                        route 0.0.0.0/24 {
+                            community [ 1733:5200 1733:1733 1733:1241 ];
+                            discard;
+                        }
+                    }
+                    maximum-prefixes 500 threshold 90 log-interval 5;
+                }
+            }
+        }
+    }
+    CUSTOMER_CONFIG_AS5972-VPN-DKL300227-BWG2 {
+        interfaces {
+            ge-2/2/0 {
+                unit 0 {
+                    description ::BWG2::DK_ALUDEID_QA::CUS::100M::ETH::BGP::33.48.241.2::MHS_MEDCOI_ALUDEID_QA::;
+                    family inet {
+                        filter {
+                            input-list [ LINE-INGRESS-L3VPN LINE-ALLOW-ALL ];
+                            output-list [ LINE-EGRESS-L3VPN LINE-ALLOW-ALL ];
+                        }
+                        address 33.48.241.1/30;
+                    }
+                }
+            }
+        }
+        policy-options {
+            policy-statement EXPORT-AS5972-VPN-DKL300227 {
+                term ACCEPT-VPN-ROUTES {
+                    from {
+                        protocol [ bgp static aggregate ];
+                        community ALL-DISN-ROUTES;
+                    }
+                    then {
+                        tag 1000;
+                    }
+                }
+            }
+            policy-statement IMPORT-AS5972-VPN-DKL300227 {
+                term ADD-COMMON-COMMUNITY {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                        community add LOCAL-PE-ID;
+                        community add SWA-DISN-ROUTE;
+                        community add EUROPE-DISN-ROUTE;
+                        community add DKL300227-RT;
+                    }
+                }
+            }
+        }
+        routing-instances {
+            DKL300227 {
+                interface ge-2/2/0.0;
+                protocols {
+                    bgp {
+                        group AS5972 {
+                            type external;
+                            description ::BWG2::DK_ALUDEID_QA::CUS::100M::ETH::BGP::33.48.241.2::MHS_MEDCOI_ALUDEID_QA::;
+                            peer-as 5972;
+                            as-override;
+                            neighbor 33.48.241.2 {
+                                local-address 33.48.241.1;
+                                import [ MODIFY-IMPORT-ROUTES IMPORT-AS5972-VPN-DKL300227 ALLOW-TAGGED-ROUTES ];
+                                family inet {
+                                    unicast {
+                                        prefix-limit {
+                                            maximum 100;
+                                            teardown 90 idle-timeout 10;
+                                        }
+                                    }
+                                }
+                                authentication-key "<removed>"; ## SECRET-DATA
+                                export [ EXPORT-AS5972-VPN-DKL300227 MODIFY-EXPORT-ROUTES ALLOW-TAGGED-ROUTES ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-MPA1 {
+        interfaces {
+            at-1/2/0 {
+                description To_N049_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 105 {
+                    description OC3_ATM_PVC_40.402;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.402;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.240 {
+                    interface at-1/2/0.105 {
+                        virtual-circuit-id 900089;
+                        description "TO UJECBMT030:MPA1:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-MPAL {
+        interfaces {
+            at-1/2/0 {
+                description To_N028_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 101 {
+                    description OC3_ATM_PVC_40.400;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.400;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.243 {
+                    interface at-1/2/0.101 {
+                        virtual-circuit-id 900106;
+                        description "TO UJECALH030:MPAL:SCLX:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-MPAC {
+        interfaces {
+            at-1/2/0 {
+                description To_N049_SCLX;
+                enable;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 102 {
+                    enable;
+                    description OC3_ATM_PVC_40.409;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.409;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.240 {
+                    interface at-1/2/0.102 {
+                        virtual-circuit-id 900096;
+                        description "TO UJECBMT030:MPAC:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-MPA8 {
+        interfaces {
+            at-1/2/1 {
+                description To_N049_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 101 {
+                    description OC3_ATM_PVC_40.410;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.410;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.240 {
+                    interface at-1/2/1.101 {
+                        virtual-circuit-id 900094;
+                        description "TO UJECBMT030:MPA8:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-MPAF {
+        interfaces {
+            at-1/2/1 {
+                description To_N154_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 100 {
+                    description OC3_ATM_PVC_40.421;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.421;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.242 {
+                    interface at-1/2/1.100 {
+                        virtual-circuit-id 900101;
+                        description "TO UJECARF030:MPAF:SCLX:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-MPAK {
+        interfaces {
+            at-1/2/0 {
+                description To_N155_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 103 {
+                    description OC3_ATM_PVC_40.416;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.416;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.242 {
+                    interface at-1/2/0.103 {
+                        virtual-circuit-id 900104;
+                        description "TO UJECARF030:MPAK:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-MPAG {
+        interfaces {
+            at-1/2/1 {
+                description To_N155_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 102 {
+                    description OC3_ATM_PVC_40.420;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.420;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.242 {
+                    interface at-1/2/1.102 {
+                        virtual-circuit-id 900102;
+                        description "TO UJECARF030:MPAG:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-MPAJ {
+        interfaces {
+            at-1/2/0 {
+                description To_N154_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 104 {
+                    description OC3_ATM_PVC_40.417;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.417;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.242 {
+                    interface at-1/2/0.104 {
+                        virtual-circuit-id 900105;
+                        description "TO UJECARF030:MPAJ:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-MPA3 {
+        interfaces {
+            at-1/2/1 {
+                description To_N058_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 103 {
+                    description OC3_ATM_PVC_40.403;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.403;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.240 {
+                    interface at-1/2/1.103 {
+                        virtual-circuit-id 900093;
+                        description "TO UJECBMT030:MPA3:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    /* Script: custConfig v3.23 gulbront 20160923-145145 */
+    VPN-DBCX70024-CONFIG {
+        policy-options {
+            policy-statement IMPORT-VPN-DBCX70024 {
+                term ROUTE-TARGET {
+                    from community DBCX70024-RT;
+                    then accept;
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            policy-statement EXPORT-VPN-DBCX70024 {
+                term BGP-VPN-ROUTES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                    }
+                }
+                term STATIC-VPN-ROUTES {
+                    from {
+                        protocol static;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DBCX70024-RT;
+                        community add SWA-STATIC-ROUTE;
+                    }
+                }
+                term AGGREGATE-VPN-ROUTES {
+                    from {
+                        protocol aggregate;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DBCX70024-RT;
+                        community add SWA-AGGREGATE-ROUTE;
+                    }
+                }
+                term ACCEPT {
+                    from {
+                        community DBCX70024-RT;
+                        tag 1000;
+                    }
+                    then {
+                        tag subtract 1000;
+                        community add IPT-LAYER;
+                        accept;
+                    }
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            community DBCX70024-RT members target:27060:1999070024;
+            community IPT-LAYER members target:27060:99;
+            community SWA-STATIC-ROUTE members 27060:5000;
+            community SWA-AGGREGATE-ROUTE members 27060:5200;
+        }
+        routing-instances {
+            DBCX70024 {
+                instance-type vrf;
+                route-distinguisher 27060:1999070024;
+                vrf-import IMPORT-VPN-DBCX70024;
+                vrf-export EXPORT-VPN-DBCX70024;
+                vrf-table-label;
+                routing-options {
+                    aggregate {
+                        route 33.48.241.0/24 {
+                            community [ 27060:5200 27060:27060 27060:1241 ];
+                            discard;
+                        }
+                    }
+                    maximum-prefixes 500 threshold 90 log-interval 5;
+                }
+            }
+        }
+    }
+    CUSTOMER_CONFIG_AS65010-VPN-DBCX70024-MSA1 {
+        interfaces {
+            ge-2/2/8 {
+                unit 0 {
+                    description ::MSA1::DB_INCRLKAB_TR::CUS::N::ETH::10M::X::X::33.48.241.6::L3VPN_DBCX70024_NGA_INCRLKAB_TR::;
+                    family inet {
+                        filter {
+                            input-list [ LINE-INGRESS-L3VPN LINE-ALLOW-ALL ];
+                            output-list [ LINE-EGRESS-L3VPN LINE-ALLOW-ALL ];
+                        }
+                        address 33.48.241.5/30;
+                    }
+                }
+            }
+        }
+        policy-options {
+            policy-statement EXPORT-AS65010-VPN-DBCX70024 {
+                term ACCEPT-VPN-ROUTES {
+                    from {
+                        protocol [ bgp static aggregate ];
+                        community ALL-DISN-ROUTES;
+                    }
+                    then {
+                        tag 1000;
+                    }
+                }
+            }
+            policy-statement IMPORT-AS65010-VPN-DBCX70024 {
+                term ADD-COMMON-COMMUNITY {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                        community add LOCAL-PE-ID;
+                        community add SWA-DISN-ROUTE;
+                        community add EUROPE-DISN-ROUTE;
+                        community add DBCX70024-RT;
+                    }
+                }
+            }
+        }
+        routing-instances {
+            DBCX70024 {
+                interface ge-2/2/8.0;
+                protocols {
+                    bgp {
+                        group AS65010 {
+                            type external;
+                            description ::MSA1::DB_INCRLKAB_TR::CUS::N::ETH::10M::X::X::33.48.241.5::L3VPN_DBCX70024_NGA_INCRLKAB_TR::;
+                            peer-as 65010;
+                            as-override;
+                            neighbor 33.48.241.6 {
+                                local-address 33.48.241.5;
+                                import [ MODIFY-IMPORT-ROUTES IMPORT-AS65010-VPN-DBCX70024 ALLOW-TAGGED-ROUTES ];
+                                family inet {
+                                    unicast {
+                                        prefix-limit {
+                                            maximum 100;
+                                            teardown 90 idle-timeout 10;
+                                        }
+                                    }
+                                }
+                                authentication-key "<removed>"; ## SECRET-DATA
+                                export [ EXPORT-AS65010-VPN-DBCX70024 MODIFY-EXPORT-ROUTES ALLOW-TAGGED-ROUTES ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    ETHERNET_PW_BS2T {
+        interfaces {
+            ge-2/2/6 {
+                encapsulation ethernet-ccc;
+                unit 0 {
+                    description ::BS2T::UJECAAS030::CUS::N::4M::ETH::NA::X::X::33.20.224.245::NA::PW_TO_ARIFJAN_VCID_900051::;
+                    family ccc {
+                        filter {
+                            input-list [ LINE-INGRESS-BS2T CCC-LINE-ALLOW-ALL ];
+                            output-list [ LINE-EGRESS-BS2T CCC-LINE-ALLOW-ALL ];
+                        }
+                    }
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.245 {
+                    interface ge-2/2/6.0 {
+                        virtual-circuit-id 900051;
+                        description "TO UJECAAS030:L2CKT";
+                    }
+                }
+            }
+        }
+        firewall {
+            family ccc {
+                filter LINE-INGRESS-BS2T {
+                    term POLICER {
+                        then {
+                            policer LINE-BS2T;
+                            next term;
+                        }
+                    }
+                    term EXPANDED-POLICER {
+                        then {
+                            policer LINE-EXPANDED-BS2T;
+                            count LINE-EXPANDED-BS2T;
+                            next term;
+                        }
+                    }
+                }
+                filter LINE-EGRESS-BS2T {
+                    term POLICER {
+                        then {
+                            policer LINE-BS2T;
+                            next term;
+                        }
+                    }
+                    term EXPANDED-POLICER {
+                        then {
+                            policer LINE-EXPANDED-BS2T;
+                            count LINE-EXPANDED-BS2T;
+                            next term;
+                        }
+                    }
+                }
+            }
+            policer LINE-BS2T {
+                if-exceeding {
+                    bandwidth-limit 4m;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            policer LINE-EXPANDED-BS2T {
+                if-exceeding {
+                    bandwidth-limit 5m;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            filter TEMPORARY-RPF-FAIL-FILTER {
+                term ALLOW-FAILED-RPF {
+                    then {
+                        count ALLOW-FAILED-RPF;
+                        log;
+                        accept;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN27064-RPG0 {
+        interfaces {
+            at-1/2/0 {
+                description To_N177_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 107 {
+                    description OC3_ATM_PVC_40.415;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.415;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.0.66 {
+                    interface at-1/2/0.107 {
+                        virtual-circuit-id 900111;
+                        description "TO UJEWGUN030:RPG0:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN1733-WAM0 {
+        interfaces {
+            at-0/2/0 {
+                description To_N168_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 0;
+                }
+                unit 100 {
+                    description OC3_ATM_PVC_0.145;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 0.145;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.242 {
+                    interface at-0/2/0.100 {
+                        virtual-circuit-id 900128;
+                        description "TO UJECARF030:WAM0:SCLX:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-ASN27064-RPH0 {
+        interfaces {
+            at-1/2/1 {
+                description To_N177_SCLX;
+                atm-options {
+                    cell-bundle-size 20;
+                    vpi 40;
+                }
+                unit 104 {
+                    description OC3_ATM_PVC_40.418;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 40.418;
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.0.66 {
+                    interface at-1/2/1.104 {
+                        virtual-circuit-id 900112;
+                        description "TO UJEWGUN030:RPH0:L2CKT";
+                        no-control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER_CONFIG_AS64764-VPN-DBL300219-28BZ {
+        interfaces {
+            xe-2/0/1 {
+                unit 0 {
+                    description ::28BZ::NGAISR_ALD::CUS::O::1.4G::ETH::BGP::NA::NA::33.48.241.10::NA::NGA_ISR_PED_ALUDEID::;
+                    family inet {
+                        filter {
+                            input-list [ LINE-INGRESS-L3VPN LINE-INGRESS-28BZ LINE-ALLOW-ALL ];
+                            output-list [ LINE-EGRESS-L3VPN LINE-EGRESS-28BZ LINE-ALLOW-ALL ];
+                        }
+                        address 33.48.241.9/30;
+                    }
+                }
+            }
+        }
+        policy-options {
+            policy-statement EXPORT-AS64764-VPN-DBL300219 {
+                term ACCEPT-VPN-ROUTES {
+                    from {
+                        protocol [ bgp static aggregate ];
+                        community ALL-DISN-ROUTES;
+                    }
+                    then {
+                        tag 1000;
+                    }
+                }
+            }
+            policy-statement IMPORT-AS64764-VPN-DBL300219 {
+                term ADD-COMMON-COMMUNITY {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                        community add LOCAL-PE-ID;
+                        community add SWA-DISN-ROUTE;
+                        community add EUROPE-DISN-ROUTE;
+                        community add DBL300219-RT;
+                    }
+                }
+            }
+        }
+        firewall {
+            family inet {
+                filter LINE-INGRESS-28BZ {
+                    term POLICER {
+                        from {
+                            forwarding-class-except [ ASSURED-RT NON-ASSURED-RT ];
+                        }
+                        then {
+                            policer LINE-28BZ;
+                            next term;
+                        }
+                    }
+                    term EXPANDED-POLICER {
+                        then {
+                            policer LINE-EXPANDED-28BZ;
+                            count LINE-EXPANDED-28BZ;
+                            next term;
+                        }
+                    }
+                }
+                filter LINE-EGRESS-28BZ {
+                    term POLICER {
+                        from {
+                            forwarding-class-except [ ASSURED-RT NON-ASSURED-RT ];
+                        }
+                        then {
+                            policer LINE-28BZ;
+                            next term;
+                        }
+                    }
+                    term EXPANDED-POLICER {
+                        then {
+                            policer LINE-EXPANDED-28BZ;
+                            count LINE-EXPANDED-28BZ;
+                            next term;
+                        }
+                    }
+                }
+            }
+            policer LINE-28BZ {
+                if-exceeding {
+                    bandwidth-limit 1400000000;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            policer LINE-EXPANDED-28BZ {
+                if-exceeding {
+                    bandwidth-limit 1540000000;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            filter TEMPORARY-RPF-FAIL-FILTER {
+                term ALLOW-FAILED-RPF {
+                    then {
+                        count ALLOW-FAILED-RPF;
+                        log;
+                        accept;
+                    }
+                }
+            }
+        }
+        routing-instances {
+            DBL300219 {
+                interface xe-2/0/1.0;
+                protocols {
+                    bgp {
+                        group AS64764 {
+                            type external;
+                            description ::28BZ::NGAISR_ALD::CUS::N::1.4G::ETH::BGP::NA::NA::33.48.241.10::NA::NGA_ISR_PED_ALUDEID::;
+                            peer-as 64764;
+                            as-override;
+                            neighbor 33.48.241.10 {
+                                local-address 33.48.241.9;
+                                import [ MODIFY-IMPORT-ROUTES IMPORT-AS64764-VPN-DBL300219 ALLOW-TAGGED-ROUTES ];
+                                family inet {
+                                    unicast {
+                                        prefix-limit {
+                                            maximum 100;
+                                            teardown 90 idle-timeout 10;
+                                        }
+                                    }
+                                }
+                                authentication-key "<removed>"; ## SECRET-DATA
+                                export [ EXPORT-AS64764-VPN-DBL300219 MODIFY-EXPORT-ROUTES ALLOW-TAGGED-ROUTES ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    VPN-DBL300219-CONFIG {
+        policy-options {
+            policy-statement IMPORT-VPN-DBL300219 {
+                term ROUTE-TARGET {
+                    from community DBL300219-RT;
+                    then accept;
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            policy-statement EXPORT-VPN-DBL300219 {
+                term BGP-VPN-ROUTES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                    }
+                }
+                term STATIC-VPN-ROUTES {
+                    from {
+                        protocol static;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DBL300219-RT;
+                        community add SWA-STATIC-ROUTE;
+                    }
+                }
+                term AGGREGATE-VPN-ROUTES {
+                    from {
+                        protocol aggregate;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DBL300219-RT;
+                        community add SWA-AGGREGATE-ROUTE;
+                    }
+                }
+                term ACCEPT {
+                    from {
+                        community DBL300219-RT;
+                        tag 1000;
+                    }
+                    then {
+                        tag subtract 1000;
+                        community add UPE-LAYER;
+                        accept;
+                    }
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            community DBL300219-RT members target:27064:1999000219;
+            community UPE-LAYER members target:27064:99;
+            community SWA-STATIC-ROUTE members 1733:5000;
+            community SWA-AGGREGATE-ROUTE members 1733:5200;
+        }
+        routing-instances {
+            DBL300219 {
+                instance-type vrf;
+                route-distinguisher 27064:1999000219;
+                vrf-import IMPORT-VPN-DBL300219;
+                vrf-export EXPORT-VPN-DBL300219;
+                vrf-table-label;
+                routing-options {
+                    aggregate {
+                        route 33.48.241.0/24 {
+                            community [ 1733:5200 1733:1733 1733:62413 ];
+                            discard;
+                        }
+                    }
+                    maximum-prefixes 500 threshold 90 log-interval 5;
+                }
+            }
+        }
+    }
+    /* Script: custConfig v4.05 pinkertk 20170817-164944 */
+    VPN-DLL300341-CONFIG {
+        policy-options {
+            policy-statement IMPORT-VPN-DLL300341 {
+                term ROUTE-TARGET {
+                    from community DLL300341-RT;
+                    then accept;
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            policy-statement EXPORT-VPN-DLL300341 {
+                term BGP-VPN-ROUTES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                    }
+                }
+                term STATIC-VPN-ROUTES {
+                    from {
+                        protocol static;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DLL300341-RT;
+                        community add SWA-STATIC-ROUTE;
+                    }
+                }
+                term AGGREGATE-VPN-ROUTES {
+                    from {
+                        protocol aggregate;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DLL300341-RT;
+                        community add SWA-AGGREGATE-ROUTE;
+                    }
+                }
+                term ACCEPT {
+                    from {
+                        community DLL300341-RT;
+                        tag 1000;
+                    }
+                    then {
+                        tag subtract 1000;
+                        community add IPT-LAYER;
+                        accept;
+                    }
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            community DLL300341-RT members target:27060:1999000341;
+        }
+        routing-instances {
+            DLL300341 {
+                instance-type vrf;
+                route-distinguisher 27060:1999000341;
+                vrf-import IMPORT-VPN-DLL300341;
+                vrf-export EXPORT-VPN-DLL300341;
+                vrf-table-label;
+                routing-options {
+                    aggregate {
+                        route 33.48.241.0/24 {
+                            community [ 1733:5200 1733:1733 1733:62413 ];
+                            discard;
+                        }
+                    }
+                    maximum-prefixes 500 threshold 90 log-interval 5;
+                }
+            }
+        }
+    }
+    VPN-DKL300242-CONFIG {
+        policy-options {
+            policy-statement IMPORT-VPN-DKL300242 {
+                term ROUTE-TARGET {
+                    from community DKL300242-RT;
+                    then accept;
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            policy-statement EXPORT-VPN-DKL300242 {
+                term BGP-VPN-ROUTES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                    }
+                }
+                term STATIC-VPN-ROUTES {
+                    from {
+                        protocol static;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DKL300242-RT;
+                        community add SWA-STATIC-ROUTE;
+                    }
+                }
+                term AGGREGATE-VPN-ROUTES {
+                    from {
+                        protocol aggregate;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DKL300242-RT;
+                        community add SWA-AGGREGATE-ROUTE;
+                    }
+                }
+                term ACCEPT {
+                    from {
+                        community DKL300242-RT;
+                        tag 1000;
+                    }
+                    then {
+                        tag subtract 1000;
+                        community add UPE-LAYER;
+                        accept;
+                    }
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            community DKL300242-RT members target:27064:1999000242;
+            community UPE-LAYER members target:27064:99;
+            community SWA-STATIC-ROUTE members 1733:5000;
+            community SWA-AGGREGATE-ROUTE members 1733:5200;
+        }
+        routing-instances {
+            DKL300242 {
+                instance-type vrf;
+                route-distinguisher 27064:1999000242;
+                vrf-import IMPORT-VPN-DKL300242;
+                vrf-export EXPORT-VPN-DKL300242;
+                vrf-table-label;
+                routing-options {
+                    aggregate {
+                        route 33.48.241.0/24 {
+                            community [ 1733:5200 1733:1733 1733:62413 ];
+                            discard;
+                        }
+                    }
+                    maximum-prefixes 500 threshold 90 log-interval 5;
+                }
+            }
+        }
+    }
+    CUSTOMER_CONFIG_AS65018-VPN-DKL300242-M882 {
+        interfaces {
+            ge-2/2/5 {
+                unit 0 {
+                    description ::M882::DJ_CPLEMONR_DJ::CUS::N::50M::ETH::BGP::X::X::33.48.241.18::NA::NCTAMS_LANT_CAMP_LEMONIER_L3VPN_DKL300242::;
+                    family inet {
+                        filter {
+                            input-list [ LINE-INGRESS-L3VPN LINE-INGRESS-M882 LINE-ALLOW-ALL ];
+                            output-list [ LINE-EGRESS-L3VPN LINE-EGRESS-M882 LINE-ALLOW-ALL ];
+                        }
+                        address 33.48.241.17/30;
+                    }
+                }
+            }
+        }
+        policy-options {
+            policy-statement EXPORT-AS65018-VPN-DKL300242 {
+                term ACCEPT-VPN-ROUTES {
+                    from {
+                        protocol [ bgp static aggregate ];
+                        community ALL-DISN-ROUTES;
+                    }
+                    then {
+                        tag 1000;
+                    }
+                }
+            }
+            policy-statement IMPORT-AS65018-VPN-DKL300242 {
+                term ADD-COMMON-COMMUNITY {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                        community add LOCAL-PE-ID;
+                        community add SWA-DISN-ROUTE;
+                        community add EUROPE-DISN-ROUTE;
+                        community add DKL300242-RT;
+                    }
+                }
+            }
+        }
+        firewall {
+            family inet {
+                filter LINE-INGRESS-M882 {
+                    term POLICER {
+                        from {
+                            forwarding-class-except [ ASSURED-RT NON-ASSURED-RT ];
+                        }
+                        then {
+                            policer LINE-M882;
+                            next term;
+                        }
+                    }
+                    term EXPANDED-POLICER {
+                        then {
+                            policer LINE-EXPANDED-M882;
+                            count LINE-EXPANDED-M882;
+                            next term;
+                        }
+                    }
+                }
+                filter LINE-EGRESS-M882 {
+                    term POLICER {
+                        from {
+                            forwarding-class-except [ ASSURED-RT NON-ASSURED-RT ];
+                        }
+                        then {
+                            policer LINE-M882;
+                            next term;
+                        }
+                    }
+                    term EXPANDED-POLICER {
+                        then {
+                            policer LINE-EXPANDED-M882;
+                            count LINE-EXPANDED-M882;
+                            next term;
+                        }
+                    }
+                }
+            }
+            policer LINE-M882 {
+                if-exceeding {
+                    bandwidth-limit 50m;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            policer LINE-EXPANDED-M882 {
+                if-exceeding {
+                    bandwidth-limit 55m;
+                    burst-size-limit 625k;
+                }
+                then discard;
+            }
+            filter TEMPORARY-RPF-FAIL-FILTER {
+                term ALLOW-FAILED-RPF {
+                    then {
+                        count ALLOW-FAILED-RPF;
+                        log;
+                        accept;
+                    }
+                }
+            }
+        }
+        routing-instances {
+            DKL300242 {
+                interface ge-2/2/5.0;
+                protocols {
+                    bgp {
+                        group AS65018 {
+                            type external;
+                            peer-as 65018;
+                            as-override;
+                            neighbor 33.48.241.18 {
+                                local-address 33.48.241.17;
+                                import [ MODIFY-IMPORT-ROUTES IMPORT-AS65018-VPN-DKL300242 ALLOW-TAGGED-ROUTES ];
+                                family inet {
+                                    unicast {
+                                        prefix-limit {
+                                            maximum 100;
+                                            teardown 90 idle-timeout 10;
+                                        }
+                                    }
+                                }
+                                authentication-key "<removed>"; ## SECRET-DATA
+                                export [ EXPORT-AS65018-VPN-DKL300242 MODIFY-EXPORT-ROUTES ALLOW-TAGGED-ROUTES ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /* Script: custConfig v4.05 wallc 20170715-170238 */
+    VPN-DKL300316-CONFIG {
+        policy-options {
+            policy-statement IMPORT-VPN-DKL300316 {
+                term ROUTE-TARGET {
+                    from community [ DKL300316-RT TO-INET0-RT ];
+                    then accept;
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            policy-statement EXPORT-VPN-DKL300316 {
+                term BGP-VPN-ROUTES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                    }
+                }
+                term STATIC-VPN-ROUTES {
+                    from {
+                        protocol static;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DKL300316-RT;
+                        community add SWA-STATIC-ROUTE;
+                    }
+                }
+                term AGGREGATE-VPN-ROUTES {
+                    from {
+                        protocol aggregate;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DKL300316-RT;
+                        community add SWA-AGGREGATE-ROUTE;
+                    }
+                }
+                term ACCEPT {
+                    from {
+                        community DKL300316-RT;
+                        tag 1000;
+                    }
+                    then {
+                        tag subtract 1000;
+                        community add IPT-LAYER;
+                        accept;
+                    }
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            community DKL300316-RT members target:27060:1999000316;
+            community TO-INET0-RT members target:27060:1999069998;
+        }
+        routing-instances {
+            DKL300316 {
+                instance-type vrf;
+                route-distinguisher 27060:1999000316;
+                vrf-import IMPORT-VPN-DKL300316;
+                vrf-export EXPORT-VPN-DKL300316;
+                vrf-table-label;
+                routing-options {
+                    aggregate {
+                        route 33.48.241.0/24 {
+                            community [ 1733:5200 1733:1733 1733:62413 721:211 ];
+                            discard;
+                        }
+                    }
+                    maximum-prefixes 100000 threshold 90 log-interval 5;
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-AS317-VPN-DKL300316-M0PX {
+        interfaces {
+            ge-2/2/4 {
+                vlan-tagging;
+                unit 400 {
+                    description ::M0PX::SOCCENTT_1::CUS::N::20M::ETH::BGP::LINE-INGRESS::LINE-EGRESS::33.48.241.41::X::TO_HQ_ALUDEID::;
+                    vlan-id 400;
+                    family inet {
+                        filter {
+                            input-list [ LINE-INGRESS-L3VPN LINE-ALLOW-ALL ];
+                            output-list [ LINE-EGRESS-L3VPN LINE-ALLOW-ALL ];
+                        }
+                        policer {
+                            input POLICER-20M;
+                            output POLICER-20M;
+                        }
+                        address 33.48.241.41/30;
+                    }
+                }
+            }
+        }
+        policy-options {
+            policy-statement EXPORT-AS317-VPN-DKL300316-M0PX {
+                term ACCEPT-DEFAULT {
+                    from {
+                        protocol [ bgp aggregate ];
+                        route-filter 0.0.0.0/0 exact;
+                    }
+                    then {
+                        tag 1000;
+                    }
+                }
+            }
+            policy-statement IMPORT-AS317-VPN-DKL300316-M0PX {
+                term IAP-TAG-AS317-M0PX {
+                    from protocol bgp;
+                    then {
+                        community add IAP-TAG-AS317-M0PX;
+                    }
+                }
+                term ADD-COMMON-COMMUNITIES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                        community add LOCAL-PE-ID;
+                        community add SWA-DISN-ROUTE;
+                        community add DKL300316-RT;
+                        community add AS317;
+                    }
+                }
+            }
+            community IAP-TAG-AS317-M0PX members 721:211;
+            community AS317 members 65534:317;
+        }
+        firewall {
+            policer POLICER-20M {
+                if-exceeding {
+                    bandwidth-limit 20m;
+                    burst-size-limit 20k;
+                }
+                then discard;
+            }
+        }
+        routing-instances {
+            DKL300316 {
+                interface ge-2/2/4.400;
+                protocols {
+                    bgp {
+                        group AS317 {
+                            type external;
+                            description M0PX_NIPR_VRF;
+                            peer-as 317;
+                            as-override;
+                            neighbor 33.48.241.42 {
+                                local-address 33.48.241.41;
+                                import [ MODIFY-IMPORT-ROUTES IMPORT-AS317-VPN-DKL300316-M0PX ALLOW-TAGGED-ROUTES ];
+                                family inet {
+                                    unicast {
+                                        prefix-limit {
+                                            maximum 500;
+                                            teardown 90 idle-timeout 10;
+                                        }
+                                    }
+                                }
+                                authentication-key "<removed>"; ## SECRET-DATA
+                                export [ EXPORT-AS317-VPN-DKL300316-M0PX MODIFY-EXPORT-ROUTES ALLOW-TAGGED-ROUTES ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-STATIC-VPN-DKL300316-MU00 {
+        interfaces {
+            ge-2/2/9 {
+                vlan-tagging;
+                unit 400 {
+                    description ::MU00::AKAMAI_ALD::CUS::O::6M::ETH::STATIC::161::160::33.48.241.26::X::DKL300316_NIPRVRF::;
+                    vlan-id 400;
+                    family inet {
+                        filter {
+                            input-list [ LINE-INGRESS-L3VPN LINE-ALLOW-ALL ];
+                            output-list [ LINE-EGRESS-L3VPN LINE-ALLOW-ALL ];
+                        }
+                        policer {
+                            input POLICER-6M;
+                            output POLICER-6M;
+                        }
+                        address 33.48.241.25/30;
+                    }
+                }
+            }
+        }
+        firewall {
+            policer POLICER-6M {
+                if-exceeding {
+                    bandwidth-limit 6m;
+                    burst-size-limit 6k;
+                }
+                then discard;
+            }
+        }
+        routing-instances {
+            DKL300316 {
+                interface ge-2/2/9.400;
+            }
+        }
+    }
+    CUSTOMER-CONFIG-AS673-VPN-DKL300316-MTN1 {
+        interfaces {
+            ge-2/2/2 {
+                vlan-tagging;
+                unit 400 {
+                    description ::MTN1::DA_ALUDEDAB_QA::CUS::N::10M::ETH::BGP::X::X::33.48.241.30::NA::USACE_ALUD_NIPR_VRF_DKL300316::;
+                    vlan-id 400;
+                    family inet {
+                        filter {
+                            input-list [ LINE-INGRESS-L3VPN LINE-ALLOW-ALL ];
+                            output-list [ LINE-EGRESS-L3VPN LINE-ALLOW-ALL ];
+                        }
+                        policer {
+                            input POLICER-10M;
+                            output POLICER-10M;
+                        }
+                        address 33.48.241.29/30;
+                    }
+                }
+            }
+        }
+        policy-options {
+            policy-statement EXPORT-AS673-VPN-DKL300316-MTN1 {
+                term ACCEPT-DEFAULT {
+                    from {
+                        protocol [ bgp aggregate ];
+                        route-filter 0.0.0.0/0 exact;
+                    }
+                    then {
+                        tag 1000;
+                    }
+                }
+            }
+            policy-statement IMPORT-AS673-VPN-DKL300316-MTN1 {
+                term IAP-TAG-AS673-MTN1 {
+                    from protocol bgp;
+                    then {
+                        community add IAP-TAG-AS673-MTN1;
+                    }
+                }
+                term ADD-COMMON-COMMUNITIES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                        community add LOCAL-PE-ID;
+                        community add SWA-DISN-ROUTE;
+                        community add DKL300316-RT;
+                        community add AS673;
+                    }
+                }
+            }
+            community IAP-TAG-AS673-MTN1 members 721:211;
+            community AS673 members 65534:673;
+        }
+        firewall {
+            policer POLICER-10M {
+                if-exceeding {
+                    bandwidth-limit 10m;
+                    burst-size-limit 10k;
+                }
+                then discard;
+            }
+        }
+        routing-instances {
+            DKL300316 {
+                interface ge-2/2/2.400;
+                protocols {
+                    bgp {
+                        group AS673 {
+                            type external;
+                            description USACE_MTN1;
+                            peer-as 673;
+                            as-override;
+                            neighbor 33.48.241.30 {
+                                local-address 33.48.241.29;
+                                import [ MODIFY-IMPORT-ROUTES IMPORT-AS673-VPN-DKL300316-MTN1 ALLOW-TAGGED-ROUTES ];
+                                family inet {
+                                    unicast {
+                                        prefix-limit {
+                                            maximum 500;
+                                            teardown 90 idle-timeout 10;
+                                        }
+                                    }
+                                }
+                                authentication-key "<removed>"; ## SECRET-DATA
+                                export [ EXPORT-AS673-VPN-DKL300316-MTN1 MODIFY-EXPORT-ROUTES ALLOW-TAGGED-ROUTES ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    CONFIG-VPN-DKL300332 {
+        policy-options {
+            policy-statement IMPORT-VPN-DKL300332 {
+                term ROUTE-TARGET {
+                    from community [ DKL300332-TARGET HAIPE-S-TARGET ];
+                    then accept;
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            policy-statement EXPORT-VPN-DKL300332 {
+                term BGP-VPN-ROUTES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                    }
+                }
+                term DIRECT {
+                    from protocol direct;
+                    then {
+                        tag 1000;
+                        community add DKL300332-TARGET;
+                        community add SWA-DIRECT-ROUTE;
+                        community add LOCAL-PE-ID;
+                        accept;
+                    }
+                }
+                term STATIC-VPN-ROUTES {
+                    from {
+                        protocol static;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DKL300332-TARGET;
+                        community add SWA-STATIC-ROUTE;
+                    }
+                }
+                term AGGREGATE-VPN-ROUTES {
+                    from {
+                        protocol aggregate;
+                        community LOCAL-PE-ID;
+                    }
+                    then {
+                        tag 1000;
+                        community add DKL300332-TARGET;
+                        community add SWA-AGGREGATE-ROUTE;
+                    }
+                }
+                term ACCEPT {
+                    from {
+                        community DKL300332-TARGET;
+                        tag 1000;
+                    }
+                    then {
+                        tag subtract 1000;
+                        community add IPT-LAYER;
+                        accept;
+                    }
+                }
+                term REJECT {
+                    then reject;
+                }
+            }
+            community DKL300332-TARGET members target:27060:1999000332;
+        }
+        routing-instances {
+            DKL300332 {
+                description CONFIG-VPN-DKL300332;
+                instance-type vrf;
+                route-distinguisher 27060:1999000332;
+                vrf-import IMPORT-VPN-DKL300332;
+                vrf-export EXPORT-VPN-DKL300332;
+                vrf-table-label;
+                routing-options {
+                    aggregate {
+                        route 33.48.241.0/24 community [ 1733:5200 1733:1733 1733:62413 ];
+                    }
+                    maximum-prefixes 10000 threshold 90 log-interval 5;
+                    auto-export;
+                }
+            }
+        }
+    }
+    APPLY-TRUNK-FILTERS {
+        interfaces {
+            <*> {
+                unit <*> {
+                    family inet {
+                        filter {
+                            input-list [ TRUNK-INGRESS TRUNK-INGRESS-QOS TRUNK-ALLOW-ALL ];
+                            output-list [ TRUNK-EGRESS TRUNK-EGRESS-QOS TRUNK-ALLOW-ALL ];
+                        }
+                    }
+                    family mpls {
+                        filter {
+                            input-list [ MPLS-TRUNK-INGRESS-QOS MPLS-TRUNK-ALLOW-ALL ];
+                            output-list [ MPLS-TRUNK-EGRESS-QOS MPLS-TRUNK-ALLOW-ALL ];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-DKL300332-M23C {
+        interfaces {
+            ge-2/3/4 {
+                mtu 4462;
+                unit 0 {
+                    description ::M23C::CCECBMT020::IRT::O::1G::ETH::VPN::X::X::33.48.241.34::DKL300332::NO_REMARKS::;
+                    bandwidth 1g;
+                    family inet {
+                        address 33.48.241.33/30;
+                    }
+                }
+            }
+        }
+        routing-instances {
+            DKL300332 {
+                interface ge-2/3/4.0;
+            }
+        }
+    }
+    CUSTOMER-CONFIG-AS65010-VPN-DLL300341-BSU3 {
+        interfaces {
+            ge-2/3/6 {
+                unit 0 {
+                    description ::BSU3::DL_LSARBRBTS_IQ::CUS::45M::ETH::BGP::33.48.241.14::L3VPN_DLL300341_ALUDEID_QA::;
+                    family inet {
+                        filter {
+                            input-list [ LINE-INGRESS-L3VPN LINE-ALLOW-ALL ];
+                            output-list [ LINE-EGRESS-L3VPN LINE-ALLOW-ALL ];
+                        }
+                        policer {
+                            input POLICER-45M;
+                            output POLICER-45M;
+                        }
+                        address 33.48.241.13/30;
+                    }
+                }
+            }
+        }
+        policy-options {
+            policy-statement EXPORT-AS65010-VPN-DLL300341-BSU3 {
+                term ACCEPT-VPN-ROUTES {
+                    from {
+                        protocol [ bgp static aggregate ];
+                        community ALL-DISN-ROUTES;
+                    }
+                    then {
+                        tag 1000;
+                    }
+                }
+            }
+            policy-statement IMPORT-AS65010-VPN-DLL300341-BSU3 {
+                term ADD-COMMON-COMMUNITIES {
+                    from protocol bgp;
+                    then {
+                        tag 1000;
+                        community add LOCAL-PE-ID;
+                        community add SWA-DISN-ROUTE;
+                        community add DLL300341-RT;
+                        community add AS65010;
+                    }
+                }
+            }
+            community AS65010 members 65534:65010;
+        }
+        firewall {
+            policer POLICER-45M {
+                if-exceeding {
+                    bandwidth-limit 45m;
+                    burst-size-limit 45k;
+                }
+                then discard;
+            }
+        }
+        routing-instances {
+            DLL300341 {
+                interface ge-2/3/6.0;
+                protocols {
+                    bgp {
+                        group AS65010 {
+                            type external;
+                            description BSU3;
+                            peer-as 65010;
+                            as-override;
+                            neighbor 33.48.241.14 {
+                                local-address 33.48.241.13;
+                                import [ MODIFY-IMPORT-ROUTES IMPORT-AS65010-VPN-DLL300341-BSU3 ALLOW-TAGGED-ROUTES ];
+                                family inet {
+                                    unicast {
+                                        prefix-limit {
+                                            maximum 100;
+                                            teardown 90 idle-timeout 10;
+                                        }
+                                    }
+                                }
+                                authentication-key "<removed>"; ## SECRET-DATA
+                                export [ EXPORT-AS65010-VPN-DLL300341-BSU3 MODIFY-EXPORT-ROUTES ALLOW-TAGGED-ROUTES ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-DKL300332-MC51 {
+        interfaces {
+            ge-2/3/1 {
+                mtu 4462;
+                unit 0 {
+                    description ::MC51::CCECALD010::IRT::O::1G::ETH::VPN::X::X::33.48.241.46::CT_INT::DKL300332::;
+                    bandwidth 1g;
+                    family inet {
+                        address 33.48.241.45/30;
+                    }
+                }
+            }
+        }
+        routing-instances {
+            DKL300332 {
+                interface ge-2/3/1.0;
+            }
+        }
+    }
+    CUSTOMER-CONFIG-6FU5 {
+        interfaces {
+            at-1/2/7 {
+                description ::6FU5::UATCALD02C::NET::O::X::X::X::X::X::X::X::X::;
+                per-unit-scheduler;
+                sonet-options {
+                    payload-scrambler;
+                }
+                atm-options {
+                    cell-bundle-size 1;
+                    vpi 0;
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-WGT0 {
+        interfaces {
+            at-1/2/7 {
+                unit 3101 {
+                    description ::WGT0::UJECBMT030::CUS::X::X::X::X::X:::X:::X:::X:::PW_XC_UJECBMT030_DEDICATED_MDA::;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 0.149;
+                    family ccc {
+                        filter {
+                            input-list [ ATM-QOS TDM-ALLOW-ALL ];
+                        }
+                    }
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.240 {
+                    interface at-1/2/7.3101 {
+                        virtual-circuit-id 900522;
+                        description "TO UJEEPTM250:WGT0:L2CKT";
+                        control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                        ignore-mtu-mismatch;
+                    }
+                }
+            }
+        }
+        class-of-service {
+            traffic-control-profiles {
+                atm-shape-WGT0 {
+                    atm-service cbr;
+                    peak-rate 40218;
+                }
+            }
+            interfaces {
+                at-1/2/7 {
+                    unit 3101 {
+                        output-traffic-control-profile atm-shape-WGT0;
+                    }
+                }
+            }
+        }
+        firewall {
+            family ccc {
+                filter ATM-QOS {
+                    interface-specific;
+                    term ATM {
+                        from {
+                            forwarding-class ELASTIC;
+                        }
+                        then {
+                            count ATM-CUST;
+                            loss-priority low;
+                            forwarding-class TDM;
+                            next term;
+                        }
+                    }
+                }
+                filter TDM-ALLOW-ALL {
+                    term TDM-ALLOW-ALL {
+                        then accept;
+                    }
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-68A6 {
+        interfaces {
+            at-0/2/7 {
+                description ::68A6::UATCALD02c::NET::0::ATM::NA::X::X::NA::NA::NO_RMKS::;
+                enable;
+                per-unit-scheduler;
+                sonet-options {
+                    payload-scrambler;
+                }
+                atm-options {
+                    cell-bundle-size 1;
+                    vpi 0;
+                }
+            }
+        }
+    }
+    CUSTOMER-CONFIG-WHT0 {
+        interfaces {
+            at-0/2/7 {
+                unit 3101 {
+                    description ::WHT0::UJECALD030::CUS::X::X::X::X::X:::X:::X:::X:::PW_XC_UJECALD030_DEDICATED_MDA::;
+                    encapsulation atm-ccc-cell-relay;
+                    vci 0.148;
+                    family ccc {
+                        filter {
+                            input-list [ ATM-QOS TDM-ALLOW-ALL ];
+                        }
+                    }
+                }
+            }
+        }
+        protocols {
+            l2circuit {
+                neighbor 33.20.224.240 {
+                    interface at-0/2/7.3101 {
+                        virtual-circuit-id 900056;
+                        description "TO UJEEALD030:WHT0:L2CKT";
+                        control-word;
+                        encapsulation-type atm-cell-vc-mode;
+                        ignore-mtu-mismatch;
+                    }
+                }
+            }
+        }
+        class-of-service {
+            traffic-control-profiles {
+                atm-shape-WHT0 {
+                    atm-service cbr;
+                    peak-rate 40218;
+                }
+            }
+            interfaces {
+                at-0/2/7 {
+                    unit 3101 {
+                        output-traffic-control-profile atm-shape-WHT0;
+                    }
+                }
+            }
+        }
+        firewall {
+            family ccc {
+                filter ATM-QOS {
+                    interface-specific;
+                    term ATM {
+                        from {
+                            forwarding-class ELASTIC;
+                        }
+                        then {
+                            count ATM-CUST;
+                            loss-priority low;
+                            forwarding-class TDM;
+                            next term;
+                        }
+                    }
+                }
+                filter TDM-ALLOW-ALL {
+                    term TDM-ALLOW-ALL {
+                        then accept;
+                    }
+                }
+            }
+        }
+    }
+}
+apply-groups [ re0 re1 global SONET-RFC-2615 UNIQUE-PREFIX-LISTS COMMON-PREFIX-LISTS IA-QOS-FILTERS TRUNK-FILTERS CUSTOMER-FILTERS RPM-COMMON-PARAMS CUSTOMER_CONFIG_AS5972-VPN-DKL300227-BWG2 VPN-DKL300227-CONFIG CUSTOMER-CONFIG-ASN1733-MPAC CUSTOMER-CONFIG-ASN1733-MPA1 CUSTOMER-CONFIG-ASN1733-MPA8 CUSTOMER-CONFIG-ASN1733-MPAF CUSTOMER-CONFIG-ASN1733-MPAL CUSTOMER-CONFIG-ASN1733-MPAK CUSTOMER-CONFIG-ASN1733-MPAG CUSTOMER-CONFIG-ASN1733-MPAJ CUSTOMER-CONFIG-ASN1733-MPA3 CUSTOMER_CONFIG_AS65010-VPN-DBCX70024-MSA1 
+VPN-DBCX70024-CONFIG ETHERNET_PW_BS2T CUSTOMER-CONFIG-ASN27064-RPG0 CUSTOMER-CONFIG-ASN1733-WAM0 CUSTOMER-CONFIG-ASN27064-RPH0 CUSTOMER_CONFIG_AS64764-VPN-DBL300219-28BZ VPN-DBL300219-CONFIG VPN-DKL300242-CONFIG CUSTOMER_CONFIG_AS65018-VPN-DKL300242-M882 CUSTOMER-CONFIG-AS317-VPN-DKL300316-M0PX VPN-DKL300316-CONFIG CUSTOMER-CONFIG-STATIC-VPN-DKL300316-MU00 CUSTOMER-CONFIG-AS673-VPN-DKL300316-MTN1 CONFIG-VPN-DKL300332 CUSTOMER-CONFIG-DKL300332-M23C CUSTOMER-CONFIG-AS65010-VPN-DLL300341-BSU3 VPN-DLL300341-CONFIG 
+CUSTOMER-CONFIG-DKL300332-MC51 CUSTOMER-CONFIG-6FU5 CUSTOMER-CONFIG-WGT0 CUSTOMER-CONFIG-68A6 CUSTOMER-CONFIG-WHT0 ];
+system {
+    domain-name dcn.disn.mil;
+    backup-router 10.71.12.1 destination 10.0.0.0/8;
+    no-redirects;
+    authentication-order [ radius password ];
+    ports {
+        console insecure;
+        auxiliary disable;
+    }
+    diag-port-authentication {
+        encrypted-password "<removed>"; ## SECRET-DATA
+    }
+    pic-console-authentication {
+        encrypted-password "<removed>"; ## SECRET-DATA
+    }
+    root-authentication {
+        encrypted-password "<removed>"; ## SECRET-DATA
+    }
+    name-server {
+        10.44.5.17;
+        10.30.5.17;
+    }
+    radius-server {
+        10.44.5.1 {
+            port 1645;
+            secret "<removed>"; ## SECRET-DATA
+            timeout 3;
+            retry 3;
+            source-address 10.71.12.8;
+        }
+        10.30.5.1 {
+            port 1645;
+            secret "<removed>"; ## SECRET-DATA
+            timeout 3;
+            retry 3;
+            source-address 10.71.12.8;
+        }
+        10.30.5.140 {
+            port 1645;
+            secret "<removed>"; ## SECRET-DATA
+            timeout 3;
+            retry 3;
+        }
+        10.53.5.1 {
+            port 1645;
+            secret "<removed>"; ## SECRET-DATA
+            timeout 3;
+            retry 3;
+        }
+    }
+    login {
+        message "\n\nYou are accessing a U.S. Government (USG) Information System (IS)\nthat is provided for USG-authorized use only.\n\nBy using this IS (which includes any device attached to this IS),\nyou consent to the following conditions:\n\n-The USG routinely intercepts and monitors communications on this\n IS for purposes including, but not limited to, penetration\n testing, COMSEC monitoring, network operations and defense,\n personnel misconduct (PM), law enforcement (LE), and\n counterintelligence (CI) investigations.\n\n-At any time, the USG may inspect and seize data stored on this\n IS.\n\n-Communications using, or data stored on, this IS are not private,\n  are subject to routine monitoring, interception, and search, and\n may be disclosed or used for any USG-authorized purpose.\n\n-This IS includes security measures (e.g., authentication and\n access controls) to protect USG interests--not for your personal\n benefit or privacy.\n\n-Notwithstanding the above, using this IS does not constitute\n consent to PM, LE, or CI investigative searching or monitoring of\n the content of privileged communications, or work product,\n related to personal representation or services by attorneys,\n psychotherapists, or clergy, and their assistants. Such\n communications and work product are private and confidential.\n\nSee User Agreement for details.\n\n";
+        retry-options {
+            tries-before-disconnect 3;
+            maximum-time 60;
+        }
+        class DORADO-CLASS {
+            idle-timeout 10;
+            permissions all;
+            deny-commands "(start shell)";
+        }
+        class TIER-0 {
+            idle-timeout 10;
+            permissions interface;
+            allow-commands "(show interfaces)";
+            deny-commands "(request)|(file)|(help)";
+        }
+        class TIER-0-PRIV {
+            idle-timeout 10;
+            permissions [ view view-configuration ];
+            allow-commands "(ping)|(traceroute)";
+            deny-commands "(clear)|(file)|(request)|(test)|(monitor)";
+        }
+        class TIER-1 {
+            idle-timeout 10;
+            permissions [ clear configure interface-control network rollback view view-configuration ];
+            allow-commands "(request chassis pic)|(request support information)|(request system halt)|(request system reboot)|(monitor)";
+            deny-commands "(request chassis)|(request ipsec)|(request services)|(request system)";
+            allow-configuration "(groups CUSTOMER-CONFIG.* interfaces)|(groups CUSTOMER-CONFIG.* class-of-service interfaces)|(groups CUSTOMER-CONFIG.* routing-instances)|(groups CUSTOMER-CONFIG.* protocols bgp)|(groups CUSTOMER-CONFIG.* protocols msdp)|(groups CUSTOMER-CONFIG.* protocols pim)|(groups CUSTOMER-CONFIG.* policy-options)|(groups CUSTOMER-CONFIG.* routing-options static)";
+        }
+        class TIER-2 {
+            idle-timeout 10;
+            permissions all;
+        }
+        class TIER-3 {
+            idle-timeout 10;
+            permissions [ clear maintenance network secret view view-configuration ];
+            allow-commands "(start shell pfe)|(request message)|(request routing-engine login)";
+            deny-commands "(start shell)|(request)";
+        }
+        class TIER-3-PRIV {
+            idle-timeout 10;
+            permissions [ clear configure maintenance network secret view view-configuration ];
+            allow-commands "(start shell pfe)|(request message)|(request routing-engine login)";
+            deny-commands "(start shell)|(request)";
+            allow-configuration "(firewall)|(interfaces .* unit .* family .* filter)|(interfaces traceoptions)|(protocols .* traceoptions)|(groups .* firewall)|(groups .* interfaces .* unit .* family .* filter)";
+        }
+        user <removed> {
+            uid 2000;
+            class super-user;
+            authentication {
+                encrypted-password "<removed>"; ## SECRET-DATA
+            }
+        }
+        user <removed> {
+            uid 2001;
+            class TIER-2;
+        }
+        user <removed> {
+            uid 2002;
+            class TIER-3;
+        }
+        user <removed> {
+            uid 2003;
+            class TIER-1;
+            authentication {
+                encrypted-password "<removed>"; ## SECRET-DATA
+            }
+        }
+        user <removed> {
+            uid 2004;
+            class TIER-2;
+        }
+        user <removed> {
+            uid 2005;
+            class TIER-0;
+        }
+        user <removed> {
+            uid 2006;
+            class TIER-0-PRIV;
+        }
+        user <removed> {
+            uid 2007;
+            class TIER-3-PRIV;
+        }
+        user <removed> {
+            uid 2008;
+            class TIER-1;
+        }
+        user <removed> {
+            uid 2009;
+            class TIER-2;
+        }
+        user <removed> {
+            uid 2010;
+            class TIER-3;
+        }
+        user <removed> {
+            uid 2011;
+            class TIER-2;
+            authentication {
+                encrypted-password "<removed>"; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        ssh {
+            root-login deny;
+            protocol-version v2;
+            ciphers [ aes256-ctr aes192-ctr aes128-ctr aes256-cbc aes192-cbc aes128-cbc ];
+            connection-limit 20;
+            rate-limit 20;
+        }
+    }
+    syslog {
+        user <removed> {
+            any emergency;
+        }
+        host 10.53.6.177 {
+            any info;
+            interactive-commands info;
+            match "!((.*PING*.)|(.*fxp0.0       D .*)|(PFE_FW_SYSLOG_IP))";
+            facility-override local7;
+            explicit-priority;
+        }
+        host 10.30.6.177 {
+            any info;
+            interactive-commands info;
+            match "!((.*PING*.)|(.*fxp0.0       D .*)|(PFE_FW_SYSLOG_IP))";
+            facility-override local7;
+            explicit-priority;
+        }
+        host 10.44.6.177 {
+            any info;
+            interactive-commands info;
+            match "!((.*PING*.)|(.*fxp0.0       D .*)|(PFE_FW_SYSLOG_IP))";
+            facility-override local7;
+            explicit-priority;
+        }
+        file messages {
+            any warning;
+            authorization info;
+            explicit-priority;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+        file cli-commands {
+            interactive-commands info;
+            explicit-priority;
+        }
+        source-address 10.71.12.8;
+    }
+    processes {
+        routing failover other-routing-engine;
+    }
+    ntp {
+        boot-server 10.44.4.5;
+        authentication-key 1 type md5 value "<removed>"; ## SECRET-DATA
+        authentication-key 2 type md5 value "<removed>"; ## SECRET-DATA
+        server 10.44.4.5;
+        server 10.44.4.6;
+        trusted-key [ 1 2 ];
+    }
+}
+chassis {
+    redundancy {
+        failover {
+            on-loss-of-keepalives;
+            on-disk-failure;
+        }
+        keepalive-time 15;
+    }
+    aggregated-devices {
+        ethernet {
+            device-count 5;
+        }
+    }
+    fpc 0 {
+        pic 0 {
+            max-queues-per-interface 8;
+        }
+        pic 2 {
+            max-queues-per-interface 8;
+        }
+    }
+    fpc 1 {
+        pic 0 {
+            max-queues-per-interface 8;
+        }
+        pic 1 {
+            port 0 {
+                speed oc3-stm1;
+            }
+            port 1 {
+                speed oc3-stm1;
+            }
+        }
+        pic 2 {
+            max-queues-per-interface 8;
+            port 0 {
+                speed oc3-stm1;
+            }
+            port 1 {
+                speed oc3-stm1;
+            }
+        }
+    }
+    fpc 2 {
+        pic 0 {
+            traffic-manager {
+                mode ingress-and-egress;
+            }
+        }
+        pic 1 {
+            traffic-manager {
+                mode ingress-and-egress;
+            }
+        }
+        pic 2 {
+            traffic-manager {
+                mode ingress-and-egress;
+            }
+        }
+        pic 3 {
+            traffic-manager {
+                mode ingress-and-egress;
+            }
+        }
+    }
+    fpc 3 {
+        pic 0 {
+            framing lan;
+            traffic-manager {
+                mode ingress-and-egress;
+            }
+        }
+        pic 1 {
+            traffic-manager {
+                mode ingress-and-egress;
+            }
+        }
+        pic 2 {
+            traffic-manager {
+                mode ingress-and-egress;
+            }
+        }
+        pic 3 {
+            traffic-manager {
+                mode ingress-and-egress;
+            }
+        }
+    }
+    network-services enhanced-ip;
+    synchronization {
+        network-option option-2;
+        interfaces external-0/0 {
+            signal-type t1;
+            t1-options {
+                line-encoding b8zs;
+            }
+        }
+        interfaces external-1/0 {
+            signal-type t1;
+            t1-options {
+                line-encoding b8zs;
+            }
+        }
+        source {
+            interfaces external-0/0;
+            interfaces external-1/0;
+        }
+    }
+}
+services {
+    rpm {
+        probe IcmpCktLatency {
+            test MFJ1-UJECALD030-UJPCALD010 {
+                target address 33.20.228.14;
+                source-address 33.20.228.13;
+            }
+            test MPJ1-UJECALD030-CCECALH010 {
+                target address 214.68.241.34;
+                routing-instance HAIPE-S;
+            }
+            test MC51-UJECALD030-CCECALD010 {
+                target address 33.48.241.46;
+                source-address 33.48.241.45;
+                routing-instance DKL300332;
+            }
+            test MQJ1-UJECALD030-CCECASS010 {
+                target address 214.68.241.30;
+                routing-instance HAIPE-S;
+            }
+            test M23C-UJECALD030-CCECBMT020 {
+                target address 33.48.241.34;
+                source-address 33.48.241.33;
+                routing-instance DKL300332;
+            }
+        }
+        probe IcmpLpbkLatency {
+            test UJECALD030-UJECBMT030 {
+                target address 33.20.224.240;
+            }
+            test UJECALD030-UJECBMT040 {
+                target address 33.20.226.240;
+            }
+            test UJECALD030-UJECALD040 {
+                target address 33.20.226.241;
+            }
+            test UJECALD030-UJECARF030 {
+                target address 33.20.224.242;
+            }
+            test UJECALD030-UJECARF040 {
+                target address 33.20.226.242;
+            }
+            test UJECALD030-UJECALH030 {
+                target address 33.20.224.243;
+            }
+            test UJECALD030-UJECALH040 {
+                target address 33.20.226.243;
+            }
+            test UJECALD030-UJECASS030 {
+                target address 33.20.224.244;
+            }
+            test UJECALD030-UJECASS040 {
+                target address 33.20.226.244;
+            }
+            test UJECALD030-UJECAAS030 {
+                target address 33.20.224.245;
+            }
+            test UJECALD030-UJECAAS040 {
+                target address 33.20.226.245;
+            }
+        }
+    }
+}
+interfaces {
+    at-0/2/0 {
+        description ::6R9D::UIXCALD101::NET::T::155M::IPT-PE_TO_Promina_SCLX::;
+        per-unit-scheduler;
+        atm-options {
+            cell-bundle-size 20;
+            vpi 0;
+        }
+        unit 100 {
+            description ::WAM0::UIXCARF168::NET::T::6.2M::ATM::PW_TO_ARIFJAN_VCID_900128::;
+        }
+    }
+    coc3-1/0/0 {
+        description ::6EA6::UODCALD010::NET::O::155M::SON::X::X::ACCESS_TRUNK_FOR_MULTIPLE_DS1::;
+    }
+    at-1/2/0 {
+        description ::65N5::UIXCALD057::NET::O::155M::IPT-PE_TO_Promina_SCLX::;
+        enable;
+        per-unit-scheduler;
+        atm-options {
+            cell-bundle-size 20;
+            vpi 40;
+        }
+        unit 101 {
+            description ::MPAL::UIXCALH028::NET::O::4.1M::ATM::PW_AL_DHAFRA_VCID_900106::;
+        }
+        unit 102 {
+            description ::MPAC::UIXCBMT049::NET::T::2.1M::ATM::PW_TO_BAHRAIN_VCID_900096::;
+        }
+        unit 103 {
+            description ::MPAK::UIXCARF155::NET::O::2.1M::ATM::PW_TO_ARIFJAN_VCID_900104::;
+        }
+        unit 104 {
+            description ::MPAJ::UIXCARF154::NET::O::2.1M::ATM::PW_TO_ARIFJAN_VCID_900105::;
+        }
+        unit 105 {
+            description ::MPA1::UIXCBMT048::NET::T::2.1M::ATM::PW_TO_BAHRAIN_VCID_900089::;
+        }
+        unit 107 {
+            description ::RPG0::UIXWMIA177::NET::T::2.1M::ATM::PW_TO_MIAMI_NAP_VCID_900111::;
+        }
+    }
+    at-1/2/1 {
+        description ::6PA8::UIXCALD058::NET::O::155M::IPT-PE_TO_Promina_SCLX::;
+        per-unit-scheduler;
+        atm-options {
+            cell-bundle-size 20;
+            vpi 40;
+        }
+        unit 100 {
+            description ::MPAF::UIXCARF054::NET::O::2.048MB::ATM::PW_TO_ARIFJAN_VCID_900101::;
+        }
+        unit 101 {
+            description ::MPA8::UIXCBMT049::NET::T::2.048MB::ATM::PW_TO_BAHRAIN_VCID_900094::;
+        }
+        unit 102 {
+            description ::MPAG::UIXCARF155::NET::O::2.048MB::ATM::PW_TO_ARIFJAN_VCID_900102::;
+        }
+        unit 103 {
+            description ::MPA3::UIXCBMT048::NET::T::8.192MB::ATM::PW_TO_BAHRAIN_VCID_900093::;
+        }
+        unit 104 {
+            description ::RPH0::UIXWMIA177::NET::T::2.048MB::ATM::PW_TO_MIAMI_NAP_VCID_900112::;
+        }
+    }
+    at-1/2/7 {
+        unit 3101;
+    }
+    xe-2/0/0 {
+        enable;
+        mtu 4484;
+        unit 0 {
+            apply-groups APPLY-TRUNK-FILTERS;
+            description ::MFJ1::UJPCALD010::IRT::O::10G::ETH::ISIS::X::X::33.20.228.14::XE-0/1/1::IPT-PE1_TO_P_IRT::;
+            bandwidth 10g;
+            family inet {
+                address 33.20.228.13/30;
+            }
+            family iso;
+            family mpls {
+                maximum-labels 5;
+            }
+        }
+    }
+    ge-2/2/0 {
+        enable;
+        unit 0 {
+            enable;
+            description ::BWG2::DK_ALUDEID_QA::CUS::N::100M::ETH::BGP::33.48.241.2::MHS_MEDCOI_ALUDEID_QA::;
+        }
+    }
+    ge-2/2/6 {
+        unit 0 {
+            disable;
+        }
+    }
+    ge-2/2/8 {
+        unit 0 {
+            disable;
+            description ::MSA1::DB_INCRLKAB_TR::CUS::N::10M::ETH::X::X::33.48.241.6::L3VPN_DBCX70024_NGA_INCRLKAB_TR::;
+        }
+    }
+    ge-2/3/2 {
+        mtu 4462;
+        link-mode full-duplex;
+        unit 0 {
+            apply-groups APPLY-TRUNK-FILTERS;
+            description ::MQJ1::CCECASS010::IRT::O::20M::ETH::STATIC::NA::NA::214.68.241.30::NA::GIG-E_CONNECTION_TO_ASS_REMOTE_HAIPE_CBECASS060-002::;
+            bandwidth 20m;
+            family inet {
+                address 214.68.241.29/30;
+            }
+        }
+    }
+    ge-2/3/5 {
+        mtu 4462;
+        link-mode full-duplex;
+        unit 0 {
+            apply-groups APPLY-TRUNK-FILTERS;
+            description ::MPJ1::CCECALH010::IRT::O::50M::ETH::STATIC::NA::NA::214.68.241.34::NA::GIG-E_CONNECTION_TO_ALH_REMOTE_HAIPE_CBECALH050-002::;
+            family inet {
+                address 214.68.241.33/30;
+            }
+        }
+    }
+    ge-2/3/6 {
+        enable;
+        unit 0 {
+            enable;
+            description ::BSU3::DL_LSARBRBTS_IQ::CUS::O::45M::ETH::BGP::33.48.241.14::L3VPN_DLL300341_ALUDEID_QA::;
+        }
+    }
+    xe-3/0/0 {
+        mtu 4484;
+        framing {
+            lan-phy;
+        }
+        unit 0 {
+            apply-groups APPLY-TRUNK-FILTERS;
+            description ::M7M1::UJECALD040::IRT::T::10G::ETH::ISIS::NA::NA::33.20.228.70::XE-3/0/0::JUNIPER_MX480_SITE_B::;
+            bandwidth 10g;
+            family inet {
+                address 33.20.228.69/30;
+            }
+            family iso;
+            family mpls {
+                maximum-labels 5;
+            }
+        }
+    }
+    xe-3/3/1 {
+        mtu 4484;
+        unit 0 {
+            apply-groups APPLY-TRUNK-FILTERS;
+            description ::MZL1::UJPCALD010::IRT::O::10G::ETH::ISIS::X::X::33.20.228.6::XE-1/1/1::TRUNK_TO_ALD_P::;
+            bandwidth 10g;
+            family inet {
+                address 33.20.228.5/30;
+            }
+            family iso;
+            family mpls {
+                maximum-labels 5;
+            }
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 33.20.224.241/32;
+                address 33.20.225.241/32;
+            }
+            family iso {
+                address 49.0002.0330.2022.4241.00;
+            }
+        }
+    }
+}
+snmp {
+    location SWA;
+    contact "TNC-C IP NOC 318-439-3832/3881/3831/3821";
+    view remote-view {
+        oid .1.3.6.1.2.1.80 include;
+        oid .1.3.6.1.4.1.2636.3.7 include;
+        oid .1.3.6.1.2.1.81 include;
+        oid .1.3.6.1.4.1.2636.3.8 include;
+    }
+    community <removed> {
+        authorization read-only;
+        clients {
+            10.53.6.0/24;
+            10.30.6.0/24;
+            10.53.4.0/21;
+            10.44.4.0/21;
+            10.30.4.0/21;
+            10.67.5.45/32;
+        }
+    }
+    community <removed> {
+        authorization read-only;
+        clients {
+            10.53.6.0/24;
+            10.30.6.0/24;
+            10.53.4.0/21;
+            10.44.4.0/21;
+            10.30.4.0/21;
+        }
+    }
+    community <removed> {
+        authorization read-only;
+        clients {
+            0.0.0.0/0 restrict;
+            10.30.24.0/21;
+            10.30.4.0/21;
+            10.53.4.0/21;
+            10.30.25.96/32;
+            10.30.25.101/32;
+            10.30.25.140/32;
+            10.30.25.141/32;
+            10.30.25.146/32;
+            10.53.6.33/32;
+            10.53.6.34/32;
+            10.53.6.42/32;
+            10.30.26.112/32;
+            10.30.26.114/32;
+            10.44.6.43/32;
+            10.44.6.44/32;
+            10.44.6.45/32;
+            10.30.25.0/24;
+            10.30.24.0/24;
+            10.30.129.0/24;
+        }
+    }
+    trap-options {
+        source-address 10.71.12.8;
+    }
+    trap-group micromuse {
+        version v2;
+        categories {
+            authentication;
+            chassis;
+            link;
+            remote-operations;
+            routing;
+            startup;
+            rmon-alarm;
+            vrrp-events;
+            configuration;
+            sonet-alarms;
+        }
+        targets {
+            10.30.6.177;
+            10.44.6.177;
+            10.53.6.177;
+        }
+    }
+}
+forwarding-options {
+    sampling {
+        input {
+            rate 1000;
+        }
+        family inet {
+            output {
+                flow-server 10.30.154.22 {
+                    port 9985;
+                    source-address 10.71.12.8;
+                    version 5;
+                }
+                flow-server 198.26.249.86 {
+                    port 9985;
+                    source-address 33.20.224.241;
+                    version 5;
+                }
+            }
+        }
+    }
+}
+routing-options {
+    graceful-restart;
+    interface-routes {
+        rib-group inet THREE-RIBS;
+    }
+    static {
+        route 10.0.0.0/8 next-hop [ 10.71.12.1 10.71.8.1 10.25.59.33 ];
+    }
+    martians {
+        0.0.0.0/8 orlonger;
+        100.64.0.0/10 orlonger;
+        169.254.0.0/16 orlonger;
+        172.16.0.0/12 orlonger;
+        192.0.0.0/24 orlonger;
+        192.0.2.0/24 orlonger;
+        192.168.0.0/16 orlonger;
+        198.18.0.0/15 orlonger;
+        198.51.100.0/24 orlonger;
+        203.0.113.0/24 orlonger;
+    }
+    rib-groups {
+        THREE-RIBS {
+            import-rib [ inet.0 inet.3 inet.2 ];
+            import-policy [ IMPORT-INET3 IMPORT-INET2 REJECT-TO-TABLES ];
+        }
+    }
+    router-id 33.20.224.241;
+    autonomous-system 1733;
+    forwarding-table {
+        export LOAD-BALANCE;
+    }
+}
+protocols {
+    rsvp { # bla
+        interface xe-2/0/0.0 {
+            authentication-key "<removed>"; ## SECRET-DATA
+            aggregate;
+            reliable;
+            link-protection;
+        }
+        interface xe-3/3/1.0 {
+            authentication-key "<removed>"; ## SECRET-DATA
+            aggregate;
+            reliable;
+            link-protection;
+        }
+        interface xe-3/0/0.0 {
+            authentication-key "<removed>"; ## SECRET-DATA
+            aggregate;
+            link-protection;
+        }
+    }
+    mpls {
+        optimize-aggressive;
+        no-propagate-ttl;
+        optimize-timer 600;
+        label-switched-path UJECALD030-to-UJECBMT030 {
+            from 33.20.224.241;
+            to 33.20.224.240;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECBMT040 {
+            from 33.20.224.241;
+            to 33.20.226.240;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECALD040 {
+            from 33.20.224.241;
+            to 33.20.226.241;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECARF030 {
+            from 33.20.224.241;
+            to 33.20.224.242;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECARF040 {
+            from 33.20.224.241;
+            to 33.20.226.242;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECALH030 {
+            from 33.20.224.241;
+            to 33.20.224.243;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECALH040 {
+            from 33.20.224.241;
+            to 33.20.226.243;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECASS030 {
+            from 33.20.224.241;
+            to 33.20.224.244;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECASS040 {
+            from 33.20.224.241;
+            to 33.20.226.244;
+            ldp-tunneling;
+            no-cspf;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECAAS030 {
+            from 33.20.224.241;
+            to 33.20.224.245;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECAAS040 {
+            from 33.20.224.241;
+            to 33.20.226.245;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJPCBMT010 {
+            from 33.20.224.241;
+            to 214.20.240.1;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJPCALD010 {
+            from 33.20.224.241;
+            to 214.20.241.1;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJPCARF010 {
+            from 33.20.224.241;
+            to 214.20.242.1;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECBMT010 {
+            from 33.20.224.241;
+            to 214.20.240.129;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECALD010 {
+            from 33.20.224.241;
+            to 214.20.241.129;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECARF010 {
+            from 33.20.224.241;
+            to 214.20.242.129;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECBMT020 {
+            from 33.20.224.241;
+            to 214.68.240.1;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECALD020 {
+            from 33.20.224.241;
+            to 214.68.241.1;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        label-switched-path UJECALD030-to-UJECARF020 {
+            from 33.20.224.241;
+            to 214.68.242.1;
+            ldp-tunneling;
+            node-link-protection;
+            adaptive;
+        }
+        interface xe-2/0/0.0;
+        interface xe-3/3/1.0;
+        interface xe-3/0/0.0;
+    }
+    bgp {
+        log-updown;
+        group P-RR {
+            type internal;
+            export ADVERTISE-LOCAL-LOOPBACK-WITH-LABEL;
+            neighbor 214.20.241.1 {
+                description "BGP to P241 ALD RR";
+                local-address 33.20.224.241;
+                family inet {
+                    unicast;
+                    labeled-unicast {
+                        rib {
+                            inet.3;
+                        }
+                    }
+                }
+                family inet-vpn {
+                    unicast;
+                }
+                family l2vpn {
+                    signaling;
+                }
+                authentication-key "<removed>"; ## SECRET-DATA
+            }
+            neighbor 214.20.240.1 {
+                description "BGP to P240 BMT RR";
+                local-address 33.20.224.241;
+                family inet {
+                    unicast;
+                    labeled-unicast {
+                        rib {
+                            inet.3;
+                        }
+                    }
+                }
+                family inet-vpn {
+                    unicast;
+                }
+                family l2vpn {
+                    signaling;
+                }
+                authentication-key "<removed>"; ## SECRET-DATA
+            }
+        }
+    }
+    isis {
+        traffic-engineering {
+            family inet {
+                shortcuts;
+            }
+        }
+        level 2 {
+            authentication-key "<removed>"; ## SECRET-DATA
+            authentication-type md5;
+            wide-metrics-only;
+        }
+        level 1 disable;
+        interface xe-2/0/0.0 {
+            enable;
+            point-to-point;
+            level 2 {
+                metric 100060;
+                ipv4-multicast-metric 100060;
+            }
+            level 1 disable;
+        }
+        interface xe-3/0/0.0 {
+            point-to-point;
+            level 2 {
+                metric 200000;
+                ipv4-multicast-metric 200000;
+            }
+        }
+        interface xe-3/3/1.0 {
+            enable;
+            point-to-point;
+            level 1 disable;
+            level 2 {
+                metric 100060;
+                ipv4-multicast-metric 100060;
+            }
+        }
+        interface lo0.0;
+    }
+    ldp {
+        l2-smart-policy;
+        interface lo0.0;
+    }
+}
+policy-options {
+    policy-statement ADVERTISE-LOCAL-LOOPBACK-WITH-LABEL {
+        term ADVERTISE-LOCAL-LOOPBACK {
+            from {
+                protocol direct;
+                rib inet.3;
+                prefix-list V4-LOOPBACK;
+            }
+            then {
+                community add IPT-LAYER;
+                community add LOCAL-PE-ID;
+                accept;
+            }
+        }
+    }
+    policy-statement ALLOW-TAGGED-ROUTES {
+        term ACCEPT {
+            from tag 1000;
+            then {
+                tag subtract 1000;
+                accept;
+            }
+        }
+        term REJECT {
+            then reject;
+        }
+    }
+    policy-statement HAIPE-S-EXPORT {
+        term DIRECT {
+            from protocol direct;
+            then {
+                community add HAIPE-S-TARGET;
+                accept;
+            }
+        }
+        term AGGREGATE {
+            from protocol aggregate;
+            then {
+                community add HAIPE-S-TARGET;
+                accept;
+            }
+        }
+        term REJECT {
+            then reject;
+        }
+    }
+    policy-statement HAIPE-S-IMPORT {
+        term ROUTE-TARGET {
+            from {
+                protocol [ bgp direct aggregate ];
+                community [ HAIPE-S-TARGET DKL300332-TARGET ];
+            }
+            then accept;
+        }
+        term REJECT {
+            then reject;
+        }
+    }
+    policy-statement IMPORT-INET2 {
+        term 1 {
+            from protocol [ local direct bgp ];
+            to rib inet.2;
+            then accept;
+        }
+        term 2 {
+            then next policy;
+        }
+    }
+    policy-statement IMPORT-INET3 {
+        term 1 {
+            from protocol [ local direct ];
+            to rib inet.3;
+            then accept;
+        }
+        term 2 {
+            then next policy;
+        }
+    }
+    policy-statement LOAD-BALANCE {
+        then {
+            load-balance per-packet;
+        }
+    }
+    policy-statement MODIFY-EXPORT-ROUTES {
+        term ACCEPT-DISN-ROUTES {
+            from {
+                protocol [ static aggregate bgp ];
+                community ALL-DISN-ROUTES;
+            }
+            then {
+                community delete NGGN-COMM-LABELS;
+                community delete NGGN-COMM-EXT-LABELS;
+                accept;
+            }
+        }
+        term REJECT {
+            then reject;
+        }
+    }
+    policy-statement MODIFY-IMPORT-ROUTES {
+        term LOCAL-PREF-90 {
+            from {
+                protocol bgp;
+                community LOCAL-PREF-90;
+            }
+            then {
+                local-preference 90;
+            }
+        }
+        term LOCAL-PREF-110 {
+            from {
+                protocol bgp;
+                community LOCAL-PREF-110;
+            }
+            then {
+                local-preference 110;
+            }
+        }
+        term DELETE-COMMUNITY {
+            from {
+                protocol bgp;
+                community [ NGGN-COMM-LABELS NGGN-COMM-EXT-LABELS ];
+            }
+            then {
+                community delete NGGN-COMM-LABELS;
+                community delete NGGN-COMM-EXT-LABELS;
+            }
+        }
+    }
+    policy-statement REJECT-TO-TABLES {
+        then reject;
+    }
+    community AFG-AGGREGATE-ROUTE members 27067:5200;
+    community AFG-DIRECT-ROUTE members 27067:5300;
+    community AFG-DISN-ROUTE members 27067:27067;
+    community AFG-MULTICAST-ROUTE members 27067:5100;
+    community AFG-STATIC-ROUTE members 27067:5000;
+    community ALL-DISN-ROUTES members "((2706[4-7])|(1733)):((2706[4-7])|(1733))";
+    community CONUS-AGGREGATE-ROUTE members 27064:5200;
+    community CONUS-DIRECT-ROUTE members 27064:5300;
+    community CONUS-DISN-ROUTE members 27064:27064;
+    community CONUS-MULTICAST-ROUTE members 27064:5100;
+    community CONUS-STATIC-ROUTE members 27064:5000;
+    community EUROPE-AGGREGATE-ROUTE members 27065:5200;
+    community EUROPE-DIRECT-ROUTE members 27065:5300;
+    community EUROPE-DISN-ROUTE members 27065:27065;
+    community EUROPE-MULTICAST-ROUTE members 27065:5100;
+    community EUROPE-STATIC-ROUTE members 27065:5000;
+    community HAIPE-S-TARGET members target:27062:1;
+    community IPT-LAYER members target:27060:99;
+    community LOCAL-PE-ID members 1733:62413;
+    community LOCAL-PREF-110 members 27066:110;
+    community LOCAL-PREF-90 members 27066:90;
+    community NGGN-COMM-EXT-LABELS members [ "target:(2706[0-7]):(.*)" "origin:(2706[0-7]):(.*)" ];
+    community NGGN-COMM-LABELS members "^(((2706[0-7])|(1733)|(65534)):(.*))$";
+    community PAC-AGGREGATE-ROUTE members 27066:5200;
+    community PAC-DIRECT-ROUTE members 27066:5300;
+    community PAC-DISN-ROUTE members 27066:27066;
+    community PAC-MULTICAST-ROUTE members 27066:5100;
+    community PAC-STATIC-ROUTE members 27066:5000;
+    community SWA-AGGREGATE-ROUTE members 1733:5200;
+    community SWA-DIRECT-ROUTE members 1733:5300;
+    community SWA-DISN-ROUTE members 1733:1733;
+    community SWA-MULTICAST-ROUTE members 1733:5100;
+    community SWA-STATIC-ROUTE members 1733:5000;
+}
+class-of-service {
+    classifiers {
+        exp DISNCORE {
+            forwarding-class INTERNET {
+                loss-priority low code-points INTERNET-1;
+            }
+            forwarding-class UNCLASS-PREF-ELASTIC {
+                loss-priority low code-points UNCLASS-PREF-ELASTIC-2;
+            }
+            forwarding-class SIPR-PREF-ELASTIC {
+                loss-priority low code-points SIPR-PREF-ELASTIC-3;
+            }
+            forwarding-class ASSURED-RT {
+                loss-priority low code-points ASSURED-RT-4;
+            }
+            forwarding-class NON-ASSURED-RT {
+                loss-priority low code-points NON-ASSURED-RT-5;
+            }
+            forwarding-class NETWORK-CONTROL {
+                loss-priority low code-points NETWORK-CONTROL-6;
+            }
+            forwarding-class TDM {
+                loss-priority low code-points TDM-7;
+            }
+        }
+    }
+    code-point-aliases {
+        exp {
+            TDM-7 111;
+            NETWORK-CONTROL-6 110;
+            NON-ASSURED-RT-5 101;
+            ASSURED-RT-4 100;
+            SIPR-PREF-ELASTIC-3 011;
+            UNCLASS-PREF-ELASTIC-2 010;
+            INTERNET-1 001;
+            ELASTIC-0 000;
+        }
+    }
+    drop-profiles {
+        be-low-plp-iq2 {
+            fill-level 40 drop-probability 5;
+            fill-level 90 drop-probability 50;
+        }
+        pref-elas-low-plp-iq2 {
+            fill-level 70 drop-probability 5;
+            fill-level 90 drop-probability 20;
+        }
+        BE-LOW-PLP {
+            fill-level 50 drop-probability 10;
+            fill-level 70 drop-probability 30;
+            fill-level 90 drop-probability 50;
+            fill-level 40 drop-probability 5;
+        }
+        PREF-ELAS-LOW-PLP {
+            fill-level 80 drop-probability 10;
+            fill-level 90 drop-probability 20;
+            fill-level 70 drop-probability 5;
+        }
+    }
+    forwarding-classes {
+        queue 0 ELASTIC;
+        queue 1 INTERNET;
+        queue 2 UNCLASS-PREF-ELASTIC;
+        queue 3 SIPR-PREF-ELASTIC;
+        queue 4 ASSURED-RT;
+        queue 5 NON-ASSURED-RT;
+        queue 6 NETWORK-CONTROL;
+        queue 7 TDM;
+    }
+    traffic-control-profiles {
+        atm-shaper-2MB {
+            atm-service cbr;
+            peak-rate 6344;
+        }
+        atm-shaper-4MB {
+            atm-service cbr;
+            peak-rate 12682;
+        }
+        atm-shaper-8MB {
+            atm-service cbr;
+            peak-rate 25363;
+        }
+        atm-shaper-10MB {
+            atm-service cbr;
+            peak-rate 31715;
+        }
+        atm-shaper-16MB {
+            atm-service cbr;
+            peak-rate 51k;
+        }
+        atm-shaper-6MB {
+            atm-service cbr;
+            peak-rate 19k;
+        }
+    }
+    interfaces {
+        at-* {
+            unit * {
+                rewrite-rules {
+                    exp DISNCORE;
+                }
+            }
+        }
+        ge-* {
+            scheduler-map COS-MAP;
+            unit * {
+                classifiers {
+                    exp DISNCORE;
+                }
+                rewrite-rules {
+                    exp DISNCORE;
+                }
+            }
+        }
+        so-* {
+            scheduler-map COS-MAP;
+            unit * {
+                classifiers {
+                    exp DISNCORE;
+                }
+                rewrite-rules {
+                    exp DISNCORE;
+                }
+            }
+        }
+        xe-* {
+            scheduler-map COS-MAP;
+            unit * {
+                classifiers {
+                    exp DISNCORE;
+                }
+                rewrite-rules {
+                    exp DISNCORE;
+                }
+            }
+        }
+        at-0/2/0 {
+            unit 100 {
+                output-traffic-control-profile atm-shaper-6MB;
+            }
+        }
+        at-1/2/0 {
+            unit 101 {
+                output-traffic-control-profile atm-shaper-4MB;
+            }
+            unit 102 {
+                output-traffic-control-profile atm-shaper-2MB;
+            }
+            unit 103 {
+                output-traffic-control-profile atm-shaper-2MB;
+            }
+            unit 104 {
+                output-traffic-control-profile atm-shaper-2MB;
+            }
+            unit 105 {
+                output-traffic-control-profile atm-shaper-2MB;
+            }
+            unit 107 {
+                output-traffic-control-profile atm-shaper-2MB;
+            }
+        }
+        at-1/2/1 {
+            unit 100 {
+                output-traffic-control-profile atm-shaper-2MB;
+            }
+            unit 101 {
+                output-traffic-control-profile atm-shaper-2MB;
+            }
+            unit 102 {
+                output-traffic-control-profile atm-shaper-2MB;
+            }
+            unit 103 {
+                output-traffic-control-profile atm-shaper-8MB;
+            }
+            unit 104 {
+                output-traffic-control-profile atm-shaper-2MB;
+            }
+        }
+    }
+    rewrite-rules {
+        exp DISNCORE {
+            forwarding-class ELASTIC {
+                loss-priority low code-point ELASTIC-0;
+            }
+            forwarding-class INTERNET {
+                loss-priority low code-point INTERNET-1;
+            }
+            forwarding-class UNCLASS-PREF-ELASTIC {
+                loss-priority low code-point UNCLASS-PREF-ELASTIC-2;
+            }
+            forwarding-class SIPR-PREF-ELASTIC {
+                loss-priority low code-point SIPR-PREF-ELASTIC-3;
+            }
+            forwarding-class ASSURED-RT {
+                loss-priority low code-point ASSURED-RT-4;
+            }
+            forwarding-class NON-ASSURED-RT {
+                loss-priority low code-point NON-ASSURED-RT-5;
+            }
+            forwarding-class NETWORK-CONTROL {
+                loss-priority low code-point NETWORK-CONTROL-6;
+            }
+            forwarding-class TDM {
+                loss-priority low code-point TDM-7;
+            }
+        }
+    }
+    scheduler-maps {
+        COS-MAP {
+            forwarding-class ELASTIC scheduler ELASTIC;
+            forwarding-class INTERNET scheduler INTERNET;
+            forwarding-class UNCLASS-PREF-ELASTIC scheduler UNCLASS-PREF-ELASTIC;
+            forwarding-class SIPR-PREF-ELASTIC scheduler SIPR-PREF-ELASTIC;
+            forwarding-class ASSURED-RT scheduler ASSURED-RT;
+            forwarding-class NON-ASSURED-RT scheduler NON-ASSURED-RT;
+            forwarding-class NETWORK-CONTROL scheduler NETWORK-CONTROL;
+            forwarding-class TDM scheduler TDM;
+        }
+    }
+    schedulers {
+        ELASTIC {
+            transmit-rate percent 20;
+            priority low;
+            drop-profile-map loss-priority low protocol any drop-profile BE-LOW-PLP;
+        }
+        INTERNET {
+            transmit-rate percent 10;
+            priority low;
+            drop-profile-map loss-priority low protocol any drop-profile BE-LOW-PLP;
+        }
+        UNCLASS-PREF-ELASTIC {
+            transmit-rate percent 20;
+            priority medium-low;
+            drop-profile-map loss-priority low protocol any drop-profile PREF-ELAS-LOW-PLP;
+        }
+        SIPR-PREF-ELASTIC {
+            transmit-rate percent 10;
+            priority medium-high;
+            drop-profile-map loss-priority low protocol any drop-profile PREF-ELAS-LOW-PLP;
+        }
+        ASSURED-RT {
+            shaping-rate percent 15;
+            buffer-size temporal 5k;
+            priority high;
+        }
+        NON-ASSURED-RT {
+            shaping-rate percent 10;
+            buffer-size temporal 5k;
+            priority high;
+        }
+        NETWORK-CONTROL {
+            shaping-rate percent 5;
+            buffer-size temporal 5k;
+            priority high;
+        }
+        TDM {
+            shaping-rate percent 10;
+            buffer-size temporal 5k;
+            priority high;
+        }
+    }
+}
+routing-instances {
+    HAIPE-S {
+        instance-type vrf;
+        interface ge-2/3/2.0;
+        interface ge-2/3/5.0;
+        route-distinguisher 214.68.241.1:1;
+        vrf-import HAIPE-S-IMPORT;
+        vrf-export HAIPE-S-EXPORT;
+        vrf-table-label;
+        routing-options {
+            aggregate {
+                route 214.68.241.0/24 discard;
+            }
+            auto-export;
+        }
+    }
+}

@@ -15,13 +15,14 @@ namespace JMW.Parsing.Extractors
 
         public override string Parse(string s)
         {
-            if (Positions == null)
-                throw new ArgumentException("Positions property must be set.");
-
-            if (Positions.Count < Index)
+            if (Positions != null && Positions.Count < Index)
                 throw new ArgumentException("Provided index (" + Index + ") exceeded the number of columns (" + Positions.Count + "):" + Positions.Select(c => c.Name).ToDelimitedString(","));
 
-            return Positions[Index].GetColumnValue(s);
+            if (Positions != null)
+                return Positions[Index].GetColumnValue(s);
+         
+            // treat it like a split.
+            return s.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[Index];
         }
 
         public Column(Tag t) : base(t)

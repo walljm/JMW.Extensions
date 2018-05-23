@@ -66,7 +66,7 @@ namespace JMW.Collections.Tests
         [Test]
         public void RingBufferTest4()
         {
-            var buff = new RingBuffer<int>(new[] { 3, 4, 5});
+            var buff = new RingBuffer<int>(new[] { 3, 4, 5 });
             Assert.AreEqual(5, buff.Last());
             buff = new RingBuffer<int>(new[] { 3, 4, 5 }, true);
             Assert.AreEqual(3, buff.Last());
@@ -77,6 +77,31 @@ namespace JMW.Collections.Tests
 
             buff = new RingBuffer<int>(10, new[] { 3, 4, 5 }, true);
             Assert.AreEqual(3, buff.Last());
+        }
+
+        [Test]
+        public void RingBufferTest5()
+        {
+            var buff = new RingBuffer<int>(new[] { 3, 4, 5 });
+            Assert.AreEqual(5, buff[2]);
+            Assert.AreEqual(4, buff[1]);
+            Assert.AreEqual(3, buff[0]);
+            Assert.AreEqual(3, buff.First());
+            Assert.AreEqual(5, buff.Last());
+
+            buff.Add(6);
+            Assert.AreEqual(6, buff[2]);
+            Assert.AreEqual(5, buff[1]);
+            Assert.AreEqual(4, buff[0]);
+            Assert.AreEqual(4, buff.First());
+            Assert.AreEqual(6, buff.Last());
+
+            buff.Add(7);
+            Assert.AreEqual(7, buff[2]);
+            Assert.AreEqual(6, buff[1]);
+            Assert.AreEqual(5, buff[0]);
+            Assert.AreEqual(5, buff.First());
+            Assert.AreEqual(7, buff.Last());
         }
     }
 }

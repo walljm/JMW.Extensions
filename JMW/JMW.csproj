@@ -48,7 +48,7 @@
     <Compile Include="Extensions\IO.cs" />
     <Compile Include="Extensions\Numbers.cs" />
     <Compile Include="Functional\Maybe.cs" />
-    <Compile Include="Differerential.cs" />
+    <Compile Include="Differential.cs" />
     <Compile Include="Extensions\Object.cs" />
     <Compile Include="Functional\Optional.cs" />
     <Compile Include="IO\FileExtensions.cs" />

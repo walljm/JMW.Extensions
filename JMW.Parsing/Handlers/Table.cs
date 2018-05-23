@@ -12,7 +12,7 @@ using JMW.Parsing.Extractors;
 
 namespace JMW.Parsing.Handlers
 {
-    public class Table : IParser, IProperty
+    public class Table : Base, IParser, IProperty
     {
         public const string NAME = "table";
 
@@ -20,6 +20,8 @@ namespace JMW.Parsing.Handlers
         public const string A_HEADER = "header";
         public const string A_ROW = "row";
         public const string A_PROPS = "props";
+        public const string A_VALIDATE = "validate";
+        public const string A_SPLIT = "split";
 
         public string Name { get; } = NAME;
 
@@ -27,45 +29,65 @@ namespace JMW.Parsing.Handlers
         private IExpression _headerExp = null;
         private IExpression _rowExp = null;
         private List<IProperty> _props = new List<IProperty>();
+        private string _split;
 
         public Table(Tag token)
         {
-            if (!token.Properties.ContainsKey(A_ROW))
-                throw new ParseException("Missing property: " + A_ROW);
-
+            // optional.
             if (token.Properties.ContainsKey(A_INCLUDE))
                 _include = new Include(token.Properties[A_INCLUDE]);
 
+            // optional.
             if (token.Properties.ContainsKey(A_HEADER))
                 _headerExp = Expressions.Base.ToExpression(token.Properties[A_HEADER]);
 
+            // optional
+            if (token.Properties.ContainsKey(A_SPLIT))
+                _split = token.Properties[A_SPLIT].Value.ToString();
+
             // find first line that matches.
+            if (!token.Properties.ContainsKey(A_ROW))
+                throw new ParseException("Missing property: " + A_ROW);
             _rowExp = Expressions.Base.ToExpression(token.Properties[A_ROW]);
 
+            if (!token.Properties.ContainsKey(A_PROPS))
+                throw new ParseException("Missing property: " + A_PROPS);
             var props = (Stack<Tag>)token.Properties[A_PROPS].Value;
             foreach (var p in props)
             {
-                if (p.Name == NAME)
-                    _props.Add(new Paragraph(p));
-                else
-                    _props.Add(new Property(p));
+                switch (p.Name)
+                {
+                    case Paragraph.NAME:
+                        _props.Add(new Paragraph(p));
+                        break;
+
+                    case Property.NAME:
+                        _props.Add(new Property(p));
+                        break;
+
+                    default:
+                        throw new ArgumentException("Unsupported " + nameof(IProperty) + "Tag", p.Name);
+                }
             }
         }
 
-        public IEnumerable<object[]> Parse(StreamReader reader)
+        public override IEnumerable<object[]> Parse(StreamReader reader)
         {
             if (reader == null)
                 yield break;
             var pos = reader.BaseStream.Position;
 
             // get header row, and handle it
-            var cols = _props.FindAll(p => p is Column);
+            var cols = _props.FindAll(p => p is Property && ((Property)p).Extractors.Any(ex => ex is Column));
             if (_headerExp != null && cols.Count > 0)
             {
                 var header = _include.GetNextRow(reader, _headerExp);
                 var column_positions = DeriveColumnPositions(header.ToList()).Positions.Values.ToList();
-                foreach (var col in cols)
-                    ((Column)col).Positions = column_positions;
+                foreach (var p in cols)
+                {
+                    foreach (var c in ((Property)p).Extractors)
+                        ((Column)c).Positions = column_positions;
+                }
             }
             reader.BaseStream.Position = pos;
 
@@ -83,34 +105,6 @@ namespace JMW.Parsing.Handlers
                     }
                 }
                 yield return record.ToArray();
-            }
-        }
-
-        public IEnumerable<object[]> Parse(string text)
-        {
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(text)))
-            using (var sr = new StreamReader(ms))
-            {
-                return Parse(sr);
-            }
-        }
-
-        public IEnumerable<Dictionary<string, object>> ParseNamed(string text)
-        {
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(text)))
-            using (var sr = new StreamReader(ms))
-            {
-                foreach (var o in Parse(sr))
-                {
-                    var i = 0;
-                    var dict = new Dictionary<string, object>();
-                    foreach (var p in _props)
-                    {
-                        dict.Add(p.Name, o[i]);
-                        i++;
-                    }
-                    yield return dict;
-                }
             }
         }
 
