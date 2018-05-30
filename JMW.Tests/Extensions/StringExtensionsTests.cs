@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 
 namespace JMW.Extensions.String.Tests
 {
@@ -88,6 +89,13 @@ namespace JMW.Extensions.String.Tests
             Assert.That(str == str.ParseAfterLastIndexOf_PlusLength("Str"));
             Assert.That(string.Empty == string.Empty.ParseAfterLastIndexOf_PlusLength("Str"));
             Assert.That("that" == "that".ParseAfterLastIndexOf_PlusLength());
+        }
+
+        [Test]
+        public void ToLinesTest()
+        {
+            var str = "This is another\r\nThis is a string\r\n a string";
+            Assert.AreEqual(3, str.ToLines().Count());
         }
     }
 }

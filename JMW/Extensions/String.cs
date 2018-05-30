@@ -702,5 +702,17 @@ namespace JMW.Extensions.String
 
             return hist;
         }
+
+        public static IEnumerable<string> ToLines(this string s)
+        {
+            using (var sr = new StringReader(s))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    yield return line;
+                }
+            }
+        }
     }
 }

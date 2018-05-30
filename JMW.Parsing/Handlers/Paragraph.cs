@@ -5,6 +5,7 @@ using System.Text;
 using JMW.Extensions.Enumerable;
 using JMW.Parsing.Compile;
 using JMW.Parsing.Expressions;
+using JMW.Parsing.IO;
 
 namespace JMW.Parsing.Handlers
 {
@@ -16,17 +17,10 @@ namespace JMW.Parsing.Handlers
         public const string A_START = "start";
         public const string A_STOP = "stop";
         public const string A_PROPS = "props";
-        public const string A_SPLIT = "split";
 
         public string Name { get; } = NAME;
 
-        public void Validate(Tag tag, Token token)
-        {
-        }
-
-        private string _split;
-
-        private Include _include = new Include();
+        private Include _include = new Include(null, null);
         private IExpression _stop = null;
         private IExpression _start = null;
 
@@ -42,9 +36,6 @@ namespace JMW.Parsing.Handlers
 
             if (token.Properties.ContainsKey(A_STOP))
                 _stop = Expressions.Base.ToExpression(token.Properties[A_STOP]);
-
-            if (token.Properties.ContainsKey(A_SPLIT))
-                _split = token.Properties[A_SPLIT].Value.ToString();
 
             // find first line that matches.
             _start = Expressions.Base.ToExpression(token.Properties[A_START]);
@@ -64,7 +55,7 @@ namespace JMW.Parsing.Handlers
             if (reader == null)
                 yield break;
 
-            var paras = _include.GetParagraphs(reader, _start, _stop);
+            var paras = GetParagraphs(reader, _start, _stop);
 
             // parse the paragraphs
             foreach (var lines in paras)
@@ -86,6 +77,39 @@ namespace JMW.Parsing.Handlers
                 }
                 yield return record.ToArray();
             }
+        }
+
+        public IEnumerable<List<string>> GetParagraphs(StreamReader reader, IExpression para_start, IExpression para_stop)
+        {
+            var sr = new SectionReader(reader, _include);
+
+            var paragraph = new List<string>();
+            var started = false;
+            string line;
+            while ((line = sr.ReadLine()) != null)
+            {
+                if (paragraph.Count > 0 && ((para_stop != null && para_stop.Test(line)) || para_start.Test(line)))
+                {
+                    yield return paragraph;
+                    paragraph = new List<string>();
+                }
+
+                if (!started && _start != null && !_start.Test(line))
+                    continue;
+
+                started = true;
+
+                if (_stop != null && _stop.Test(line))
+                {
+                    started = false;
+                    continue;
+                }
+
+                paragraph.Add(line);
+            }
+
+            // return the last paragraph.
+            yield return paragraph;
         }
 
         object IProperty.Parse(StreamReader reader)

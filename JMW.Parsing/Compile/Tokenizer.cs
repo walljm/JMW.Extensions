@@ -155,6 +155,7 @@ namespace JMW.Parsing.Compile
             {
                 _reader.PushBack((char)c);
             }
+            
             Token.Value = new string(value.ToArray());
             return type;
         }
@@ -224,7 +225,7 @@ namespace JMW.Parsing.Compile
 
         internal TokenType consumeWord()
         {
-            var acceptable = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
+            var acceptable = "abcdefghijklmnopqrstuvwxyz_-".ToCharArray();
 
             var identifier = new List<char>();
             var c = _reader.Read();

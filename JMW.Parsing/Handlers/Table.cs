@@ -9,6 +9,7 @@ using JMW.Extensions.String;
 using JMW.Parsing.Compile;
 using JMW.Parsing.Expressions;
 using JMW.Parsing.Extractors;
+using JMW.Parsing.IO;
 
 namespace JMW.Parsing.Handlers
 {
@@ -21,15 +22,14 @@ namespace JMW.Parsing.Handlers
         public const string A_ROW = "row";
         public const string A_PROPS = "props";
         public const string A_VALIDATE = "validate";
-        public const string A_SPLIT = "split";
+        //public const string A_SPLIT = "split";
 
         public string Name { get; } = NAME;
 
-        private Include _include = new Include();
+        private Include _include = new Include(null, null);
         private IExpression _headerExp = null;
         private IExpression _rowExp = null;
-        private List<IProperty> _props = new List<IProperty>();
-        private string _split;
+        private bool _validate = false;
 
         public Table(Tag token)
         {
@@ -41,9 +41,18 @@ namespace JMW.Parsing.Handlers
             if (token.Properties.ContainsKey(A_HEADER))
                 _headerExp = Expressions.Base.ToExpression(token.Properties[A_HEADER]);
 
+            //// optional
+            //if (token.Properties.ContainsKey(A_SPLIT))
+            //    _split = token.Properties[A_SPLIT].Value.ToString();
+
             // optional
-            if (token.Properties.ContainsKey(A_SPLIT))
-                _split = token.Properties[A_SPLIT].Value.ToString();
+            if (token.Properties.ContainsKey(A_VALIDATE))
+            {
+                var v = token.Properties[A_VALIDATE].Value.ToString();
+                if (v.ToLower() != "true" && v.ToLower() != "false")
+                    throw new ParseException("Property must be either 'true' or 'false'.");
+                _validate = bool.Parse(v);
+            }
 
             // find first line that matches.
             if (!token.Properties.ContainsKey(A_ROW))
@@ -52,6 +61,7 @@ namespace JMW.Parsing.Handlers
 
             if (!token.Properties.ContainsKey(A_PROPS))
                 throw new ParseException("Missing property: " + A_PROPS);
+
             var props = (Stack<Tag>)token.Properties[A_PROPS].Value;
             foreach (var p in props)
             {
@@ -71,18 +81,36 @@ namespace JMW.Parsing.Handlers
             }
         }
 
+        public IEnumerable<string> GetNextRow(StreamReader reader, IExpression row)
+        {
+            var sr = new SectionReader(reader, _include);
+
+            string line;
+            while ((line = sr.ReadLine()) != null)
+            {
+                if (row != null && row.Test(line))
+                {
+                    yield return line;
+                }
+            }
+        }
+
         public override IEnumerable<object[]> Parse(StreamReader reader)
         {
             if (reader == null)
                 yield break;
+
             var pos = reader.BaseStream.Position;
 
             // get header row, and handle it
             var cols = _props.FindAll(p => p is Property && ((Property)p).Extractors.Any(ex => ex is Column));
             if (_headerExp != null && cols.Count > 0)
             {
-                var header = _include.GetNextRow(reader, _headerExp);
-                var column_positions = DeriveColumnPositions(header.ToList()).Positions.Values.ToList();
+                var exp = _validate ? new Or(new List<IExpression> { _headerExp, _rowExp }) : _headerExp;
+
+                var header = GetNextRow(reader, exp);
+
+                var column_positions = DeriveColumnPositions(header.ToList(), validate_with_data: _validate).Positions.Values.ToList();
                 foreach (var p in cols)
                 {
                     foreach (var c in ((Property)p).Extractors)
@@ -92,7 +120,7 @@ namespace JMW.Parsing.Handlers
             reader.BaseStream.Position = pos;
 
             // parse the rows
-            foreach (var line in _include.GetNextRow(reader, _rowExp))
+            foreach (var line in GetNextRow(reader, _rowExp))
             {
                 var record = new List<object>();
 
@@ -113,10 +141,6 @@ namespace JMW.Parsing.Handlers
             return Parse(reader);
         }
 
-        public void Validate(Tag tag, Token token)
-        {
-        }
-
         #region Static Methods
 
         /// <summary>
@@ -131,6 +155,7 @@ namespace JMW.Parsing.Handlers
         public static ColumnPositionCollection DeriveColumnPositions(IList<string> table, bool validate_with_data = true)
         {
             var whitespace = new HashSet<string> { " ", "\r", "\n", "+" };
+            var original_column_string = "";
 
             #region Get Columns
 
@@ -141,6 +166,7 @@ namespace JMW.Parsing.Handlers
             {
                 columnnames = table[++c];
             }
+            original_column_string = columnnames;
 
             // initialize the field positions dictionary object.
             var field_positions = new Dictionary<string, ColumnPosition>();
@@ -180,7 +206,7 @@ namespace JMW.Parsing.Handlers
                     o.Start = columnnames.IndexOf(" " + col + " ", StringComparison.Ordinal).ToString().ToInt() + 1;
                     o.Length = columnnames.IndexOf(" " + columns[i + 1] + " ", StringComparison.Ordinal) - o.Start.ToString().ToInt() + 1;
                 }
-                o.Name = pre_columns[i];
+                o.Name = columns[i];
                 o.Key = columns[i];
                 field_positions.Add(col, o);
                 positions.Add(o);
@@ -201,7 +227,7 @@ namespace JMW.Parsing.Handlers
                 for (var i = 0; i < positions.Count; i++) positions[i].Start++;
 
                 // now test to make sure your column boundaries are correct by looping through the rest of the table
-                for (var i = c + 1; i < table.Count; i++)
+                for (var i = c; i < table.Count; i++)
                 {
                     var row = table[i];
 
@@ -243,6 +269,20 @@ namespace JMW.Parsing.Handlers
             field_positions = CombineMultiwordColumnNames(positions);
 
             #endregion Validate
+
+            // fix the column names.
+            foreach (var kvp in field_positions.ToList())
+            {
+                field_positions.Remove(kvp.Key);
+
+                kvp.Value.Name = kvp.Value.GetColumnValue(original_column_string).Trim();
+                var d = 1;
+                while (field_positions.ContainsKey(kvp.Value.Name))
+                {
+                    kvp.Value.Name += d;
+                }
+                field_positions.Add(kvp.Value.Name, kvp.Value);
+            }
 
             return new ColumnPositionCollection(field_positions);
         }
@@ -321,7 +361,7 @@ namespace JMW.Parsing.Handlers
 
             foreach (var col in cols)
             {
-                int occurrences = columnnames.CountInstances(col, true);
+                var occurrences = columnnames.CountInstances(col, true);
                 if (occurrences > 1)
                 {
                     var n = 0;
@@ -390,6 +430,7 @@ namespace JMW.Parsing.Handlers
             {
                 return line.Substring(Start, Length);
             }
+
             if (line.Length > Start)
             {
                 return line.Substring(Start);

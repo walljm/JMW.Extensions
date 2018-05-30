@@ -68,6 +68,7 @@
     <Compile Include="Extractors\After.cs" />
     <Compile Include="Extractors\Split.cs" />
     <Compile Include="Extractors\To.cs" />
+    <Compile Include="IO\SectionReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Compile\Tag.cs" />
     <Compile Include="Compile\TagTypes.cs" />

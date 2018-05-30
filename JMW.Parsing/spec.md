@@ -2,12 +2,6 @@
 Record types take a string[] and return an object (either a string, or string[]) to be stored
 ```coffeescript
 para {
-    
-    # if present, overrides the default line delimiter.
-    #  this allows you to index the document
-    #  by any character or set of characters.
-    split:"val" #optional
-
     # sets boundaries on the whole document, not on
     #  each paragraph
     include: section{} #optional
@@ -24,12 +18,6 @@ para {
 }
 
 table {
-    
-    # if present, overrides the default line delimiter.
-    #  this allows you to index the document
-    #  by any character or set of characters.
-    split:"val" #optional
-
     # sets boundaries on the whole document, not on
     #  each paragraph
     include: section{} #optional
@@ -37,7 +25,7 @@ table {
     # identifies a header line.
     # this is used to figure out the location
     #  of columns.  This is required if the
-    #  column parser is used.
+    #  column parser is used with the 'n' property
     header:exp{} #optional
     
     # identifies which lines have rows in them.
@@ -47,8 +35,8 @@ table {
     # you can include any Record type
     parsers: [ Extractor{} Extractor{} ... ] #required.
 
-    # i == validate the columns with data
-    validate: "i" #currently unsupported
+    # true/false
+    validate: "true"
 }
 
 prop {

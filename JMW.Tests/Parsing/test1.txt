@@ -1,0 +1,13 @@
+﻿blah
+blah
+foo
+start
+ this is 0 a line
+ this is 0 another line
+start
+ this is 5 foo
+ this is 5 more foo
+bar
+start
+ this is 6 foo
+ this is 6 more foo
