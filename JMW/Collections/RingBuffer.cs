@@ -8,7 +8,6 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -70,9 +69,9 @@ namespace JMW.Collections
         public IEnumerator<T> GetEnumerator()
         {
             if (ReverseIteration)
-                return new RingReverseEnumerator<T>(_index, _array);
+                return new RingReverseEnumerator<T>(_index, _array, Count);
 
-            return new RingEnumerator<T>(_index, _array);
+            return new RingEnumerator<T>(_index, _array, Count);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -117,10 +116,13 @@ namespace JMW.Collections
 
         public T[] ToArray()
         {
-            var arr = new T[this.Count];
-            var c = 0;
+            var arr = new T[Count];
+
+            var j = 0;
             foreach (var i in this)
-                arr[c++] = i;
+            {
+                arr[j++] = i;
+            }
 
             return arr;
         }
@@ -157,11 +159,13 @@ namespace JMW.Collections
         private readonly int _origin;
         private int _idx;
         private readonly T[] _arr;
+        private int _length;
 
-        public RingReverseEnumerator(int idx, T[] arr)
+        public RingReverseEnumerator(int idx, T[] arr, int length)
         {
             _idx = idx; _origin = idx;
             _arr = arr;
+            _length = length;
         }
 
         public bool MoveNext()
@@ -170,8 +174,8 @@ namespace JMW.Collections
             if (_idx > 0)
                 _idx--;
             else
-                _idx = _arr.Length - 1;
-            return _cnt <= _arr.Length;
+                _idx = _length - 1;
+            return _cnt <= _length;
         }
 
         public void Reset()
@@ -193,22 +197,24 @@ namespace JMW.Collections
         private readonly int _origin;
         private int _idx;
         private readonly T[] _arr;
+        private int _length;
 
-        public RingEnumerator(int idx, T[] arr)
+        public RingEnumerator(int idx, T[] arr, int length)
         {
             _idx = idx - 1; _origin = idx - 1;
             _arr = arr;
+            _length = length;
         }
 
         public bool MoveNext()
         {
             _cnt++;
-            if (_idx < _arr.Length - 1)
+            if (_idx < _length - 1)
                 _idx++;
             else
                 _idx = 0;
 
-            return _cnt <= _arr.Length;
+            return _cnt <= _length;
         }
 
         public void Reset()

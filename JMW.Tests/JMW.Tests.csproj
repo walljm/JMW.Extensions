@@ -54,6 +54,7 @@
     <Compile Include="Collections\IndexedCollectionTest.cs" />
     <Compile Include="Collections\RingBufferTest.cs" />
     <Compile Include="Extensions\ConversionsExtensionsTests.cs" />
+    <Compile Include="Extensions\DateAndTimeTests.cs" />
     <Compile Include="Extensions\EnumerableExtensionsTests.cs" />
     <Compile Include="DifferentialTests.cs" />
     <Compile Include="Extensions\IOTests.cs" />

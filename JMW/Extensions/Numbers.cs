@@ -1,7 +1,7 @@
-﻿using JMW.Types;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JMW.Types;
 
 namespace JMW.Extensions.Numbers
 {
@@ -14,8 +14,7 @@ namespace JMW.Extensions.Numbers
         /// <returns></returns>
         public static bool IsInt(this string s)
         {
-            int t;
-            return int.TryParse(s, out t);
+            return int.TryParse(s, out _);
         }
 
         /// <summary>
@@ -25,8 +24,7 @@ namespace JMW.Extensions.Numbers
         /// <returns></returns>
         public static bool IsLong(this string s)
         {
-            long t;
-            return long.TryParse(s, out t);
+            return long.TryParse(s, out _);
         }
 
         /// <summary>
@@ -36,8 +34,7 @@ namespace JMW.Extensions.Numbers
         /// <returns></returns>
         public static bool IsDouble(this string s)
         {
-            double t;
-            return double.TryParse(s, out t);
+            return double.TryParse(s, out _);
         }
 
         /// <summary>
@@ -75,14 +72,6 @@ namespace JMW.Extensions.Numbers
         }
 
         /// <summary>
-        /// Converts a string to an integer using int.Parse
-        /// </summary>
-        public static int ToInt(this string i)
-        {
-            return int.Parse(i);
-        }
-
-        /// <summary>
         /// A highly performant integer checking function.  Less robust than the default C# implementation.
         /// </summary>
         /// <param name="str">String to check</param>
@@ -103,6 +92,11 @@ namespace JMW.Extensions.Numbers
             return true;
         }
 
+        /// <summary>
+        /// A highly performant integer conversion function.  Less robust than the default C# implementation. Use at your own risk.
+        /// </summary>
+        /// <param name="s">String to check</param>
+        /// <returns>If the string is a 32bit Integer, true, else false.</returns>
         public static int ToIntFast(this string s)
         {
             if (s.Length == 0)
@@ -179,6 +173,11 @@ namespace JMW.Extensions.Numbers
             return result;
         }
 
+        /// <summary>
+        /// A highly performant integer conversion function.  Less robust than the default C# implementation. Use at your own risk.
+        /// </summary>
+        /// <param name="s">String to check</param>
+        /// <param name="def">The value to return if the number isn't an integer.</param>
         public static int ToIntOrDefaultFast(this string s, int def = 0)
         {
             if (s.Length == 0)
@@ -306,49 +305,30 @@ namespace JMW.Extensions.Numbers
             return Convert.ToDouble(i);
         }
 
-        /// <summary>
-        /// Safely converts a string to a integer. If the string is not an integer, returns -1 as a default.
-        /// </summary>
-        /// <param name="s">A string to convert to an Integer.</param>
-        /// <returns>An Integer.</returns>
-        public static int ToIntOrNeg1(this string s)
+        private static Dictionary<string, long> _numAbbreviations = new Dictionary<string, long>
         {
-            //good for timers in defunct state
-            int i;
-            var r = int.TryParse(s, out i);
-
-            if (r)
-            {
-                return i;
-            }
-            return -1;
-        }
+            { "k", 1000 },
+            { "m", 1000000 },
+            { "g", 1000000000 },
+            { "b", 1000000000 },
+            { "t", 1000000000000 },
+            { "p", 1000000000000000 }
+        };
 
         /// <summary>
-        /// Safely converts a string to a 64bit integer. If the string is not a 64bit integer, returns -1 as a default.
-        /// </summary>
-        /// <param name="s">A string to convert to a 64bit Integer.</param>
-        /// <returns>An Integer.</returns>
-        public static long ToInt64OrNeg1(this string s)
-        {
-            //good for timers in defunct state
-            long i;
-            var r = long.TryParse(s, out i);
-
-            if (r)
-            {
-                return i;
-            }
-            return -1;
-        }
-
-        private static Dictionary<string, long> _numAbbreviations = new Dictionary<string, long> { { "k", 1000 }, { "m", 1000000 }, { "g", 1000000000 }, { "t", 1000000000000 } };
-
-        /// <summary>
-        /// Handles converting text to an Int64. Will properly deal with common abbreviations (1k, 2m)
+        /// Handles converting text to an <see cref="Int64"/>. Will properly deal with the following common abbreviations
+        ///
+        /// <para>
+        /// k1 == 1000 // 1 thousand (kila)
+        /// m1 == 1,000,000 // 1 million (mega)
+        /// g1 == 1,000,000,000 // 1 billion (giga)
+        /// b1 == 1,000,000,000 // 1 billion (giga)
+        /// t1 == 1,000,000,000,000 // 1 trillion (tera)
+        /// p1 == 1,000,000,000,000,000 // 1 quadrillion (peda)
+        /// </para>
         /// </summary>
         /// <param name="i">The text to be converted</param>
-        /// <returns></returns>
+        /// <returns>Value as a <see cref="long"/></returns>
         public static long ToInt64(this string i)
         {
             var last = i.ToLower().ToCharArray().Last().ToString();
@@ -362,14 +342,43 @@ namespace JMW.Extensions.Numbers
         }
 
         /// <summary>
-        /// Handles converting text to an Int64. Will properly deal with common abbreviations (1k, 2m)
+        /// Handles converting text to an <see cref="Int64"/>. Will properly deal with the following common abbreviations
+        ///
+        /// <para>
+        /// k1 == 1000 // 1 thousand (kila)
+        /// m1 == 1,000,000 // 1 million (mega)
+        /// g1 == 1,000,000,000 // 1 billion (giga)
+        /// b1 == 1,000,000,000 // 1 billion (giga)
+        /// t1 == 1,000,000,000,000 // 1 trillion (tera)
+        /// p1 == 1,000,000,000,000,000 // 1 quadrillion (peda)
+        /// </para>
         /// </summary>
         /// <param name="i">The text to be converted</param>
-        /// <returns></returns>
-        public static long ToInt64orNeg1(this string i)
+        /// <returns>Value as a <see cref="long"/></returns>
+        public static long ToInt64OrNeg1(this string i)
+        {
+            return i.ToInt64orDefault(-1);
+        }
+
+        ///  <summary>
+        ///  Handles converting text to an <see cref="Int64"/>. Will properly deal with the following common abbreviations
+        ///
+        ///  <para>
+        ///  k1 == 1000 // 1 thousand (kila)
+        ///  m1 == 1,000,000 // 1 million (mega)
+        ///  g1 == 1,000,000,000 // 1 billion (giga)
+        ///  b1 == 1,000,000,000 // 1 billion (giga)
+        ///  t1 == 1,000,000,000,000 // 1 trillion (tera)
+        ///  p1 == 1,000,000,000,000,000 // 1 quadrillion (peda)
+        ///  </para>
+        ///  </summary>
+        ///  <param name="i">The text to be converted</param>
+        /// <param name="def">The number to return if its not a valid value</param>
+        /// <returns>Value as a <see cref="long"/></returns>
+        public static long ToInt64orDefault(this string i, long def = -1)
         {
             long val;
-            if (i.Length == 0) return -1;
+            if (i.Length == 0) return def;
 
             var last = i.ToLower().ToCharArray().Last().ToString();
             var prefex = i.ToLower().Substring(0, i.Length - 1);
@@ -379,17 +388,91 @@ namespace JMW.Extensions.Numbers
                 var n = prefex.ToDouble() * _numAbbreviations[last];
 
                 if (long.TryParse(n.ToString(), out val)) return val;
-                return -1;
+                return def;
             }
 
             if (long.TryParse(i, out val)) return val;
+            return def;
+        }
+
+        /// <summary>
+        /// Handles converting text to an <see cref="int"/>. Will properly deal with the following common abbreviations
+        ///
+        /// <para>
+        /// k1 == 1000 // 1 thousand (kila)
+        /// m1 == 1,000,000 // 1 million (mega)
+        /// </para>
+        /// </summary>
+        /// <param name="i">The text to be converted</param>
+        /// <returns>Value as a <see cref="int"/></returns>
+        public static int ToInt(this string i)
+        {
+            if (i.Length == 0)
+                throw new ArgumentOutOfRangeException(nameof(i), i, "Value must be a valid integer.");
+
+            var last = i.ToLower().ToCharArray().Last().ToString();
+            var prefex = i.ToLower().Substring(0, i.Length - 1);
+            // first, check if its abbreviated.
+            if (_numAbbreviations.ContainsKey(last) && prefex.IsDouble())
+            {
+                var n = prefex.ToDouble() * _numAbbreviations[last];
+
+                return int.Parse(n.ToString());
+            }
+
+            return int.Parse(i);
+        }
+
+        /// <summary>
+        /// Handles converting text to an <see cref="int"/>. Will properly deal with the following common abbreviations
+        ///
+        /// <para>
+        /// k1 == 1000 // 1 thousand (kila)
+        /// m1 == 1,000,000 // 1 million (mega)
+        /// </para>
+        /// </summary>
+        /// <param name="i">The text to be converted</param>
+        /// <returns>Value as a <see cref="int"/></returns>
+        public static int ToIntOrNeg1(this string i)
+        {
+            return i.ToIntOrDefault(-1);
+        }
+
+        ///  <summary>
+        ///  Handles converting text to an <see cref="int"/>. Will properly deal with the following common abbreviations
+        ///
+        ///  <para>
+        ///  k1 == 1000 // 1 thousand (kila)
+        ///  m1 == 1,000,000 // 1 million (mega)
+        ///  </para>
+        ///  </summary>
+        ///  <param name="i">The text to be converted</param>
+        /// <param name="def">Value to return if not a valid Integer.</param>
+        /// <returns>Value as a <see cref="int"/></returns>
+        public static int ToIntOrDefault(this string i, int def = -1)
+        {
+            int val;
+            if (i.Length == 0)
+                return -1;
+
+            var last = i.ToLower().ToCharArray().Last().ToString();
+            var prefex = i.ToLower().Substring(0, i.Length - 1);
+            // first, check if its abbreviated.
+            if (_numAbbreviations.ContainsKey(last) && prefex.IsDouble())
+            {
+                var n = prefex.ToDouble() * _numAbbreviations[last];
+
+                if (int.TryParse(n.ToString(), out val)) return val;
+                return -1;
+            }
+
+            if (int.TryParse(i, out val)) return val;
             return -1;
         }
 
         public static float? ToFloat(this string s)
         {
-            float i;
-            var r = float.TryParse(s, out i);
+            var r = float.TryParse(s, out var i);
 
             if (r)
             {
@@ -398,28 +481,58 @@ namespace JMW.Extensions.Numbers
             return null;
         }
 
+        ///  <summary>
+        ///  Handles converting text to an <see cref="float"/>
+        ///  </summary>
+        ///  <param name="s">The text to be converted</param>
+        /// <returns>Value as a <see cref="float"/> or -1 of invalid</returns>
         public static float ToFloatOrNeg1(this string s)
         {
-            float i;
-            var r = float.TryParse(s, out i);
-
-            if (r)
-            {
-                return i;
-            }
-            return -1;
+            return s.ToFloatOrDefault(-1);
         }
 
-        public static double ToDoubleOrNeg1(this string s)
+        ///  <summary>
+        ///  Handles converting text to an <see cref="float"/>
+        ///  </summary>
+        ///  <param name="s">The text to be converted</param>
+        /// <param name="def">Value to return if not a valid Integer.</param>
+        /// <returns>Value as a <see cref="float"/></returns>
+        public static float ToFloatOrDefault(this string s, float def = -1)
         {
-            double i;
-            var r = double.TryParse(s, out i);
+            var r = float.TryParse(s, out var i);
 
             if (r)
             {
                 return i;
             }
-            return -1;
+            return def;
+        }
+
+        ///  <summary>
+        ///  Handles converting text to an <see cref="double"/>
+        ///  </summary>
+        ///  <param name="s">The text to be converted</param>
+        /// <returns>Value as a <see cref="double"/> or -1 of invalid</returns>
+        public static double ToDoubleOrNeg1(this string s)
+        {
+            return s.ToDoubleOrDefault(-1);
+        }
+
+        ///  <summary>
+        ///  Handles converting text to an <see cref="double"/>
+        ///  </summary>
+        ///  <param name="s">The text to be converted</param>
+        /// <param name="def">Value to return if not a valid Integer.</param>
+        /// <returns>Value as a <see cref="double"/></returns>
+        public static double ToDoubleOrDefault(this string s, double def = -1)
+        {
+            var r = double.TryParse(s, out var i);
+
+            if (r)
+            {
+                return i;
+            }
+            return def;
         }
 
         public static string CollapseIntsToRanges(this IEnumerable<string> ints)

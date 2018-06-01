@@ -103,5 +103,20 @@ namespace JMW.Collections.Tests
             Assert.AreEqual(5, buff.First());
             Assert.AreEqual(7, buff.Last());
         }
+
+        [Test]
+        public void RingBufferTest6()
+        {
+            var buff = new RingBuffer<int>(100);
+            buff.Add(3);
+            buff.Add(4);
+            buff.Add(5);
+            var arr2 = buff.ToArray();
+            Assert.AreEqual(arr2.Length, buff.Count);
+
+            buff.ReverseIteration = true;
+            arr2 = buff.ToArray();
+            Assert.AreEqual(arr2.Length, buff.Count);
+        }
     }
 }

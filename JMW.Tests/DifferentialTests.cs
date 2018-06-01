@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -37,6 +38,134 @@ namespace JMW.Differentials.Tests
             Assert.AreEqual("b B", diff.Modified.First().Differences.First().Difference);
             Assert.AreEqual("b", diff.Modified.First().ObjectA);
             Assert.AreEqual("B", diff.Modified.First().ObjectB);
+        }
+
+        [Test]
+        public void PairTest1()
+        {
+            var o1 = "Jason";
+            var o2 = "Wall";
+            var o3 = "Jason";
+            var o4 = "Wall";
+
+            var p1 = new Pair<string>(o1, o2);
+            var p2 = new Pair<string>(o3, o4);
+
+            Assert.AreEqual(p1, p2);
+            Assert.IsTrue(p1.Equals(p2));
+            Assert.IsTrue(p1.Equals((object)p2));
+            Assert.IsTrue(p1.Equals(p1, p2));
+
+            Assert.IsTrue(((IStructuralEquatable)p1).Equals(p2));
+            Assert.IsTrue(p1.Equals((object)p2));
+
+            Assert.IsTrue(((IStructuralEquatable)p1).Equals(p2, EqualityComparer<string>.Default));
+            Assert.IsTrue(p1.Equals((object)p2));
+
+
+            Assert.IsTrue(p1 == p2);
+            Assert.IsTrue(p1 == p2);
+            Assert.IsTrue(p1 == p2);
+            Assert.IsTrue(p1 == p2);
+
+            Assert.AreEqual(0, p1.CompareTo(p2));
+
+            o1 = "1Jason";
+            p1 = new Pair<string>(o1, o2);
+            Assert.AreEqual(-1, p1.CompareTo(p2));
+            o1 = "Jason1";
+            p1 = new Pair<string>(o1, o2);
+            Assert.AreEqual(1, p1.CompareTo(p2));
+            Assert.AreEqual(1, p1.CompareTo(null));
+
+            Assert.AreEqual(1, ((IComparable)p1).CompareTo(p2));
+            Assert.AreEqual(1, ((IComparable)p1).CompareTo(null));
+
+
+            o1 = "Jason";
+            o2 = "Wall";
+            o3 = "Jason";
+            o4 = "Wall1";
+
+            p1 = new Pair<string>(o1, o2);
+            p2 = new Pair<string>(o3, o4);
+
+            Assert.AreNotEqual(p1, p2);
+            Assert.IsFalse(p1.Equals(p2));
+            Assert.IsFalse(p1.Equals(null));
+            Assert.IsFalse(null == p1);
+            Assert.IsFalse(p1 == null);
+            Assert.IsFalse((Pair<string>)null != null);
+            Assert.IsTrue(p1 !=p2);
+            Assert.IsTrue(p1 != null);
+            Assert.IsTrue(null != p2);
+
+        }
+
+        [Test]
+        public void PairTest2()
+        {
+            var o1 = "Jason";
+            var o2 = 1;
+            var o3 = "Jason";
+            var o4 = 1;
+
+            var p1 = new Pair<string, int>(o1, o2);
+            var p2 = new Pair<string, int>(o3, o4);
+
+            Assert.AreEqual(p1, p2);
+
+
+            Assert.AreEqual(p1, p2);
+            Assert.IsTrue(p1.Equals(p2));
+            Assert.IsTrue(p1.Equals((object)p2));
+            Assert.IsTrue(p1.Equals(p1, p2));
+
+            Assert.IsTrue(((IStructuralEquatable)p1).Equals(p2));
+            Assert.IsTrue(p1.Equals((object)p2));
+
+            Assert.IsTrue(((IStructuralEquatable)p1).Equals(p2, EqualityComparer<string>.Default));
+            Assert.IsTrue(p1.Equals((object)p2));
+
+
+            Assert.IsTrue(p1 == p2);
+            Assert.IsTrue(p1 == p2);
+            Assert.IsTrue(p1 == p2);
+            Assert.IsTrue(p1 == p2);
+
+            Assert.AreEqual(0, p1.CompareTo(p2));
+
+            o1 = "1Jason";
+            p1 = new Pair<string, int>(o1, o2);
+            Assert.AreEqual(-1, p1.CompareTo(p2));
+            o1 = "Jason1";
+            p1 = new Pair<string, int>(o1, o2);
+            Assert.AreEqual(1, p1.CompareTo(p2));
+            Assert.AreEqual(1, p1.CompareTo(null));
+
+            Assert.AreEqual(1, ((IComparable)p1).CompareTo(p2));
+            Assert.AreEqual(1, ((IComparable)p1).CompareTo(null));
+            Assert.AreEqual(0, new PairComparer<string, int>().Compare(null, null));
+            Assert.AreEqual(1, new PairComparer<string, int>().Compare(null, p2));
+
+
+            o1 = "Jason";
+            o2 = 1;
+            o3 = "Jason";
+            o4 = 2;
+
+            p1 = new Pair<string, int>(o1, o2);
+            p2 = new Pair<string, int>(o3, o4);
+
+            Assert.AreNotEqual(p1, p2);
+            Assert.IsFalse(p1.Equals(p2));
+            Assert.IsFalse(p1.Equals(null));
+            Assert.IsFalse(null == p1);
+            Assert.IsFalse(p1 == null);
+            Assert.IsFalse((Pair<string>)null != null);
+            Assert.IsTrue(p1 != p2);
+            Assert.IsTrue(p1 != null);
+            Assert.IsTrue(null != p2);
         }
 
         private class MyDiff
