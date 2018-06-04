@@ -2,7 +2,7 @@
 using JMW.Extensions.DateAndTime;
 using NUnit.Framework;
 
-namespace JMW.Extensions.Numbers.Tests
+namespace JMW.Extensions.DateAndTime.Tests
 {
     [TestFixture]
     public class DateAndTimeTests

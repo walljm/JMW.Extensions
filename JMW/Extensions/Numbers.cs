@@ -690,6 +690,55 @@ namespace JMW.Extensions.Numbers
             return r;
         }
 
+        public static List<LongRange> CollapseLongsToLongRanges(this IEnumerable<long> ints)
+        {
+            var r = new List<LongRange>();
+            long prev = -1;
+            long current = -1;
+
+            var sorted = ints.Distinct().OrderBy(i => i).ToList();
+
+            if (sorted.Count > 1)
+            {
+                for (var i = 1; i < sorted.Count; i++)
+                {
+                    prev = sorted[i - 1];
+                    current = sorted[i];
+
+                    if (prev + 1 == current) // you're at the start of a range.
+                    {
+                        var first = prev;
+
+                        while (prev + 1 == current)
+                        {
+                            prev = current;
+                            if (i < sorted.Count - 1)
+                            {
+                                current = sorted[++i];
+                            }
+                            else { break; }
+                        }
+                        r.Add(new LongRange(first, prev));
+                    }
+                    else // its a single.
+                    {
+                        r.Add(new LongRange(prev, prev));
+                    }
+                }
+            }
+            else if (sorted.Count == 1)
+            {
+                r.Add(new LongRange(sorted[0], sorted[0]));
+            }
+
+            if (prev != current)
+            {
+                r.Add(new LongRange(sorted.Last(), sorted.Last()));
+            }
+
+            return r;
+        }
+
         public static bool NearlyEqual(this double a, double b, double epsilon)
         {
             var absA = Math.Abs(a);

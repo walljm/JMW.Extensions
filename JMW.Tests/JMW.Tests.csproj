@@ -60,13 +60,14 @@
     <Compile Include="Extensions\IOTests.cs" />
     <Compile Include="Extensions\NumbersTests.cs" />
     <Compile Include="NetworkingRulesTests.cs" />
-    <Compile Include="IntegerRangeCollectionTests.cs" />
+    <Compile Include="Types\IntegerRangeCollectionTests.cs" />
     <Compile Include="MaybeTests.cs" />
     <Compile Include="Networking\JunosParsingTest.cs" />
     <Compile Include="Parsing\SectionReaderTest.cs" />
     <Compile Include="Parsing\ParsingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringEnumTests.cs" />
+    <Compile Include="Types\VariantTests.cs" />
+    <Compile Include="Types\StringEnumTests.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensionTests.cs" />
     <Compile Include="Templates\TemplateTests.cs" />

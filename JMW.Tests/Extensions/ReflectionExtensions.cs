@@ -7,7 +7,7 @@ using System;
 using JMW.Collections;
 using JMW.Extensions.Enumerable;
 
-namespace JMW.Extensions.String.Tests
+namespace JMW.Extensions.Reflection.Tests
 {
     [TestFixture]
     public class ReflectionExtensions

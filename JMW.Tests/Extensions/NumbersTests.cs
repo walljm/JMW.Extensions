@@ -58,6 +58,10 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.AreEqual((double)1431234121, "1431234121".ToDouble());
 
             Assert.AreEqual(-1, "1431234121aasdf".ToDoubleOrNeg1());
+            Assert.AreEqual(-1, "1431234121aasdf".ToDoubleOrDefault());
+
+            Assert.AreEqual(1431, "1431".ToDoubleOrNeg1());
+            Assert.AreEqual(1431, "1431".ToDoubleOrDefault());
 
             Assert.AreEqual((double)1, 1.ToDouble());
             Assert.AreEqual((double)11234, 11234.ToDouble());
@@ -97,6 +101,7 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.AreEqual(-1, "143123412000001b".ToInt64OrNeg1());
             Assert.AreEqual(1431234121, "1431234121".ToInt64OrNeg1());
             Assert.AreEqual(1000, "1k".ToInt64OrNeg1());
+            Assert.AreEqual(1000, "1k".ToInt64());
         }
 
         [Test]
@@ -111,6 +116,10 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.AreEqual(null, fl);
 
             Assert.AreEqual(-1, "1431234121sdf".ToFloatOrNeg1());
+            Assert.AreEqual(-1, "1431234121sdf".ToFloatOrDefault());
+
+            Assert.AreEqual(1431, "1431".ToFloatOrNeg1());
+            Assert.AreEqual(1431, "1431".ToFloatOrDefault());
         }
 
         [Test]
@@ -118,6 +127,7 @@ namespace JMW.Extensions.Numbers.Tests
         {
             Assert.AreEqual(1, "1".ToInt());
             Assert.AreEqual(11234, "11234".ToInt());
+            Assert.AreEqual(1000, "1k".ToInt());
             Assert.AreEqual(4321341, "4321341".ToInt());
             Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToInt());
             Assert.AreEqual(1431234121, "1431234121".ToInt());
@@ -127,6 +137,24 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.AreEqual(4321341, "4321341".ToIntFast());
             Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToIntFast());
             Assert.AreEqual(1431234121, "1431234121".ToIntFast());
+
+            Assert.AreEqual(1, "1".ToIntFast());
+            Assert.AreEqual(-11234, "-11234".ToIntFast());
+            Assert.AreEqual(4321341, " 4321341 ".ToIntFast());
+            Assert.AreEqual(-4321341, " -4321341 ".ToIntFast());
+            Assert.AreEqual(1431234121, "1431234121".ToIntFast());
+
+            Assert.AreEqual(1, "1".ToIntOrDefaultFast());
+            Assert.AreEqual(11234, "11234".ToIntOrDefaultFast());
+            Assert.AreEqual(4321341, "4321341".ToIntOrDefaultFast());
+            Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToIntOrDefaultFast());
+            Assert.AreEqual(1431234121, "1431234121".ToIntOrDefaultFast());
+
+            Assert.AreEqual(1, "1".ToIntOrDefaultFast());
+            Assert.AreEqual(-11234, "-11234".ToIntOrDefaultFast());
+            Assert.AreEqual(4321341, " 4321341 ".ToIntOrDefaultFast());
+            Assert.AreEqual(-4321341, " -4321341 ".ToIntOrDefaultFast());
+            Assert.AreEqual(1431234121, "1431234121".ToIntOrDefaultFast());
 
             Assert.AreEqual(1, 1.0.ToInt());
             Assert.AreEqual(11234, 11234.0.ToInt());
@@ -183,7 +211,6 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.AreEqual("1", new List<string> { "1" }.CollapseLongsToRanges());
         }
 
-
         [Test]
         public void CollapseIntegerRangesToRangesTest()
         {
@@ -197,6 +224,15 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.AreEqual(expected.Count, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges().Count);
             Assert.AreEqual(expected[1].Start, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges()[1].Start);
             Assert.AreEqual(expected[1].Stop, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges()[1].Stop);
+        }
+
+
+        [Test]
+        public void IsNearlyEqualTest()
+        {
+            Assert.IsTrue(((double)1.2).NearlyEqual(1.2, 0.0000001));
+            Assert.IsTrue(((double)1.20001).NearlyEqual(1.20002, 0.0001));
+            Assert.False(((double)1.20001).NearlyEqual(1.20002, 0.000001));
         }
     }
 }

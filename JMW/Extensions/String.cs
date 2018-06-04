@@ -101,7 +101,7 @@ namespace JMW.Extensions.String
                 var tidx = IndexOf(str, p, case_insensitive, last: true);
                 if (idx == -1)
                     idx = tidx;
-                else if (idx > tidx && tidx > -1)
+                else if (idx < tidx && tidx > -1)
                     idx = tidx;
             }
 
@@ -211,55 +211,7 @@ namespace JMW.Extensions.String
                     idx = tidx;
                     l = p.Length;
                 }
-                else if (idx > tidx && tidx > -1)
-                {
-                    idx = tidx;
-                    l = p.Length;
-                }
-            }
-
-            // if its greater than 0, return it.
-            if (idx > -1)
-            {
-                return s.SafeSubstring(0, idx + l);
-            }
-
-            // worst case, return the string as is.
-            return s;
-        }
-
-        /// <summary>
-        ///   Returns a string from the begining to the last index of one of the provided string parameters, plus the length of the found parameter
-        /// </summary>
-        /// <param name="s">The string to parse</param>
-        /// <param name="qty">The number of the search patter to parse after</param>
-        /// <param name="case_insensitive">Wheather to performs a case insensitive search or not</param>
-        /// <param name="parms">The strings to parse to</param>
-        public static string ParseToDesignatedIndexOf_PlusLength(this string s, int qty, bool case_insensitive = false, params string[] parms)
-        {
-            // return empty if string is empty
-            if (s.Length == 0) return string.Empty;
-
-            // return full string if no params were provided
-            if (parms.Length == 0) return s;
-
-            // lowercase the string if we're working with case insensitive search
-            var str = case_insensitive ? s.ToLower() : s;
-
-            var idx = -1;
-            var l = 0;
-
-            // look for earch parm, return first one found.
-            foreach (var p in parms)
-            {
-                // get the index of our search parameter
-                var tidx = IndexOf(str, p, case_insensitive, qty);
-                if (idx == -1)
-                {
-                    idx = tidx;
-                    l = p.Length;
-                }
-                else if (idx > tidx && tidx > -1)
+                else if (idx < tidx && tidx > -1)
                 {
                     idx = tidx;
                     l = p.Length;
@@ -371,55 +323,7 @@ namespace JMW.Extensions.String
                     idx = tidx;
                     l = p.Length;
                 }
-                else if (idx > tidx && tidx > -1)
-                {
-                    idx = tidx;
-                    l = p.Length;
-                }
-            }
-
-            // if its greater than 0, return it.
-            if (idx > -1)
-            {
-                return s.SafeSubstring(idx + l);
-            }
-
-            // worst case, return the string as is.
-            return s;
-        }
-
-        /// <summary>
-        ///   Returns a string starting after the last index of the first provided string parameter discovered to the end of the string
-        /// </summary>
-        /// <param name="s">The string to parse</param>
-        /// <param name="qty">The number of the search patter to parse after</param>
-        /// <param name="case_insensitive">Wheather to performs a case insensitive search or not</param>
-        /// <param name="parms">The strings to parse to</param>
-        public static string ParseAfterDesignatedIndexOf_PlusLength(this string s, int qty, bool case_insensitive = false, params string[] parms)
-        {
-            // return empty if string is empty
-            if (s.Length == 0) return string.Empty;
-
-            // return full string if no params were provided
-            if (parms.Length == 0) return s;
-
-            // lowercase the string if we're working with case insensitive search
-            var str = case_insensitive ? s.ToLower() : s;
-
-            var idx = -1;
-            var l = 0;
-
-            // look for earch parm, return first one found.
-            foreach (var p in parms)
-            {
-                // get the index of our search parameter
-                var tidx = IndexOf(str, p, case_insensitive, qty);
-                if (idx == -1)
-                {
-                    idx = tidx;
-                    l = p.Length;
-                }
-                else if (idx > tidx && tidx > -1)
+                else if (idx < tidx && tidx > -1)
                 {
                     idx = tidx;
                     l = p.Length;
@@ -437,6 +341,52 @@ namespace JMW.Extensions.String
         }
 
         #endregion ParseAfterLastIndexOf_PlusLength
+
+        #region ParseAfter/To DesignatedIndexOf_PlusLength
+
+        /// <summary>
+        ///   Returns a string from the begining to the last index of one of the provided string parameters, plus the length of the found parameter
+        /// </summary>
+        /// <param name="s">The string to parse</param>
+        /// <param name="qty">The number of the search patter to parse after</param>
+        /// <param name="case_insensitive">Wheather to performs a case insensitive search or not</param>
+        /// <param name="parms">The strings to parse to</param>
+        public static string ParseToDesignatedIndexOf_PlusLength(this string s, int qty, bool case_insensitive, params string[] parms)
+        {
+            var r = string.Empty;
+            var v = s;
+
+            for (var i = 0; i < qty; i++)
+            {
+                r += v.ParseToIndexOf_PlusLength(case_insensitive, parms);
+                v = v.ParseAfterIndexOf_PlusLength(case_insensitive, parms);
+            }
+
+            // worst case, return the string as is.
+            return r;
+        }
+
+        /// <summary>
+        ///   Returns a string starting after the last index of the first provided string parameter discovered to the end of the string
+        /// </summary>
+        /// <param name="s">The string to parse</param>
+        /// <param name="qty">The number of the search patter to parse after</param>
+        /// <param name="case_insensitive">Wheather to performs a case insensitive search or not</param>
+        /// <param name="parms">The strings to parse to</param>
+        public static string ParseAfterDesignatedIndexOf_PlusLength(this string s, int qty, bool case_insensitive = false, params string[] parms)
+        {
+            var r = s;
+
+            for (var i = 0; i < qty; i++)
+            {
+                r = r.ParseAfterIndexOf_PlusLength(case_insensitive, parms);
+            }
+
+            // worst case, return the string as is.
+            return r;
+        }
+
+        #endregion ParseAfter/To DesignatedIndexOf_PlusLength
 
         #region ParseAfterLastIndexOf
 
@@ -471,7 +421,7 @@ namespace JMW.Extensions.String
                 var tidx = IndexOf(str, p, case_insensitive, last: true);
                 if (idx == -1)
                     idx = tidx;
-                else if (idx > tidx && tidx > -1)
+                else if (idx < tidx && tidx > -1)
                     idx = tidx;
             }
 
@@ -579,7 +529,7 @@ namespace JMW.Extensions.String
                 var c = 0;
                 while (c != qty)
                 {
-                    idx = str.IndexOf(search_string, idx, StringComparison.Ordinal);
+                    idx = str.IndexOf(search_string, idx < 0 ? 0 : idx + search_string.Length, StringComparison.Ordinal);
                     c++;
                 }
             }
@@ -633,6 +583,11 @@ namespace JMW.Extensions.String
             return !str.IsEmpty();
         }
 
+        /// <summary>
+        /// Searches a string for a given <see cref="char"/>
+        /// </summary>
+        /// <param name="str">String to search</param>
+        /// <param name="c"><see cref="char"/> to find</param>
         public static bool ContainsFast(this string str, char c)
         {
             for (var i = 0; i < str.Length; i++)
@@ -641,16 +596,23 @@ namespace JMW.Extensions.String
             return false;
         }
 
+        /// <summary>
+        /// Converts a string to PascalCase.  Removes any illegal file name characters.
+        /// </summary>
+        /// <param name="str">string to convert</param>
         public static string ToPascalCase(this string str)
         {
             var v = str;
             foreach (var c in Path.GetInvalidFileNameChars())
                 v = v.Replace(c.ToString(), string.Empty);
 
+            foreach (var c in Path.GetInvalidFileNameChars())
+                v = v.Replace(c.ToString(), string.Empty);
+
             var words = v.Split(' ');
             var r = string.Empty;
             foreach (var w in words)
-                r += w.Substring(0, 1) + w.Substring(1);
+                r += w.Substring(0, 1).ToUpper() + w.Substring(1);
             return r;
         }
 

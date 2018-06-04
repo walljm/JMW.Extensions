@@ -1,10 +1,12 @@
-﻿using JMW.Extensions.Object;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JMW.Extensions.Object;
 
 namespace JMW.Types
 {
-    public class Variant
+    public class Variant : IStructuralEquatable, IEquatable<Variant>
     {
         #region Properties
 
@@ -137,14 +139,17 @@ namespace JMW.Types
         public override string ToString()
         {
             if (IsString) return _stringValue;
-            if (IsList) return "(List) Count:" + _listValue.Count;
-            if (IsDict) return "(Dict) Count:" + _dictValue.Count;
+            if (IsList) return "(List) Count: " + _listValue.Count;
+            if (IsDict) return "(Dict) Count: " + _dictValue.Count;
 
             return string.Empty;
         }
 
         public bool Equals(Variant val)
         {
+            if (val == null)
+                return false;
+
             if (IsString && val.IsString) return StringValue == val.StringValue;
             if (IsList && val.IsList)
             {
@@ -171,5 +176,26 @@ namespace JMW.Types
             // up with empty variants later we'll consider them equal.
             return true;
         }
+
+        #region Implementation of IStructuralEquatable
+
+        public bool Equals(object other, IEqualityComparer comparer)
+        {
+            if (other == null)
+                return false;
+
+            return comparer.Equals(this, other);
+        }
+
+        public int GetHashCode(IEqualityComparer comparer)
+        {
+            if (IsString) return _stringValue.GetHashCode();
+            if (IsList) return _listValue.GetHashCode();
+            if (IsDict) return _dictValue.GetHashCode();
+
+            return 0;
+        }
+
+        #endregion Implementation of IStructuralEquatable
     }
 }

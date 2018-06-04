@@ -1,14 +1,14 @@
-using JMW.Extensions.Enumerable;
-using JMW.Extensions.Numbers;
-using JMW.Extensions.String;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JMW.Extensions.Enumerable;
+using JMW.Extensions.Numbers;
+using JMW.Extensions.String;
 
 namespace JMW.Types
 {
-    public class LongRangeCollection : IList, IList<LongRange>
+    public class LongRangeCollection : IList<LongRange>
     {
         #region Constructors
 
@@ -16,29 +16,48 @@ namespace JMW.Types
         {
         }
 
+        public LongRangeCollection(IEnumerable<LongRange> rng)
+        {
+            var rngs = rng.OrderBy(r => r.Start).ToList();
+            collapseRanges(rngs);
+            rngs.Each(i => Ranges.Add(i.Start, i)); // add them to the range.;
+        }
+
         public LongRangeCollection(LongRange rng)
         {
             Ranges.Add(rng.Start, new LongRange(rng));
         }
 
-        public LongRangeCollection(int start, int stop)
+        public LongRangeCollection(long start, long stop)
         {
             Ranges.Add(start, new LongRange(start, stop));
         }
 
         public LongRangeCollection(string rng)
         {
-            rng.Split(',')
-                .Select(o => o.Trim()) // trim whitespace
-                .Where(o => o.Length > 0) // eliminate empty strings
-                .Select(o => new LongRange(o)) // create ranges
-                .SelectMany(o => o.GetInts()) // get integers so you can eliminate possible overlaps
-                .Distinct() // remove duplicates
-                .CollapseLongsToRanges() // collapse into ranges
-                .Split(',') // split the string into ranges
-                .Select(o => o.Trim()) // trim whitespace
-                .Select(o => new LongRange(o)) // turn back into objects
-                .Each(i => Ranges.Add(i.Start, i)); // add them to the range.
+            getCleanInts(rng.Split(',')).Each(i => Ranges.Add(i.Start, i)); // add them to the range.
+        }
+
+        public LongRangeCollection(IEnumerable<string> rng)
+        {
+            getCleanInts(rng).Each(i => Ranges.Add(i.Start, i)); // add them to the range.
+        }
+
+        public LongRangeCollection(IEnumerable<long> rng)
+        {
+            rng.CollapseLongsToLongRanges() // turn back into objects
+               .Each(i => Ranges.Add(i.Start, i)); // add them to the range.
+        }
+
+        private static IEnumerable<LongRange> getCleanInts(IEnumerable<string> rng)
+        {
+            var rngs = rng.Select(o => o.Trim()) // trim whitespace
+                .Where(o => o.Length > 0 && (o.Contains('-') || o.IsIntFast())) // eliminate empty strings
+                .Select(o => new LongRange(o))// create ranges
+                .OrderBy(r => r.Start)
+                .ToList();
+            collapseRanges(rngs);
+            return rngs;
         }
 
         #endregion Constructors
@@ -51,7 +70,7 @@ namespace JMW.Types
 
         #region Public Methods
 
-        public void AddUniqueIntegersFromRange(IEnumerable<string> lst)
+        public void AddUniqueLongsFromRange(IEnumerable<string> lst)
         {
             var lookup = Ranges.Select(v => v.ToString()).ToHashSet();
             foreach (var i in lst)
@@ -62,14 +81,14 @@ namespace JMW.Types
                 {
                     // its a range, so process each one.
                     var blocks = i.Split('-');
-                    if (!blocks[0].IsInt() || !blocks[1].IsInt()) continue;
-
                     var start = blocks[0].ToInt();
                     var end = blocks[1].ToInt();
                     for (var c = start; c <= end; c++)
                     {
                         if (!lookup.Contains(c.ToString()))
+                        {
                             lookup.Add(c.ToString().Trim());
+                        }
                     }
                 }
                 else if (!i.Contains("none") && !lookup.Contains(i) && !i.IsEmpty())
@@ -78,10 +97,10 @@ namespace JMW.Types
                 }
             }
 
-            lookup.Select(v => new LongRange(v)).Each(i => Ranges.Add(i.Start, i));
+            AddRange(lookup.Select(v => new LongRange(v)));
         }
 
-        public bool Contains(int num)
+        public bool Contains(long num)
         {
             return IsInRange(num);
         }
@@ -92,7 +111,11 @@ namespace JMW.Types
             return IsInRange(num.ToInt());
         }
 
-        public bool IsInRange(int num)
+        /// <summary>
+        /// Returns true if the provided int is included in the ranges.
+        /// </summary>
+        /// <param name="num">number to check</param>
+        public bool IsInRange(long num)
         {
             var lo = 0;
             var hi = Ranges.Count - 1;
@@ -111,6 +134,10 @@ namespace JMW.Types
             return false;
         }
 
+        /// <summary>
+        /// Returns true if the provided int is included in the ranges.
+        /// </summary>
+        /// <param name="num">number to check</param>
         public bool IsInRange(string num)
         {
             if (!num.IsInt()) return false;
@@ -134,22 +161,17 @@ namespace JMW.Types
 
         public override string ToString()
         {
-            return this.RangeToString();
+            return RangeToString();
         }
 
         #endregion Public Methods
 
         #region Public Static
 
-        public static string CollapseIntegersToRanges(IEnumerable<int> integers)
-        {
-            return integers.CollapseIntsToRanges();
-        }
-
         public static List<string> ExplodeRange(string rng)
         {
             var lst = new LongRangeCollection();
-            lst.AddUniqueIntegersFromRange(rng.Split(','));
+            lst.AddUniqueLongsFromRange(rng.Split(','));
             return lst.SelectMany(v => v.GetInts().Select(i => i.ToString())).ToList();
         }
 
@@ -164,12 +186,12 @@ namespace JMW.Types
 
         public IEnumerator GetEnumerator()
         {
-            return ((IEnumerable)Ranges).GetEnumerator();
+            return ((IEnumerable)Ranges.Values).GetEnumerator();
         }
 
-        public void CopyTo(Array array, int index)
+        public void CopyTo(Array array, long index)
         {
-            ((ICollection)Ranges).CopyTo(array, index);
+            throw new NotImplementedException();
         }
 
         public bool Remove(LongRange item)
@@ -179,24 +201,9 @@ namespace JMW.Types
 
         public int Count => Ranges.Count;
 
-        public object SyncRoot => ((ICollection)Ranges).SyncRoot;
+        public object SyncRoot => ((ICollection)Ranges.Values).SyncRoot;
 
-        public bool IsSynchronized => ((ICollection)Ranges).IsSynchronized;
-
-        public int Add(object value)
-        {
-            return ((IList)Ranges).Add(value);
-        }
-
-        public bool Contains(object value)
-        {
-            return ((IList)Ranges).Contains(value);
-        }
-
-        public void Add(LongRange item)
-        {
-            Ranges.Add(item.Start, item);
-        }
+        public bool IsSynchronized => ((ICollection)Ranges.Values).IsSynchronized;
 
         public void Clear()
         {
@@ -211,21 +218,6 @@ namespace JMW.Types
         public void CopyTo(LongRange[] array, int arrayIndex)
         {
             Ranges.Values.CopyTo(array, arrayIndex);
-        }
-
-        public int IndexOf(object value)
-        {
-            return ((IList)Ranges).IndexOf(value);
-        }
-
-        public void Insert(int index, object value)
-        {
-            ((IList)Ranges).Insert(index, value);
-        }
-
-        public void Remove(object value)
-        {
-            ((IList)Ranges).Remove(value);
         }
 
         public int IndexOf(LongRange item)
@@ -245,20 +237,103 @@ namespace JMW.Types
 
         LongRange IList<LongRange>.this[int index]
         {
-            get { return Ranges[index]; }
-            set { Ranges[index] = value; }
+            get { return Ranges.Values[index]; }
+            set { Ranges.RemoveAt(index); Add(value); }
         }
 
-        public object this[int index]
-        {
-            get { return ((IList)Ranges)[index]; }
-            set { ((IList)Ranges)[index] = value; }
-        }
+        public bool IsReadOnly => false;
 
-        public bool IsReadOnly => ((IList)Ranges).IsReadOnly;
-
-        public bool IsFixedSize => ((IList)Ranges).IsFixedSize;
+        public bool IsFixedSize => false;
 
         #endregion IList
+
+        public void Add(LongRange item)
+        {
+            AddRange(item.ToListOfItem());
+        }
+
+        public void AddRange(IEnumerable<LongRange> items)
+        {
+            var lst = mergeVlanRanges(Ranges.Values.ToList(), items.ToList());
+            Ranges.Clear();
+            lst.Each(o => Ranges.Add(o.Start, o));
+        }
+
+        public void AddRange(IEnumerable<string> items)
+        {
+            var lst = mergeVlanRanges(Ranges.Values.ToList(), new LongRangeCollection(items).ToList());
+            Ranges.Clear();
+            lst.Each(o => Ranges.Add(o.Start, o));
+        }
+
+        private static List<LongRange> mergeVlanRanges(IList<LongRange> a, IList<LongRange> b)
+        {
+            var rngs = new List<LongRange>();
+
+            while (b.Count > 0 && a.Count > 0)
+            {
+                LongRange r;
+
+                if (b[0].Start <= a[0].Start)
+                {
+                    r = b[0];
+
+                    if (b[0].Stop >= a[0].Start)
+                    {
+                        if (b[0].Stop > a[0].Stop)
+                            r = new LongRange(r.Start, b[0].Stop);
+                        else
+                            r = new LongRange(r.Start, a[0].Stop);
+
+                        a.RemoveAt(0); // in this case, b includes a, so a should be removed also.
+                    }
+
+                    b.RemoveAt(0); // b is what we started with, so it always gets removed.
+                    rngs.Add(r);
+                }
+                else if (a[0].Start <= b[0].Start)
+                {
+                    r = a[0];
+
+                    if (a[0].Stop >= b[0].Start)
+                    {
+                        if (a[0].Stop > b[0].Stop)
+                            r = new LongRange(r.Start, a[0].Stop);
+                        else
+                            r = new LongRange(r.Start, b[0].Stop);
+
+                        b.RemoveAt(0); // in this case, a includes b, so b should be removed also.
+                    }
+
+                    a.RemoveAt(0); // a is what we started with, so it always gets removed.
+                    rngs.Add(r);
+                }
+            }
+            if (b.Count > 0) rngs.AddRange(b);
+            if (a.Count > 0) rngs.AddRange(a);
+
+            collapseRanges(rngs);
+
+            return rngs;
+        }
+
+        private static void collapseRanges(List<LongRange> rngs)
+        {
+            // collapse contiguous ranges together
+            for (var i = 1; i < rngs.Count; i++)
+            {
+                var prev = rngs[i - 1];
+                var next = rngs[i];
+
+                if (prev.Stop + 1 >= next.Start)
+                {
+                    if (prev.Stop <= next.Stop)
+                        rngs[i - 1] = new LongRange(prev.Start, next.Stop);
+
+                    rngs.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
     }
 }
