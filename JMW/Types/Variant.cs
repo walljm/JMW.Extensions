@@ -6,7 +6,7 @@ using JMW.Extensions.Object;
 
 namespace JMW.Types
 {
-    public class Variant : IStructuralEquatable, IEquatable<Variant>
+    public class Variant : IEquatable<Variant>
     {
         #region Properties
 
@@ -176,26 +176,5 @@ namespace JMW.Types
             // up with empty variants later we'll consider them equal.
             return true;
         }
-
-        #region Implementation of IStructuralEquatable
-
-        public bool Equals(object other, IEqualityComparer comparer)
-        {
-            if (other == null)
-                return false;
-
-            return comparer.Equals(this, other);
-        }
-
-        public int GetHashCode(IEqualityComparer comparer)
-        {
-            if (IsString) return _stringValue.GetHashCode();
-            if (IsList) return _listValue.GetHashCode();
-            if (IsDict) return _dictValue.GetHashCode();
-
-            return 0;
-        }
-
-        #endregion Implementation of IStructuralEquatable
     }
 }

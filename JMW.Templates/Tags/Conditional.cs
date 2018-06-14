@@ -1,8 +1,8 @@
-﻿using JMW.Extensions.Enumerable;
-using JMW.Extensions.String;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JMW.Extensions.Enumerable;
+using JMW.Extensions.String;
 
 namespace JMW.Template.Tags
 {
@@ -70,7 +70,7 @@ namespace JMW.Template.Tags
                     if (values.Count != 1)
                     {
                         throw new Exception(
-                            "The \"" + ATTR_OCT + "\" attribute is currently incompatible with multiple arguments for the If tag.");
+                            "The '" + ATTR_OCT + "' attribute is currently incompatible with multiple arguments for the '" + TAG + "' tag.");
                     }
 
                     values[0] = TagHelpers.RetrieveOctet(values[0], token.Properties[ATTR_OCT]);
@@ -80,18 +80,10 @@ namespace JMW.Template.Tags
             }
             else if (token.Properties.ContainsKey(ATTR_VALUE) && token.Properties.ContainsKey(ATTR_TYPE))
             {
+                // the column will always have a ':' to split on, as we alias default tables with a default table name.
                 var split_data = token.Properties[ATTR_COLUMN].Split(':');
-                string sheetID, columnID;
-                if (split_data.Length > 1)
-                {
-                    sheetID = split_data[0];
-                    columnID = split_data[1];
-                }
-                else
-                {
-                    sheetID = "csv";
-                    columnID = split_data[0];
-                }
+                var sheetID = split_data[0];
+                var columnID = split_data[1];
 
                 var value = token.Properties[ATTR_VALUE];
                 var operatorID = token.Properties[ATTR_TYPE].ToLower();
@@ -101,60 +93,60 @@ namespace JMW.Template.Tags
                 {
                     case "eq":
                     case "equals":
-                    {
-                        if (actualValue == value)
-                            condition_met = true;
-                        break;
-                    }
+                        {
+                            if (actualValue == value)
+                                condition_met = true;
+                            break;
+                        }
                     case "neq":
                     case "notequals":
-                    {
-                        if (actualValue != value)
-                            condition_met = true;
-                        break;
-                    }
+                        {
+                            if (actualValue != value)
+                                condition_met = true;
+                            break;
+                        }
                     case "cnt":
                     case "contains":
-                    {
-                        if (actualValue.Contains(value))
-                            condition_met = true;
-                        break;
-                    }
+                        {
+                            if (actualValue.Contains(value))
+                                condition_met = true;
+                            break;
+                        }
                     case "ncnt":
                     case "notcontains":
-                    {
-                        if (!actualValue.Contains(value))
-                            condition_met = true;
-                        break;
-                    }
+                        {
+                            if (!actualValue.Contains(value))
+                                condition_met = true;
+                            break;
+                        }
                     case "strt":
                     case "startswith":
-                    {
-                        if (actualValue.StartsWith(value))
-                            condition_met = true;
-                        break;
-                    }
+                        {
+                            if (actualValue.StartsWith(value))
+                                condition_met = true;
+                            break;
+                        }
                     case "nstrt":
                     case "notstartswith":
-                    {
-                        if (!actualValue.StartsWith(value))
-                            condition_met = true;
-                        break;
-                    }
+                        {
+                            if (!actualValue.StartsWith(value))
+                                condition_met = true;
+                            break;
+                        }
                     case "ends":
                     case "endswith":
-                    {
-                        if (actualValue.EndsWith(value))
-                            condition_met = true;
-                        break;
-                    }
+                        {
+                            if (actualValue.EndsWith(value))
+                                condition_met = true;
+                            break;
+                        }
                     case "nends":
                     case "notendswith":
-                    {
-                        if (!actualValue.EndsWith(value))
-                            condition_met = true;
-                        break;
-                    }
+                        {
+                            if (!actualValue.EndsWith(value))
+                                condition_met = true;
+                            break;
+                        }
                 }
             }
 
@@ -183,7 +175,7 @@ namespace JMW.Template.Tags
 
                 if (!ALLOWEDPROPVALUES.Contains(type))
                 {
-                    throw new ParseException("Invalid property value for \"type\" property on <if> tag. Allowed values: " + ALLOWEDPROPVALUES.ToDelimitedString(", "), token);
+                    throw new ParseException("Invalid property value for 'type' property on '" + TAG + "' tag. Allowed values: '" + ALLOWEDPROPVALUES.ToDelimitedString("', '") + "'.", token);
                 }
             }
         }

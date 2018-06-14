@@ -33,7 +33,7 @@ namespace JMW.Template.Tags
             }
             catch (Exception ex)
             {
-                throw new Exception("Unable to interpret tag: " + tag.Name + " with format: " + format + ". Error Message: " + ex.Message);
+                throw new Exception("Unable to interpret tag '" + tag.Name + "' with format: '" + format + "'. Error Message: " + ex.Message);
             }
         }
     }

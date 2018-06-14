@@ -10,6 +10,7 @@ namespace JMW.Template
         PARAMVALUE,
         TEXT,
         ERROR,
+        COMMENT
     }
 }
 

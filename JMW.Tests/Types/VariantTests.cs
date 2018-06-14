@@ -19,6 +19,7 @@ namespace JMW.Types.Tests
             Assert.AreEqual("jason", tv1.StringValue);
             v1.StringValue = "";
             Assert.AreEqual("", v1.StringValue);
+            Assert.IsTrue(v1.GetHashCode() > 0);
 
             var v2 = new Variant(new List<Variant> { "jason" });
             Assert.AreEqual(true, v2.IsList);
@@ -36,6 +37,7 @@ namespace JMW.Types.Tests
             v2.ListValue = new List<Variant>();
             Assert.AreEqual(0, v2.ListValue.Count);
             Assert.AreEqual("(List) Count: 1", tv2.ToString());
+            Assert.IsTrue(v2.GetHashCode() > 0);
 
             var v3 = new Variant(new Dictionary<string, Variant> { { "one", "jason" } });
             Assert.AreEqual(true, v3.IsDict);
@@ -50,6 +52,7 @@ namespace JMW.Types.Tests
             v3.DictValue = new Dictionary<string, Variant>();
             Assert.AreEqual(0, v3.DictValue.Count);
             Assert.AreEqual("(Dict) Count: 1", tv3.ToString());
+            Assert.IsTrue(v3.GetHashCode() > 0);
 
             var v = new Variant();
             Assert.AreEqual("", v.ToString());

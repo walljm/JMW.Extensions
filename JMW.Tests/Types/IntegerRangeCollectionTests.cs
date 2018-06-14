@@ -19,7 +19,17 @@ namespace JMW.Extensions.Tests
             Assert.That(foo.IsInRange(3), Is.EqualTo(true));
             Assert.That(foo.IsInRange(13), Is.EqualTo(true));
             Assert.That(foo.IsInRange(0), Is.EqualTo(false));
+
+            Assert.That(foo.IsInRange("13"), Is.EqualTo(true));
+            Assert.That(foo.IsInRange("0"), Is.EqualTo(false));
+
             Assert.That(foo.IsInRange(16), Is.EqualTo(false));
+            Assert.That(foo.Contains(16), Is.EqualTo(false));
+            Assert.That(foo.Contains(10), Is.EqualTo(true));
+            Assert.That(foo.Contains("16"), Is.EqualTo(false));
+            Assert.That(foo.Contains("10"), Is.EqualTo(true));
+            Assert.That(new IntegerRange("8-12").Contains("10"), Is.EqualTo(true));
+            Assert.That(new IntegerRange(new IntegerRange("8-12")).Contains("10"), Is.EqualTo(true));
         }
 
         [Test]

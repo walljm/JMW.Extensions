@@ -79,9 +79,8 @@ namespace JMW.Template.Tags
 
         public static string RetrieveOctet(string data, string octet_string)
         {
-            var octet = 0;
             var val = data;
-            if (!int.TryParse(octet_string, out octet) || octet > 4 || octet < 1)
+            if (!int.TryParse(octet_string, out var octet) || octet > 4 || octet < 1)
             {
                 throw new Exception("The value provided for octet argument was invalid. Must be a number between 1 and 4.");
             }
@@ -90,14 +89,13 @@ namespace JMW.Template.Tags
                 var split = data.Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries);
                 if (split.Length != 4)
                 {
-                    throw new Exception("There was a problem parsing octets from the IP: " + data +
-                                        ". Please check formatting.");
+                    throw new Exception("There was a problem parsing octets from the IP: '" + data + "'. Please check formatting.");
                 }
                 val = split[octet - 1];
             }
             else
             {
-                throw new Exception("The provided column value: " + data + " is not an IP.");
+                throw new Exception("The provided column value: '" + data + "' is not an IP.");
             }
 
             return val;
@@ -182,9 +180,8 @@ namespace JMW.Template.Tags
             var i = 0;
             while (i < variables.Count && i < arguments.Count)
             {
-                double argument;
                 // try to convert to a number if possible
-                if (double.TryParse(arguments[i], out argument))
+                if (double.TryParse(arguments[i], out var argument))
                     result.SetValue(variables[i], argument);
                 else // else, use a string.
                     result.SetValue(variables[i], arguments[i]);

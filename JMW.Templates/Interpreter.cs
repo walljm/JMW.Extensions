@@ -1,11 +1,11 @@
-using JMW.Extensions.String;
-using JMW.Functional;
-using JMW.Template.Tags;
-
-//third party
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JMW.Extensions.String;
+using JMW.Functional;
+using JMW.Template.Tags;
+using Version = JMW.Template.Tags.Version;
 
 namespace JMW.Template
 {
@@ -18,7 +18,7 @@ namespace JMW.Template
         #region Handlers
 
         private Variable _varHandler;
-        private Tags.Text _textHandler;
+        private Text _textHandler;
 
         #endregion Handlers
 
@@ -42,7 +42,7 @@ namespace JMW.Template
             OutputStream = output_stream;
 
             _varHandler = new Variable();
-            _textHandler = new Tags.Text();
+            _textHandler = new Text();
 
             AddHandler(new Conditional(Retrievers));
             AddHandler(_varHandler);
@@ -55,15 +55,6 @@ namespace JMW.Template
         }
 
         #region Public Functions
-
-        /// <summary>
-        /// Sets the default handler
-        /// </summary>
-        /// <param name="h">A handler in the form of a delegate</param>
-        public void SetDefaultHandler(Handler h)
-        {
-            DefaultHandler = new Optional<Handler>(h);
-        }
 
         /// <summary>
         /// Parse the template in the input, then interpret the tags.
@@ -128,9 +119,9 @@ namespace JMW.Template
                             {
                                 // we need to create the handler here using the data from the tables specified.
                                 if (!Handlers.ContainsKey(left_tag))
-                                    throw new System.Exception("Specified table: " + left_tag + " in \'" + Join.ATTR_LEFT_TABLE + "\" attribute does not exist.");
+                                    throw new Exception("Specified table: '" + left_tag + "' in '" + Join.ATTR_LEFT_TABLE + "' attribute does not exist.");
                                 if (!Handlers.ContainsKey(right_tag))
-                                    throw new System.Exception("Specified table: " + right_tag + " in \'" + Join.ATTR_RIGHT_TABLE + "\" attribute does not exist.");
+                                    throw new Exception("Specified table: '" + right_tag + "' in '" + Join.ATTR_RIGHT_TABLE + "' attribute does not exist.");
 
                                 var left = (Table)Handlers[left_tag];
                                 var right = (Table)Handlers[right_tag];
@@ -155,7 +146,7 @@ namespace JMW.Template
                             {
                                 // we need to create the handler here using the data from the tables specified.
                                 if (!Handlers.ContainsKey(table_tag))
-                                    throw new System.Exception("Specified table: " + table_tag + " in \'" + Lookup.ATTR_TABLE + "\" attribute does not exist.");
+                                    throw new Exception("Specified table: '" + table_tag + "' in '" + Lookup.ATTR_TABLE + "' attribute does not exist.");
 
                                 var table = (Table)Handlers[table_tag];
                                 AddHandler(new Lookup(table.TableData, this));

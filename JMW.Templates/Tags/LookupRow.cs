@@ -38,7 +38,7 @@ namespace JMW.Template.Tags
             }
             else
             {
-                throw new System.Exception("The " + ATTR_KEY + " attribute is required.");
+                throw new System.Exception("The '" + ATTR_KEY + "' attribute is required.");
             }
         }
     }

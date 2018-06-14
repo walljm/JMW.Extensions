@@ -61,7 +61,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions\Reflection.cs" />
     <Compile Include="Reflection\Linq.cs" />
-    <Compile Include="Types\StringEnum.cs" />
     <Compile Include="Extensions\String.cs" />
     <Compile Include="Types\Variant.cs" />
     <Compile Include="Types\WeakEvent.cs" />

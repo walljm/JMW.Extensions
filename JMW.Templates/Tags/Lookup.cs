@@ -57,7 +57,7 @@ namespace JMW.Template.Tags
                     else if (tag.Properties.ContainsKey(ATTR_KEY_COL)) // use the value of the key column
                         key = lr[TableData.ColumnIndexes[tag.Properties[ATTR_KEY_COL].ToLower()]];
                     else
-                        throw new Exception("Require attribute is missing. A " + ATTR_KEY_EXP + " or " + ATTR_KEY_COL + "attribute is required.");
+                        throw new Exception("Require attribute is missing. A '" + ATTR_KEY_EXP + "' or '" + ATTR_KEY_COL + "' attribute is required.");
 
                     if (LookupTable.ContainsKey(key))
                         LookupTable[key].Add(lr);

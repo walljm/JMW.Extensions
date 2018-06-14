@@ -43,35 +43,28 @@ namespace JMW.Template.Tags
 
                             i--;
                         }
-                        catch (KeyNotFoundException e)
+                        catch (FileNotFoundException e)
                         {
-                            throw new Exception("<" + TAG + "> tag refers to a template which does not exist: " + file_name + ".", e);
+                            throw new Exception("The <" + TAG + "> tag refers to a template which does not exist: '" + file_name + "'.", e);
                         }
                     }
                     else if (tag.Properties.ContainsKey(ATTR_NAME))
                     {
-                        try
-                        {
-                            var name = tag.Properties[ATTR_NAME];
+                        var name = tag.Properties[ATTR_NAME];
 
-                            if (!includes.ContainsKey(name))
-                                throw new Exception(TAG + " referenced a named " + TAG + ":\"" + name + "\" that does not exist in the template.");
+                        if (!includes.ContainsKey(name))
+                            throw new Exception("The <" + TAG + "> tag referenced named " + TAG + " '" + name + "' which does not exist in the template.");
 
-                            var children = includes[name].Children;
+                        var children = includes[name].Children;
 
-                            var index = tags.IndexOf(tag);
-                            tags.Remove(tag);
-                            tags.InsertRange(index, children);
+                        var index = tags.IndexOf(tag);
+                        tags.Remove(tag);
+                        tags.InsertRange(index, children);
 
-                            i--;
-                        }
-                        catch (KeyNotFoundException e)
-                        {
-                            throw new Exception("<" + TAG + "> tag refers to a template which does not exist: " + tag.Properties[ATTR_PATH] + ".", e);
-                        }
+                        i--;
                     }
                     else
-                        throw new Exception("The <" + TAG + "> tag requires either a " + ATTR_NAME + " attribute or a " + ATTR_PATH + " attribute.");
+                        throw new Exception("The <" + TAG + "> tag requires either a '" + ATTR_NAME + "' attribute or a '" + ATTR_PATH + "' attribute.");
                 }
                 else if (tag.TagType == TagTypes.Tag && tag.HasChildren)
                 {

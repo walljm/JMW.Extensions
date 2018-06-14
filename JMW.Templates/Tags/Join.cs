@@ -90,7 +90,7 @@ namespace JMW.Template.Tags
                     {
                         var key = TagHelpers.EvaluateExpression(tag.Properties[ATTR_LEFT_KEY_EXP], lr);
                         if (left.ContainsKey(key))
-                            throw new Exception("Key expression does not produce a unique key.  Please provide a key expression that produces a unique key.  Duplicate key: " + key);
+                            throw new Exception("Key expression does not produce a unique key.  Please provide a key expression that produces a unique key.  Duplicate key: '" + key + "'");
                         left.Add(key, lr);
                     }
                     else if (tag.Properties.ContainsKey(ATTR_LEFT_KEY)) // use the value of the key column
@@ -100,7 +100,7 @@ namespace JMW.Template.Tags
                     }
                     else
                     {
-                        throw new Exception("Require attribute is missing. A " + ATTR_LEFT_KEY_EXP + " or a " + ATTR_LEFT_KEY + "attribute is required.");
+                        throw new Exception("Require attribute is missing. A '" + ATTR_LEFT_KEY_EXP + "' or a '" + ATTR_LEFT_KEY + "' attribute is required.");
                     }
                 }
 
@@ -115,11 +115,13 @@ namespace JMW.Template.Tags
                     var key = string.Empty;
 
                     if (tag.Properties.ContainsKey(ATTR_RIGHT_KEY_EXP))
+                    {
                         key = TagHelpers.EvaluateExpression(tag.Properties[ATTR_RIGHT_KEY_EXP], rr);
+                    }
                     else if (tag.Properties.ContainsKey(ATTR_RIGHT_KEY)) // use the value of the key column
                         key = rr[_rightTableData.ColumnIndexes[tag.Properties[ATTR_RIGHT_KEY].ToLower()]];
                     else
-                        throw new Exception("Require attribute is missing. A " + ATTR_RIGHT_KEY_EXP + " or a " + ATTR_RIGHT_KEY + "attribute is required.");
+                        throw new Exception("Require attribute is missing. A '" + ATTR_RIGHT_KEY_EXP + "' or a '" + ATTR_RIGHT_KEY + "' attribute is required.");
 
                     if (left.ContainsKey(key))
                     {
@@ -156,7 +158,7 @@ namespace JMW.Template.Tags
         {
             return JoinedTableData.Data[CurrentRow][JoinedTableData.ColumnIndexes[column.ToLower()]];
         }
-        
+
         private ITagHandler makeColumnHandler(string column_name)
         {
             return new JoinColumn(Name + ":" + column_name.ToLower().Trim(), this);

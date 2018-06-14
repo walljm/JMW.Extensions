@@ -47,12 +47,7 @@ namespace JMW.Template
             AddTag(new Join());
             AddTag(new LookupRow());
         }
-
-        public Parser(Dictionary<string, ITagHandler> tags) : this()
-        {
-            _tags = tags;
-        }
-
+        
         /// <summary>
         /// Parses a template into a list of Tags to process.
         /// </summary>

@@ -1,9 +1,9 @@
-﻿using JMW.Extensions.String;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using JMW.Extensions.String;
 
 namespace JMW.Template.Tags
 {
@@ -48,12 +48,19 @@ namespace JMW.Template.Tags
             try
             {
                 if (token.Properties.ContainsKey(ATTR_STORE)) store = bool.Parse(token.Properties[ATTR_STORE]);
+            }
+            catch (Exception)
+            {
+                throw new Exception("The '" + ATTR_STORE + "' attribute value '" + token.Properties[ATTR_STORE] + "' was invalid. Value must be either 'true' or 'false'.");
+            }
+
+            try
+            {
                 if (token.Properties.ContainsKey(ATTR_PRINT)) print = bool.Parse(token.Properties[ATTR_PRINT]);
             }
             catch (Exception)
             {
-                throw new Exception("One or more properties for " + token.Name +
-                                    " was invalid. \"store\" and \"print\" arguments must have the value true or false.");
+                throw new Exception("The '" + ATTR_PRINT + "' attribute value '" + token.Properties[ATTR_PRINT] + "' was invalid. Value must be either 'true' or 'false'.");
             }
 
             if (token.Properties.ContainsKey(ATTR_EXP))
@@ -72,6 +79,11 @@ namespace JMW.Template.Tags
                 }
             }
 
+            if (token.Properties.ContainsKey(ATTR_VALUE))
+            {
+                value = token.Properties[ATTR_VALUE];
+            }
+
             if (store)
             {
                 _variables[name] = value;
@@ -85,7 +97,7 @@ namespace JMW.Template.Tags
         public void AddVariable(string name, string value)
         {
             if (_variables.ContainsKey(name.ToLower()))
-                throw new Exception("Variable: " + name + " already exists.");
+                throw new Exception("Variable: '" + name + "' already exists.");
 
             _variables.Add(name.ToLower(), value);
         }
@@ -123,19 +135,12 @@ namespace JMW.Template.Tags
                 {
                     if (tag.Properties.ContainsKey(ATTR_NAME) && tag.Properties.ContainsKey(ATTR_VALUE))
                     {
-                        if (!_variables.ContainsKey(tag.Properties[ATTR_NAME].ToLower()))
-                        {
-                            AddVariable(tag.Properties[ATTR_NAME], tag.Properties[ATTR_VALUE]);
-                        }
-                        else
-                        {
-                            throw new Exception("Two variables with the same name (" + tag.Properties[ATTR_NAME] +
-                                                ") have been used. Variable names must be unique.");
-                        }
+                        // the function does a check for duplication, no need to do that here.
+                        AddVariable(tag.Properties[ATTR_NAME], tag.Properties[ATTR_VALUE]);
                     }
                     else
                     {
-                        throw new Exception("Var tag requires both name and value arguments.");
+                        throw new Exception("'" + TAG + "' tag requires both '" + ATTR_NAME + "' and '" + ATTR_VALUE + "' attributes.");
                     }
                 }
                 if (tag.Children.Count > 0) PopulateVariables(tag.Children, interp);

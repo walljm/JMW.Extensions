@@ -6,7 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using JMW.IO;
 
-[assembly: InternalsVisibleTo("JMW.Template.Tests")]
+// Internals are visible to the Test assemblies
+[assembly: InternalsVisibleTo("JMW.Tests")]
 
 namespace JMW.Template
 {
@@ -18,13 +19,17 @@ namespace JMW.Template
             get;
         }
 
-        public static readonly string INVALID_UNICODE_ERROR = "Invalid Character Encoding for template input";
+        public const string INVALID_UNICODE_ERROR = "Invalid Character Encoding for template input";
 
-        private readonly string _begin = @"<";
-        private readonly string _end = @"</";
-        private readonly string _close = @">";
-        private readonly string _singleClose = @"/>";
-        private readonly string _slash = @"/";
+        private const char BEGIN = '<';
+        private const string END = @"</";
+        private const char CLOSE = '>';
+        private const string SINGLE_CLOSE = @"/>";
+        private const char FORWARD_SLASH = '/';
+        private const char COMMENT_START = '#';
+        private const char PARAM_ASSIGN = '=';
+        private const char ESCAPE = '\\';
+        private const string EOF = "EOF";
 
         internal bool _inTag = false;
         internal bool _inParam = false;
@@ -58,53 +63,58 @@ namespace JMW.Template
             {
                 if (_eof)
                 {
-                    return setupErrorToken("EOF");
+                    return setupErrorToken(EOF);
                 }
+
                 Token.Line = Line;
                 Token.Column = Column;
+
+                if (maybeReadCommentStart())
+                {
+                    return consumeComment();
+                }
+
                 if (maybeReadEnd())
                 {
                     return consumeTagName(TokenType.ENDTAG);
                 }
-                else if (maybeReadBegin())
+
+                if (maybeReadBegin())
                 {
                     return consumeTagName(TokenType.OPENTAG);
                 }
-                else if (maybeReadClose()) // We just eat close sigils
+
+                if (maybeReadClose()) // We just eat close sigils
                 {
                     _inTag = false;
                     // yes yes it's a goto. This is a state machine deal with it.
                     goto NEXT_START;
                 }
-                else if (maybeReadSingleClose())
+
+                if (maybeReadSingleClose())
                 {
                     _inTag = false;
                     Token.Type = TokenType.SINGLEClOSE;
                     Token.Value = string.Empty;
                     return Token.Type;
                 }
-                else if (_inTag) // if we are in a tag then we expect to start reading parameters.
+
+                if (_inTag) // if we are in a tag then we expect to start reading parameters.
                 {
-                    if (maybeReadText("="))
+                    if (maybeReadText(PARAM_ASSIGN.ToString()))
                     {
                         if (!_inParam)
                         {
-                            return setupErrorToken("Unexpected '='. Did you forget a param name?", Line, Column - 1);
+                            return setupErrorToken("Unexpected " + PARAM_ASSIGN + ". Did you forget a param name?", Line, Column - 1);
                         }
-                        else
-                        {
-                            return consumeParamValue();
-                        }
+
+                        return consumeParamValue();
                     }
-                    else
-                    {
-                        return consumeParamName();
-                    }
+
+                    return consumeParamName();
                 }
-                else // Anything else is just text.
-                {
-                    return consumeTextOrTag();
-                }
+
+                return consumeTextOrTag();
             }
             catch (Exception ex)
             {
@@ -126,13 +136,19 @@ namespace JMW.Template
             return Token.Type;
         }
 
+        private static bool isComment(StringBuilder tb, int c)
+        {
+            return c == COMMENT_START && (tb.Length == 0 || tb[tb.Length - 1] != ESCAPE);
+        }
+
         internal TokenType consumeTextOrTag()
         {
             Token.Type = TokenType.TEXT;
             var consumed = false;
             var tb = new StringBuilder();
             var c = _reader.Read();
-            while (c != -1 && c != '<')
+            var l = -1;
+            while (c != -1 && c != BEGIN && !isComment(tb, c))
             {
                 // This is the unicode invalid character. If we encounter this it means we parsed the
                 // template with an invalid encoding. Or the template was stored with an invalid
@@ -142,7 +158,14 @@ namespace JMW.Template
                     return setupErrorToken(INVALID_UNICODE_ERROR);
                 }
                 consumed = true;
-                tb.Append((char)c);
+                if (l == ESCAPE && c == COMMENT_START)
+                {
+                    // you need to replace the escape with the actual char
+                    tb[tb.Length - 1] = (char)c;
+                }
+                else
+                    tb.Append((char)c);
+                l = c;
                 c = _reader.Read();
             }
             if (c != -1) // NOTE(jeremy): -1 when cast to a char is an invalid unicode char. Don't push it back!
@@ -154,49 +177,45 @@ namespace JMW.Template
                 Token.Value = tb.ToString();
                 return Token.Type;
             }
-            else // this should only trigger if we had an immediate tag or eof.
-            {
-                return Next();
-            }
+
+            return Next();
         }
 
         internal TokenType consumeParamValue()
         {
             var c = _reader.Read();
-            if (c == -1)
+            switch (c)
             {
-                _eof = true;
-                return setupErrorToken("EOF");
+                // this function only gets called when its reading a tag name, a parameter name, or a param value.
+                //  that being the case, if you hit the end of the file, then that's a syntax error, because you
+                //  would always want to find a closing tag marker.
+                case -1:
+                    return setupErrorToken("Invalid tag. Did you forget to add a " + CLOSE + "?", Line, Column);
+
+                case '"':
+                case '\'':
+                    return consumeUntil(c, TokenType.PARAMVALUE);
             }
-            if (c == '"' || c == '\'')
-            {
-                return consumeUntil(c, TokenType.PARAMVALUE);
-            }
-            else
-            {
-                _reader.PushBack((char)c);
-                return consumeIdentifier(TokenType.PARAMVALUE);
-            }
+
+            _reader.PushBack((char)c);
+            return consumeIdentifier(TokenType.PARAMVALUE);
         }
 
-        internal TokenType consumeUntil(int cc, TokenType type)
+        internal TokenType consumeUntil(int qry, TokenType type)
         {
             Token.Type = type;
             var c = _reader.Read();
             var value = new List<char>();
-            while (c != cc && c != 0)
+            while (c != qry && c > -1)
             {
                 value.Add((char)c);
                 c = _reader.Read();
             }
             if (c == -1)
             {
-                _eof = true;
+                return setupErrorToken("Unexpected end of template.  Did you forget to add a " + (char)qry + "?", Line, Column);
             }
-            else if (c != cc)
-            {
-                _reader.PushBack((char)c);
-            }
+            
             Token.Value = new string(value.ToArray());
             return type;
         }
@@ -211,7 +230,7 @@ namespace JMW.Template
         {
             if (_inTag)
             {
-                return setupErrorToken("Invalid tag. Did you forget to add a '>'?", Line, Column - 2);
+                return setupErrorToken("Invalid tag. Did you forget to add a " + CLOSE + "?", Line, Column - 2);
             }
             _inTag = true;
             return consumeIdentifier(type);
@@ -221,19 +240,20 @@ namespace JMW.Template
         {
             var identifier = new List<char>();
             var c = _reader.Read();
-            while (c != -1 && c != '/' && c != '>' && c != '<' && c != '=' && !Char.IsWhiteSpace((char)c))
+            while (c != -1 && c != FORWARD_SLASH && c != CLOSE && c != BEGIN && c != PARAM_ASSIGN && !Char.IsWhiteSpace((char)c))
             {
                 identifier.Add((char)c);
                 c = _reader.Read();
             }
             if (c == -1)
             {
-                _eof = true;
+                // this function only gets called when its reading a tag name, a parameter name, or a param value.
+                //  that being the case, if you hit the end of the file, then that's a syntax error, because you
+                //  would always want to find a closing tag marker.
+                return setupErrorToken("Invalid tag. Did you forget to add a " + CLOSE + "?", Line, Column);
             }
-            else
-            {
-                _reader.PushBack((char)c);
-            }
+
+            _reader.PushBack((char)c);
             Token.Type = type;
             Token.Value = new string(identifier.ToArray());
             consumeWhitespace();
@@ -243,7 +263,7 @@ namespace JMW.Template
         internal void consumeWhitespace()
         {
             var c = _reader.Read();
-            while (c != -1 && Char.IsWhiteSpace((char)c))
+            while (c != -1 && char.IsWhiteSpace((char)c))
             {
                 c = _reader.Read();
             }
@@ -257,34 +277,55 @@ namespace JMW.Template
             }
         }
 
+        internal TokenType consumeComment()
+        {
+            var c = _reader.Read();
+            if (c == -1)
+            {
+                _eof = true;
+                return setupErrorToken(EOF);
+            }
+            _reader.PushBack(new[] { (char)c });
+
+            consumeUntil('\n', TokenType.COMMENT);
+            Token.Value = Token.Value.TrimEnd('\r', '\n');
+            return Token.Type;
+        }
+
+        internal bool maybeReadCommentStart()
+        {
+            return maybeReadText(COMMENT_START.ToString());
+        }
+
         internal bool maybeReadBegin()
         {
-            return maybeReadText(_begin);
+            return maybeReadText(BEGIN.ToString());
         }
 
         internal bool maybeReadEnd()
         {
-            return maybeReadText(_end);
+            return maybeReadText(END);
         }
 
         internal bool maybeReadClose()
         {
-            return maybeReadText(_close);
+            return maybeReadText(CLOSE.ToString());
         }
 
         internal bool maybeReadSingleClose()
         {
-            var ok = maybeReadText(_singleClose);
+            var ok = maybeReadText(SINGLE_CLOSE);
 
             if (!ok)
             {
-                var isslash = maybeReadText(_slash);
+                var isslash = maybeReadText(FORWARD_SLASH.ToString());
                 if (isslash && _inTag)
                     throw new Exception("Single tag closing forward slash detected without closing angle bracket.");
-                else if (isslash)
+
+                if (isslash)
                 {
                     // put the text back.
-                    _reader.PushBack(_slash.ToCharArray().First());
+                    _reader.PushBack(FORWARD_SLASH);
                 }
             }
 
@@ -293,9 +334,7 @@ namespace JMW.Template
 
         internal bool maybeReadText(string text)
         {
-            char[] buf;
-            int n;
-            readText(text, out buf, out n);
+            readText(text, out var buf, out var n);
             var ok = (n == text.Length && new String(buf) == text);
             if (!ok)
             {

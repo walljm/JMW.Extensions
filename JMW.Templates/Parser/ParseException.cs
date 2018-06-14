@@ -6,11 +6,12 @@ namespace JMW.Template
     public class ParseException : Exception
     {
         public string Location { get; } = string.Empty;
-        public string ErrorText { get; } = string.Empty;
+        public string ErrorText { get; }
 
         public ParseException(string message)
             : base(message)
         {
+            ErrorText = message;
         }
 
         public ParseException(string message, Token token)
