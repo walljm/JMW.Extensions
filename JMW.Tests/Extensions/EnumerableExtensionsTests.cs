@@ -152,6 +152,220 @@ namespace JMW.Extensions.Enumerable.Tests
             Assert.That(new List<int> { 2, 4, 6, 8 }, Is.EquivalentTo(lst.Select(i => i.Value)));
         }
 
-        private class Foo { public int Value { get; set; } = 0; }
+        [Test]
+        public void GroupIntoSetsTest()
+        {
+            var lst = new List<Foo>
+            {
+                new Foo { Value = 0 },
+                new Foo { Value = 1 },
+                new Foo { Value = 2 },
+                new Foo { Value = 3 },
+                new Foo { Value = 4 },
+                new Foo { Value = 5 },
+                new Foo { Value = 6 },
+                new Foo { Value = 7 },
+                new Foo { Value = 8 },
+                new Foo { Value = 9 }
+            };
+
+            var sets = lst.GroupIntoSets(o => o.Value % 3 == 0).ToList();
+
+            Assert.That(sets.Count, Is.EqualTo(4));
+            Assert.That(sets[0].Count, Is.EqualTo(3));
+            Assert.That(sets[3].Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ToDictionaryOfManyTest()
+        {
+            var lst = new List<Foo>
+            {
+                new Foo { Value = 0, Bar=10 },
+                new Foo { Value = 1, Bar=20 },
+                new Foo { Value = 2, Bar=30 },
+                new Foo { Value = 3, Bar=40 },
+                new Foo { Value = 4, Bar=50 },
+                new Foo { Value = 5, Bar=60 },
+                new Foo { Value = 6, Bar=70 },
+                new Foo { Value = 7, Bar=80 },
+                new Foo { Value = 8, Bar=90 },
+                new Foo { Value = 9, Bar=100 }
+            };
+            var dict = lst.ToDictionaryOfMany(o => new List<int> { o.Value, o.Bar });
+
+            Assert.That(dict.Count, Is.EqualTo(20));
+            Assert.That(dict[0], Is.EqualTo(dict[10]));
+        }
+
+        [Test]
+        public void ToDictionaryOfHashSetsTest()
+        {
+            var lst = new List<Foo>
+            {
+                new Foo { Value = 0, Bar=10 },
+                new Foo { Value = 1, Bar=20 },
+                new Foo { Value = 2, Bar=10 },
+                new Foo { Value = 3, Bar=20 },
+                new Foo { Value = 4, Bar=10 },
+                new Foo { Value = 5, Bar=20 },
+                new Foo { Value = 6, Bar=10 },
+                new Foo { Value = 7, Bar=20 },
+                new Foo { Value = 8, Bar=10 },
+                new Foo { Value = 9, Bar=20 }
+            };
+            var dict = lst.ToDictionaryOfHashSets(o => o.Bar);
+
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict[10].Count, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void ToDictionaryOfListsTest()
+        {
+            var lst = new List<Foo>
+            {
+                new Foo { Value = 0, Bar=10 },
+                new Foo { Value = 1, Bar=20 },
+                new Foo { Value = 2, Bar=10 },
+                new Foo { Value = 3, Bar=20 },
+                new Foo { Value = 4, Bar=10 },
+                new Foo { Value = 5, Bar=20 },
+                new Foo { Value = 6, Bar=10 },
+                new Foo { Value = 7, Bar=20 },
+                new Foo { Value = 8, Bar=10 },
+                new Foo { Value = 9, Bar=20 }
+            };
+            var dict = lst.ToDictionaryOfLists(o => o.Bar);
+
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict[10].Count, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void ToDictionaryOfListsOfManyTest()
+        {
+            var lst = new List<Foo>
+            {
+                new Foo { Value = 0, Bar=10 },
+                new Foo { Value = 1, Bar=20 },
+                new Foo { Value = 2, Bar=10 },
+                new Foo { Value = 3, Bar=20 },
+                new Foo { Value = 4, Bar=10 },
+                new Foo { Value = 5, Bar=20 },
+                new Foo { Value = 6, Bar=10 },
+                new Foo { Value = 7, Bar=20 },
+                new Foo { Value = 8, Bar=10 },
+                new Foo { Value = 9, Bar=20 }
+            };
+            var dict = lst.ToDictionaryOfListsOfMany(o => new List<int> { o.Bar });
+
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict[10].Count, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void ToDictionaryOfHashSetsOfManyTest()
+        {
+            var lst = new List<Foo>
+            {
+                new Foo { Value = 0, Bar=10 },
+                new Foo { Value = 1, Bar=20 },
+                new Foo { Value = 2, Bar=10 },
+                new Foo { Value = 3, Bar=20 },
+                new Foo { Value = 4, Bar=10 },
+                new Foo { Value = 5, Bar=20 },
+                new Foo { Value = 6, Bar=10 },
+                new Foo { Value = 7, Bar=20 },
+                new Foo { Value = 8, Bar=10 },
+                new Foo { Value = 9, Bar=20 }
+            };
+            var dict = lst.ToDictionaryOfHashSetsOfMany(o => new List<int> { o.Bar, o.Value });
+
+            Assert.That(dict.Count, Is.EqualTo(12));
+            Assert.That(dict[10].Count, Is.EqualTo(5));
+        }
+
+        
+        [Test]
+        public void GetDuplicatesTest()
+        {
+            var lst = new List<int>
+            {
+                1,1,2,2,3,4,5,6,7,8,9,0,0,2,4,3,2,6
+            };
+            var dict = lst.GetDuplicates().ToList();
+
+            Assert.That(dict.Count, Is.EqualTo(8));
+        }
+
+        
+        [Test]
+        public void DisctinctTest()
+        {
+            var lst = new List<Foo>
+            {
+                new Foo { Value = 0, Bar=10 },
+                new Foo { Value = 1, Bar=20 },
+                new Foo { Value = 2, Bar=10 },
+                new Foo { Value = 3, Bar=20 },
+                new Foo { Value = 4, Bar=10 },
+                new Foo { Value = 5, Bar=20 },
+                new Foo { Value = 6, Bar=10 },
+                new Foo { Value = 7, Bar=20 },
+                new Foo { Value = 8, Bar=10 },
+                new Foo { Value = 9, Bar=20 }
+            };
+            var dict = lst.Distinct(k => k.Bar).ToList();
+
+            Assert.That(dict.Count, Is.EqualTo(2));
+        }
+        
+        [Test]
+        public void ShuffleTest()
+        {
+            var lst = new List<int>
+            {
+                1,2,3,4,5,6,7,8,9,0
+            };
+            lst.Shuffle();
+
+            Assert.That(lst[0] != 1);
+        }
+        
+        [Test]
+        public void IfHasKeyTest()
+        {
+            var lst = new List<Foo>
+            {
+                new Foo { Value = 0, Bar=10 },
+                new Foo { Value = 1, Bar=20 },
+                new Foo { Value = 2, Bar=30 },
+                new Foo { Value = 3, Bar=40 },
+                new Foo { Value = 4, Bar=50 },
+                new Foo { Value = 5, Bar=60 },
+                new Foo { Value = 6, Bar=70 },
+                new Foo { Value = 7, Bar=80 },
+                new Foo { Value = 8, Bar=90 },
+                new Foo { Value = 9, Bar=100 }
+            };
+            var dict = lst.ToDictionaryOfMany(o => new List<int> { o.Value, o.Bar });
+
+            dict.IfHasKey(0, o =>
+            {
+                Assert.AreEqual(0, o.Value);
+                Assert.AreEqual(10, o.Bar);
+            });
+            dict.IfHasKey(99, o => { Assert.Fail(); });
+
+            var did = dict.TryAdd(0, new Foo());
+            Assert.IsFalse(did);
+        }
+
+        private class Foo
+        {
+            public int Value { get; set; } = 0;
+            public int Bar { get; set; } = 0;
+        }
     }
 }

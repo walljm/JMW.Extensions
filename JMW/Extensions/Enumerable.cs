@@ -388,9 +388,9 @@ namespace JMW.Extensions.Enumerable
         /// <param name="lst">List to enumerate</param>
         /// <param name="get_key">Function that returns a string to be used as distinct value</param>
         /// <returns></returns>
-        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> lst, Func<T, string> get_key)
+        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> lst, Func<T, object> get_key)
         {
-            var hsh = new HashSet<string>();
+            var hsh = new HashSet<object>();
             foreach (var item in lst)
             {
                 if (hsh.TryAdd(get_key(item)))
@@ -504,9 +504,7 @@ namespace JMW.Extensions.Enumerable
         }
 
         /// <summary>
-        /// Creates a <see>
-        ///         <cref>Dictionary{K, HashSet{V}}</cref>
-        ///     </see>
+        /// Creates a <see><cref>Dictionary{K, HashSet{V}}</cref></see> that turns a list into a dictionary where multiple items with the same key are stored in a HashSet as the value of the dict.
         /// </summary>
         /// <typeparam name="K">Type of the key</typeparam>
         /// <typeparam name="V">Type of the value</typeparam>
@@ -523,14 +521,13 @@ namespace JMW.Extensions.Enumerable
         }
 
         /// <summary>
-        /// Creates a <see>
-        ///         <cref>Dictionary{K, V}</cref>
-        ///     </see>
+        /// Creates a <see><cref>Dictionary{K, V}</cref></see> of types that is indexed on multiple values of that type.
+        /// The keys must all be unique.
         /// </summary>
         /// <typeparam name="K">Type of the key</typeparam>
         /// <typeparam name="V">Type of the value</typeparam>
         /// <param name="lst">List of items to index</param>
-        /// <param name="get_keys">function that takes an item of type <typeparamref name="V"/> and returns a key of type <see cref="K"/>.</param>
+        /// <param name="get_keys">function that takes an item of type <typeparamref name="V"/> and returns an <see cref="IEnumerable{K}"/> of keys to be indexed by.</param>
         /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="get_keys"/></returns>
         public static Dictionary<K, V> ToDictionaryOfMany<K, V>(this IEnumerable<V> lst, Func<V, IEnumerable<K>> get_keys)
         {
@@ -561,9 +558,9 @@ namespace JMW.Extensions.Enumerable
         /// Groups a list of sequential items into sets using a function to determine where a set begins.
         /// </summary>
         /// <param name="items">List of lines to group</param>
-        /// <param name="is_beginning"></param>
-        /// <returns></returns>
-        public static IEnumerable<List<T>> GroupIntoSets<T>(this IEnumerable<T> items, Func<T, bool> is_beginning)
+        /// <param name="is_beginning">This function is evaluated against each item in the <paramref name="items"/> and returns true if the item is the beginning of a new set.</param>
+        /// <typeparam name="T">Type of item to be grouped.</typeparam>
+        public static IEnumerable<List<T>> GroupIntoSets<T>(this IEnumerable<T> items, Predicate<T> is_beginning)
         {
             var set = new List<T>();
             var first = true;
