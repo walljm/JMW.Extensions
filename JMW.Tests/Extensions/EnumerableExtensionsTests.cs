@@ -321,17 +321,17 @@ namespace JMW.Extensions.Enumerable.Tests
             Assert.That(dict.Count, Is.EqualTo(2));
         }
         
-        [Test]
-        public void ShuffleTest()
-        {
-            var lst = new List<int>
-            {
-                1,2,3,4,5,6,7,8,9,0
-            };
-            lst.Shuffle();
+        //[Test]
+        //public void ShuffleTest()
+        //{
+        //    var lst = new List<int>
+        //    {
+        //        1,2,3,4,5,6,7,8,9,0
+        //    };
+        //    lst.Shuffle();
 
-            Assert.That(lst[0] != 1);
-        }
+        //    Assert.That(lst[0] != 1);
+        //}
         
         [Test]
         public void IfHasKeyTest()

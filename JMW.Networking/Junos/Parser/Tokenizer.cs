@@ -15,7 +15,6 @@ namespace JMW.Networking.Junos.Parser
         private readonly string _arrayStart = @"[";
         private readonly string _arrayStop = @"]";
         private readonly string _commentBlockStart = @"/*";
-        private readonly string _commentBlockStop = @"*/";
         private readonly string _commentStart = @"#";
         private readonly string _LineStop = @";";
 

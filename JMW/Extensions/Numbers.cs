@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JMW.Types;
+using Lambda.Generic.Arithmetic;
 
 namespace JMW.Extensions.Numbers
 {
@@ -641,60 +642,29 @@ namespace JMW.Extensions.Numbers
             return r;
         }
 
-        public static List<IntegerRange> CollapseIntsToIntegerRanges(this IEnumerable<int> ints)
+        public static IEnumerable<IntegerRange> CollapseIntsToIntegerRanges(this IEnumerable<int> ints)
         {
-            var r = new List<IntegerRange>();
-            var prev = -1;
-            var current = -1;
-
-            var sorted = ints.Distinct().OrderBy(i => i).ToList();
-
-            if (sorted.Count > 1)
-            {
-                for (var i = 1; i < sorted.Count; i++)
-                {
-                    prev = sorted[i - 1];
-                    current = sorted[i];
-
-                    if (prev + 1 == current) // you're at the start of a range.
-                    {
-                        var first = prev;
-
-                        while (prev + 1 == current)
-                        {
-                            prev = current;
-                            if (i < sorted.Count - 1)
-                            {
-                                current = sorted[++i];
-                            }
-                            else { break; }
-                        }
-                        r.Add(new IntegerRange(first, prev));
-                    }
-                    else // its a single.
-                    {
-                        r.Add(new IntegerRange(prev, prev));
-                    }
-                }
-            }
-            else if (sorted.Count == 1)
-            {
-                r.Add(new IntegerRange(sorted[0], sorted[0]));
-            }
-
-            if (prev != current)
-            {
-                r.Add(new IntegerRange(sorted.Last(), sorted.Last()));
-            }
-
+            var r = ints.Select(i => new Signed<int, IntMath>(i))
+                .CollapseNumbersToRanges()
+                .Select(i => new IntegerRange(i));
             return r;
         }
 
-        public static List<LongRange> CollapseLongsToLongRanges(this IEnumerable<long> ints)
+        public static IEnumerable<LongRange> CollapseLongsToLongRanges(this IEnumerable<long> ints)
         {
-            var r = new List<LongRange>();
-            long prev = -1;
-            long current = -1;
+            return ints.Select(i => new Signed<long, LongMath>(i))
+                .CollapseNumbersToRanges()
+                .Select(i => new LongRange(i));
+        }
+
+        public static List<Range<T, C>> CollapseNumbersToRanges<T, C>(this IEnumerable<Signed<T, C>> ints)
+            where T : IComparable<T>, IComparable, IFormattable, IConvertible, IEquatable<T>, new()
+            where C : ISignedMath<T>, new()
+        {
+            var calc = new C();
+            var r = new List<Range<T, C>>();
+            Signed<T, C> prev = calc.Negate(calc.One);
+            Signed<T, C> current = calc.Negate(calc.One);
 
             var sorted = ints.Distinct().OrderBy(i => i).ToList();
 
@@ -705,11 +675,11 @@ namespace JMW.Extensions.Numbers
                     prev = sorted[i - 1];
                     current = sorted[i];
 
-                    if (prev + 1 == current) // you're at the start of a range.
+                    if (prev + Signed<T, C>.One == current) // you're at the start of a range.
                     {
                         var first = prev;
 
-                        while (prev + 1 == current)
+                        while (prev + Signed<T, C>.One == current)
                         {
                             prev = current;
                             if (i < sorted.Count - 1)
@@ -718,22 +688,22 @@ namespace JMW.Extensions.Numbers
                             }
                             else { break; }
                         }
-                        r.Add(new LongRange(first, prev));
+                        r.Add(new Range<T, C>(first, prev));
                     }
                     else // its a single.
                     {
-                        r.Add(new LongRange(prev, prev));
+                        r.Add(new Range<T, C>(prev, prev));
                     }
                 }
             }
             else if (sorted.Count == 1)
             {
-                r.Add(new LongRange(sorted[0], sorted[0]));
+                r.Add(new Range<T, C>(sorted[0], sorted[0]));
             }
 
             if (prev != current)
             {
-                r.Add(new LongRange(sorted.Last(), sorted.Last()));
+                r.Add(new Range<T, C>(sorted.Last(), sorted.Last()));
             }
 
             return r;

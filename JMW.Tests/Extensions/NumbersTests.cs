@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JMW.Types;
 using NUnit.Framework;
 
@@ -221,11 +222,10 @@ namespace JMW.Extensions.Numbers.Tests
                 new IntegerRange(11,11)
             };
 
-            Assert.AreEqual(expected.Count, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges().Count);
-            Assert.AreEqual(expected[1].Start, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges()[1].Start);
-            Assert.AreEqual(expected[1].Stop, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges()[1].Stop);
+            Assert.AreEqual(expected.Count, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges().ToList().Count);
+            Assert.AreEqual(expected[1].Start, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges().ToList()[1].Start);
+            Assert.AreEqual(expected[1].Stop, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges().ToList()[1].Stop);
         }
-
 
         [Test]
         public void IsNearlyEqualTest()

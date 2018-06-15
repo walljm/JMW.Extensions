@@ -1,59 +1,124 @@
-using JMW.Extensions.Enumerable;
-using JMW.Extensions.Numbers;
-using JMW.Extensions.String;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JMW.Extensions.Enumerable;
+using JMW.Extensions.Numbers;
+using JMW.Extensions.String;
+using Lambda.Generic.Arithmetic;
 
 namespace JMW.Types
 {
-    public class IntegerRangeCollection : IList<IntegerRange>
+    public class LongRangeCollection : RangeCollection<long, LongMath>
     {
-        #region Constructors
+        public LongRangeCollection()
+        {
+        }
 
+        public LongRangeCollection(IEnumerable<Range<long, LongMath>> rng) : base(rng)
+        {
+        }
+
+        public LongRangeCollection(Range<long, LongMath> rng) : base(rng)
+        {
+        }
+
+        public LongRangeCollection(Signed<long, LongMath> start, Signed<long, LongMath> stop) : base(start, stop)
+        {
+        }
+
+        public LongRangeCollection(string rng) : base(rng)
+        {
+        }
+
+        public LongRangeCollection(IEnumerable<string> rng) : base(rng)
+        {
+        }
+
+        public LongRangeCollection(IEnumerable<Signed<long, LongMath>> rng) : base(rng)
+        {
+        }
+    }
+
+    public class IntegerRangeCollection : RangeCollection<int, IntMath>
+    {
         public IntegerRangeCollection()
         {
         }
 
-        public IntegerRangeCollection(IEnumerable<IntegerRange> rng)
+        public IntegerRangeCollection(IEnumerable<Range<int, IntMath>> rng) : base(rng)
+        {
+        }
+
+        public IntegerRangeCollection(Range<int, IntMath> rng) : base(rng)
+        {
+        }
+
+        public IntegerRangeCollection(Signed<int, IntMath> start, Signed<int, IntMath> stop) : base(start, stop)
+        {
+        }
+
+        public IntegerRangeCollection(string rng) : base(rng)
+        {
+        }
+
+        public IntegerRangeCollection(IEnumerable<string> rng) : base(rng)
+        {
+        }
+
+        public IntegerRangeCollection(IEnumerable<Signed<int, IntMath>> rng) : base(rng)
+        {
+        }
+    }
+
+    public class RangeCollection<T, C> : IList<Range<T, C>>
+        where T :  IComparable<T>, IComparable, IFormattable, IConvertible, IEquatable<T>, new()
+        where C : ISignedMath<T>, new()
+    {
+        #region Constructors
+
+        public RangeCollection()
+        {
+        }
+
+        public RangeCollection(IEnumerable<Range<T, C>> rng)
         {
             var rngs = rng.OrderBy(r => r.Start).ToList();
             collapseRanges(rngs);
             rngs.Each(i => Ranges.Add(i.Start, i)); // add them to the range.;
         }
 
-        public IntegerRangeCollection(IntegerRange rng)
+        public RangeCollection(Range<T, C> rng)
         {
-            Ranges.Add(rng.Start, new IntegerRange(rng));
+            Ranges.Add(rng.Start, new Range<T, C>(rng));
         }
 
-        public IntegerRangeCollection(int start, int stop)
+        public RangeCollection(Signed<T, C> start, Signed<T, C> stop)
         {
-            Ranges.Add(start, new IntegerRange(start, stop));
+            Ranges.Add(start, new Range<T, C>(start, stop));
         }
 
-        public IntegerRangeCollection(string rng)
+        public RangeCollection(string rng)
         {
             getCleanInts(rng.Split(',')).Each(i => Ranges.Add(i.Start, i)); // add them to the range.
         }
 
-        public IntegerRangeCollection(IEnumerable<string> rng)
+        public RangeCollection(IEnumerable<string> rng)
         {
             getCleanInts(rng).Each(i => Ranges.Add(i.Start, i)); // add them to the range.
         }
 
-        public IntegerRangeCollection(IEnumerable<int> rng)
+        public RangeCollection(IEnumerable<Signed<T, C>> rng)
         {
-            rng.CollapseIntsToIntegerRanges() // turn back into objects
+            rng.CollapseNumbersToRanges() // turn back into objects
                .Each(i => Ranges.Add(i.Start, i)); // add them to the range.
         }
 
-        private static IEnumerable<IntegerRange> getCleanInts(IEnumerable<string> rng)
+        private static IEnumerable<Range<T, C>> getCleanInts(IEnumerable<string> rng)
         {
             var rngs = rng.Select(o => o.Trim()) // trim whitespace
                 .Where(o => o.Length > 0 && (o.Contains('-') || o.IsIntFast())) // eliminate empty strings
-                .Select(o => new IntegerRange(o))// create ranges
+                .Select(o => new Range<T, C>(o))// create ranges
                 .OrderBy(r => r.Start)
                 .ToList();
             collapseRanges(rngs);
@@ -64,13 +129,13 @@ namespace JMW.Types
 
         #region Properties
 
-        public SortedList<int, IntegerRange> Ranges { get; set; } = new SortedList<int, IntegerRange>();
+        public SortedList<Signed<T, C>, Range<T, C>> Ranges { get; set; } = new SortedList<Signed<T, C>, Range<T, C>>();
 
         #endregion Properties
 
         #region Public Methods
 
-        public void AddUniqueIntegersFromRange(IEnumerable<string> lst)
+        public void AddUniqueLongsFromRange(IEnumerable<string> lst)
         {
             var lookup = Ranges.Select(v => v.ToString()).ToHashSet();
             foreach (var i in lst)
@@ -97,10 +162,10 @@ namespace JMW.Types
                 }
             }
 
-            AddRange(lookup.Select(v => new IntegerRange(v)));
+            AddRange(lookup.Select(v => new Range<T, C>(v)));
         }
 
-        public bool Contains(int num)
+        public bool Contains(Signed<T, C> num)
         {
             return IsInRange(num);
         }
@@ -108,14 +173,14 @@ namespace JMW.Types
         public bool Contains(string num)
         {
             if (!num.IsInt()) return false;
-            return IsInRange(num.ToInt());
+            return IsInRange(Signed<T, C>.Parse(num));
         }
 
         /// <summary>
         /// Returns true if the provided int is included in the ranges.
         /// </summary>
         /// <param name="num">number to check</param>
-        public bool IsInRange(int num)
+        public bool IsInRange(Signed<T, C> num)
         {
             var lo = 0;
             var hi = Ranges.Count - 1;
@@ -141,7 +206,7 @@ namespace JMW.Types
         public bool IsInRange(string num)
         {
             if (!num.IsInt()) return false;
-            return IsInRange(num.ToInt());
+            return IsInRange(Signed<T, C>.Parse(num));
         }
 
         public string RangeToString()
@@ -149,14 +214,14 @@ namespace JMW.Types
             return Ranges.Values.Select(o => o.ToString()).ToDelimitedString(',');
         }
 
-        public bool IntersectsWith(IntegerRange rng)
+        public bool IntersectsWith(Range<T, C> rng)
         {
             return Ranges.Any(o => o.Value.IntersectsWith(rng));
         }
 
-        public List<int> GetInts()
+        public List<Signed<T, C>> GetInts()
         {
-            return Ranges.Values.SelectMany(o => o.GetInts()).OrderBy(o => o).ToList();
+            return Ranges.Values.SelectMany(o => o.GetNumbers()).OrderBy(o => o).ToList();
         }
 
         public override string ToString()
@@ -170,16 +235,16 @@ namespace JMW.Types
 
         public static List<string> ExplodeRange(string rng)
         {
-            var lst = new IntegerRangeCollection();
-            lst.AddUniqueIntegersFromRange(rng.Split(','));
-            return lst.SelectMany(v => v.GetInts().Select(i => i.ToString())).ToList();
+            var lst = new RangeCollection<T, C>();
+            lst.AddUniqueLongsFromRange(rng.Split(','));
+            return lst.SelectMany(v => v.GetNumbers().Select(i => i.ToString())).ToList();
         }
 
         #endregion Public Static
 
         #region IList
 
-        IEnumerator<IntegerRange> IEnumerable<IntegerRange>.GetEnumerator()
+        IEnumerator<Range<T, C>> IEnumerable<Range<T, C>>.GetEnumerator()
         {
             return Ranges.Values.GetEnumerator();
         }
@@ -189,13 +254,16 @@ namespace JMW.Types
             return ((IEnumerable)Ranges.Values).GetEnumerator();
         }
 
-        public void CopyTo(Array array, int index)
+        public void CopyTo(Array array, Signed<T, C> index)
         {
             throw new NotImplementedException();
         }
 
-        public bool Remove(IntegerRange item)
+        public bool Remove(Range<T, C> item)
         {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
             return Ranges.Remove(item.Start);
         }
 
@@ -210,22 +278,25 @@ namespace JMW.Types
             Ranges.Clear();
         }
 
-        public bool Contains(IntegerRange item)
+        public bool Contains(Range<T, C> item)
         {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
             return Ranges.Values.Any(i => i.Start == item.Start && i.Stop == item.Stop);
         }
 
-        public void CopyTo(IntegerRange[] array, int arrayIndex)
+        public void CopyTo(Range<T, C>[] array, int arrayIndex)
         {
             Ranges.Values.CopyTo(array, arrayIndex);
         }
 
-        public int IndexOf(IntegerRange item)
+        public int IndexOf(Range<T, C> item)
         {
             return Ranges.Values.IndexOf(item);
         }
 
-        public void Insert(int index, IntegerRange item)
+        public void Insert(int index, Range<T, C> item)
         {
             throw new NotImplementedException();
         }
@@ -235,7 +306,7 @@ namespace JMW.Types
             Ranges.RemoveAt(index);
         }
 
-        IntegerRange IList<IntegerRange>.this[int index]
+        Range<T, C> IList<Range<T, C>>.this[int index]
         {
             get { return Ranges.Values[index]; }
             set { Ranges.RemoveAt(index); Add(value); }
@@ -247,12 +318,12 @@ namespace JMW.Types
 
         #endregion IList
 
-        public void Add(IntegerRange item)
+        public void Add(Range<T, C> item)
         {
             AddRange(item.ToListOfItem());
         }
 
-        public void AddRange(IEnumerable<IntegerRange> items)
+        public void AddRange(IEnumerable<Range<T, C>> items)
         {
             var lst = mergeVlanRanges(Ranges.Values.ToList(), items.ToList());
             Ranges.Clear();
@@ -261,18 +332,18 @@ namespace JMW.Types
 
         public void AddRange(IEnumerable<string> items)
         {
-            var lst = mergeVlanRanges(Ranges.Values.ToList(), new IntegerRangeCollection(items).ToList());
+            var lst = mergeVlanRanges(Ranges.Values.ToList(), new RangeCollection<T, C>(items).ToList());
             Ranges.Clear();
             lst.Each(o => Ranges.Add(o.Start, o));
         }
 
-        private static List<IntegerRange> mergeVlanRanges(IList<IntegerRange> a, IList<IntegerRange> b)
+        private static List<Range<T, C>> mergeVlanRanges(IList<Range<T, C>> a, IList<Range<T, C>> b)
         {
-            var rngs = new List<IntegerRange>();
+            var rngs = new List<Range<T, C>>();
 
             while (b.Count > 0 && a.Count > 0)
             {
-                IntegerRange r;
+                Range<T, C> r;
 
                 if (b[0].Start <= a[0].Start)
                 {
@@ -281,9 +352,9 @@ namespace JMW.Types
                     if (b[0].Stop >= a[0].Start)
                     {
                         if (b[0].Stop > a[0].Stop)
-                            r = new IntegerRange(r.Start, b[0].Stop);
+                            r = new Range<T, C>(r.Start, b[0].Stop);
                         else
-                            r = new IntegerRange(r.Start, a[0].Stop);
+                            r = new Range<T, C>(r.Start, a[0].Stop);
 
                         a.RemoveAt(0); // in this case, b includes a, so a should be removed also.
                     }
@@ -298,9 +369,9 @@ namespace JMW.Types
                     if (a[0].Stop >= b[0].Start)
                     {
                         if (a[0].Stop > b[0].Stop)
-                            r = new IntegerRange(r.Start, a[0].Stop);
+                            r = new Range<T, C>(r.Start, a[0].Stop);
                         else
-                            r = new IntegerRange(r.Start, b[0].Stop);
+                            r = new Range<T, C>(r.Start, b[0].Stop);
 
                         b.RemoveAt(0); // in this case, a includes b, so b should be removed also.
                     }
@@ -317,7 +388,7 @@ namespace JMW.Types
             return rngs;
         }
 
-        private static void collapseRanges(List<IntegerRange> rngs)
+        private static void collapseRanges(IList<Range<T, C>> rngs)
         {
             // collapse contiguous ranges together
             for (var i = 1; i < rngs.Count; i++)
@@ -325,10 +396,10 @@ namespace JMW.Types
                 var prev = rngs[i - 1];
                 var next = rngs[i];
 
-                if (prev.Stop + 1 >= next.Start)
+                if (prev.Stop + Signed<T, C>.One >= next.Start)
                 {
                     if (prev.Stop <= next.Stop)
-                        rngs[i - 1] = new IntegerRange(prev.Start, next.Stop);
+                        rngs[i - 1] = new Range<T, C>(prev.Start, next.Stop);
 
                     rngs.RemoveAt(i);
                     i--;

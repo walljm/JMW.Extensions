@@ -35,6 +35,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Arithmetic\Calculators.cs" />
+    <Compile Include="Arithmetic\Interfaces.cs" />
+    <Compile Include="Arithmetic\Wrappers.cs" />
     <Compile Include="Collections\IndexedAttribute.cs" />
     <Compile Include="Collections\ObservableClass.cs" />
     <Compile Include="Collections\IndexedClass.cs" />
@@ -53,10 +56,8 @@
     <Compile Include="Functional\Optional.cs" />
     <Compile Include="IO\FileExtensions.cs" />
     <Compile Include="IO\LineTrackingReader.cs" />
-    <Compile Include="Types\LongRange.cs" />
-    <Compile Include="Types\IntegerRange.cs" />
-    <Compile Include="Types\LongRangeCollection.cs" />
-    <Compile Include="Types\IntegerRangeCollection.cs" />
+    <Compile Include="Types\Range.cs" />
+    <Compile Include="Types\RangeCollection.cs" />
     <Compile Include="Types\Pair.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions\Reflection.cs" />
