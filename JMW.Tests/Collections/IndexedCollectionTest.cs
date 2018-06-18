@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace JMW.Collections.Tests
 {
@@ -163,6 +163,34 @@ namespace JMW.Collections.Tests
             f1.IndexedPropertyChanged += F1_IndexedPropertyChanged;
             f1.ClearIndexedPropertyChanged();
             Assert.That(f1.IndexedPropertyChangedEventCount == 0);
+        }
+
+        [Test]
+        public void Test2()
+        {
+            var cnt = 0;
+            var msg = "";
+
+            var idx = new IndexedCollection<Foo>();
+            idx.IndexViolated += (o, e) => { cnt++;
+                msg = e.ErrorMessage;
+            };
+            var f1 = new Foo { Bar = "jason", BarCollection = new List<string> { "one", "two" }, Baz = "me", BazCollection = new List<int> { 1, 2 } };
+            var f2 = new Foo { Bar = "wall", BarCollection = new List<string> { "three", "two" }, Baz = "me", BazCollection = new List<int> { 3, 4 } };
+            var f3 = new Foo { Bar = "wall", BarCollection = new List<string> { "three", "two" }, Baz = "me", BazCollection = new List<int> { 3, 4 } };
+            idx.Add(f1);
+            idx.Add(f2);
+            try
+            {
+                idx.Add(f3);
+            }
+            catch (OperationCanceledException ex)
+            {
+                Assert.AreEqual("Operation was cancelled due to an index violation. The Index may have been violated.", ex.Message);
+            }
+
+            Assert.AreEqual(1, cnt);
+            Assert.AreEqual("Value violated index 'Bar' using key 'wall'", msg);
         }
 
         private void F1_IndexedPropertyChanged(object sender, IndexedPropertyChangedEventArgs e)

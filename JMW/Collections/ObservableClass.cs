@@ -46,10 +46,10 @@ namespace JMW.Collections
         ///
         /// <para>Specifically PropertyChanged and PropertyChanging</para>
         /// </summary>
-        public void ClearEvents()
+        public virtual void ClearEvents()
         {
-            _PropertyChanged.Clear();
-            _PropertyChanging.Clear();
+            ClearPropertyChanged();
+            ClearPropertyChanging();
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace JMW.Collections
         /// using the <see cref="CallerMemberNameAttribute"/> via the magic of C# 6.
         /// </param>
         /// <returns>true/false indicating the success of the operation.  false if the field is null or the value is the same</returns>
-        protected bool Set<T>(ref T field, T value, [CallerMemberName]string property_name = "")
+        protected virtual bool Set<T>(ref T field, T value, [CallerMemberName]string property_name = "")
         {
             // if the field and the value are the same, don't bother.
             if (EqualityComparer<T>.Default.Equals(field, value))

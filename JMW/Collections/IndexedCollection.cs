@@ -9,10 +9,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-using JMW.Extensions.Enumerable;
-using JMW.Extensions.Reflection;
-using JMW.Functional;
-using JMW.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,6 +17,10 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using JMW.Extensions.Enumerable;
+using JMW.Extensions.Reflection;
+using JMW.Functional;
+using JMW.Reflection;
 
 namespace JMW.Collections
 {
@@ -245,8 +245,8 @@ namespace JMW.Collections
         {
             if (_uniqueIndexCollection.ContainsKey(name))
                 return new Maybe<Dictionary<string, T>>(_uniqueIndexCollection[name].ToDictionary(k => k.Key, v => v.Value));
-            else
-                return new Maybe<Dictionary<string, T>>(new ArgumentException("Property \"" + name + "\" does not exist."));
+
+            return new Maybe<Dictionary<string, T>>(new ArgumentException("Property \"" + name + "\" does not exist."));
         }
 
         /// <summary>
@@ -300,8 +300,8 @@ namespace JMW.Collections
         {
             if (_indexCollection.ContainsKey(name))
                 return new Maybe<Dictionary<string, List<T>>>(_indexCollection[name].ToDictionary(k => k.Key, v => v.Value.ToList()));
-            else
-                return new Maybe<Dictionary<string, List<T>>>(new ArgumentException("Property \"" + name + "\" does not exist."));
+
+            return new Maybe<Dictionary<string, List<T>>>(new ArgumentException("Property \"" + name + "\" does not exist."));
         }
 
         /// <summary>
@@ -393,6 +393,9 @@ namespace JMW.Collections
         /// <returns>Returns true if the item was successfully removed.</returns>
         public bool Remove(T item)
         {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
             var r = removeFromDictionaries(item);
             _collection.Remove(item);
             item.IndexedPropertyChanged -= onIndexedPropertyChanged;
@@ -447,9 +450,11 @@ namespace JMW.Collections
                     var after = ((IEnumerable)e.After).GetEnumerator();
 
                     while (before.MoveNext())
+                        // ReSharper disable once PossibleNullReferenceException
                         unique_index.Remove(before.Current.ToString());
 
                     while (after.MoveNext())
+                        // ReSharper disable once PossibleNullReferenceException
                         unique_index.Add(after.Current.ToString(), (T)sender);
                 }
                 else
@@ -536,7 +541,7 @@ namespace JMW.Collections
                             var key = o.ToString();
                             if (_uniqueIndexCollection[p.Name].AddIfNotPresent(key, val)) continue;
 
-                            IndexViolated?.Invoke(this, new IndexViolationEventArgs<T>(val, "Value violated index " + p.Name + " using key " + key));
+                            IndexViolated?.Invoke(this, new IndexViolationEventArgs<T>(val, "Value violated index '" + p.Name + "' using key '" + key + "'"));
                             return false;
                         }
                     }
@@ -545,7 +550,7 @@ namespace JMW.Collections
                         var key = p.GetValue(val, null).ToString();
                         if (_uniqueIndexCollection[p.Name].AddIfNotPresent(key, val)) continue;
 
-                        IndexViolated?.Invoke(this, new IndexViolationEventArgs<T>(val, "Value violated index " + p.Name + " using key " + key));
+                        IndexViolated?.Invoke(this, new IndexViolationEventArgs<T>(val, "Value violated index '" + p.Name + "' using key '" + key + "'"));
                         return false;
                     }
                 }
@@ -559,7 +564,7 @@ namespace JMW.Collections
 
                         foreach (var o in objs)
                         {
-                            var key = prop.IsDict ? o.GetType().GetProperty("Value").GetValue(o).ToString() : o.ToString();
+                            var key = prop.IsDict ? o.GetType().GetProperty(nameof(KeyValuePair<string, T>.Value))?.GetValue(o).ToString() : o.ToString();
                             _indexCollection[p.Name].SafeAdd(key, val);
                         }
                     }
@@ -598,7 +603,7 @@ namespace JMW.Collections
                             var key = o.ToString();
                             if (_uniqueIndexCollection[p.Name].Remove(key)) continue;
 
-                            IndexViolated?.Invoke(this, new IndexViolationEventArgs<T>(val, "Value was not found in index " + p.Name + " using key " + key));
+                            IndexViolated?.Invoke(this, new IndexViolationEventArgs<T>(val, "Value was not found in index '" + p.Name + "' using key '" + key + "'"));
                             return false;
                         }
                     }
@@ -607,7 +612,7 @@ namespace JMW.Collections
                         var key = p.GetValue(val, null).ToString();
                         if (_uniqueIndexCollection[p.Name].Remove(key)) continue;
 
-                        IndexViolated?.Invoke(this, new IndexViolationEventArgs<T>(val, "Value was not found in index " + p.Name + " using key " + key));
+                        IndexViolated?.Invoke(this, new IndexViolationEventArgs<T>(val, "Value was not found in index '" + p.Name + "' using key '" + key + "'"));
                         return false;
                     }
                 }
@@ -621,8 +626,10 @@ namespace JMW.Collections
 
                         foreach (var o in objs)
                         {
-                            var key = prop.IsDict ? o.GetType().GetProperty("Value").GetValue(o).ToString() : o.ToString();
+                            var key = prop.IsDict ? o.GetType().GetProperty(nameof(KeyValuePair<string, T>.Value))?.GetValue(o).ToString() : o.ToString();
                             var idx = _indexCollection[p.Name];
+                            if (key == null)
+                                throw new ArgumentNullException(nameof(key), "Unable to retrieve the value of the KeyValuePair.");
                             if (idx[key].Count > 1)
                                 idx[key].Remove(val);
                             else
@@ -702,6 +709,9 @@ namespace JMW.Collections
 
         public void Insert(int index, T item)
         {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
             item.IndexedPropertyChanged -= onIndexedPropertyChanged;
             addToDictionaries(item);
 

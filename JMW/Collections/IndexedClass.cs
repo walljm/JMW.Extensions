@@ -9,12 +9,12 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-using JMW.Extensions.Reflection;
-using JMW.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using JMW.Extensions.Reflection;
+using JMW.Types;
 
 namespace JMW.Collections
 {
@@ -35,7 +35,7 @@ namespace JMW.Collections
     /// <para>The only caveat here is that you must add the <see cref="Indexed"/> attribute to the appropriate
     /// property and use the Set method to handle setting props to trigger the event.</para>
     /// </summary>
-    public abstract class IndexedClass : INotifyPropertyChanged, INotifyPropertyChanging
+    public abstract class IndexedClass : ObservableClass
     {
         /// <summary>
         /// The signature of the <see cref="IndexedPropertyChangedHandler"/> used by the <see cref="IndexedPropertyChanged"/>
@@ -46,16 +46,6 @@ namespace JMW.Collections
         public delegate void IndexedPropertyChangedHandler(object sender, IndexedPropertyChangedEventArgs e);
 
         #region Properties
-
-        /// <summary>
-        /// The number of registered handlers for the event.
-        /// </summary>
-        public int PropertyChangingEventCount => _PropertyChanging.HandlerCount;
-
-        /// <summary>
-        /// The number of registered handlers for the event.
-        /// </summary>
-        public int PropertyChangedEventCount => _PropertyChanged.HandlerCount;
 
         /// <summary>
         /// The number of registered handlers for the event.
@@ -71,11 +61,10 @@ namespace JMW.Collections
         ///
         /// <para>Specifically IndexedPropertyChanged, PropertyChanged, and PropertyChanging</para>
         /// </summary>
-        public void ClearEvents()
+        public override void ClearEvents()
         {
             _IndexedPropertyChanged.Clear();
-            _PropertyChanged.Clear();
-            _PropertyChanging.Clear();
+            base.ClearEvents();
         }
 
         /// <summary>
@@ -84,22 +73,6 @@ namespace JMW.Collections
         public void ClearIndexedPropertyChanged()
         {
             _IndexedPropertyChanged.Clear();
-        }
-
-        /// <summary>
-        /// Clears the PropertyChanged events.
-        /// </summary>
-        public void ClearPropertyChanged()
-        {
-            _PropertyChanged.Clear();
-        }
-
-        /// <summary>
-        /// Clears the PropertyChanging events.
-        /// </summary>
-        public void ClearPropertyChanging()
-        {
-            _PropertyChanging.Clear();
         }
 
         #endregion Public Methods
@@ -121,35 +94,6 @@ namespace JMW.Collections
             remove { _IndexedPropertyChanged.Unsubscribe(value.CastDelegate<EventHandler<IndexedPropertyChangedEventArgs>>()); }
         }
 
-        private readonly WeakEventSource<PropertyChangingEventArgs> _PropertyChanging = new WeakEventSource<PropertyChangingEventArgs>();
-        /// <summary>
-        /// The <see cref="INotifyPropertyChanging"/> event.  Gives you the property name before
-        /// the value is changed.
-        ///
-        /// <para>Event references are weak.  Events only fire if the connected
-        /// objects have not been collected by the GC.  <see cref="WeakReference"/>'s don't prevent
-        /// the GC from collecting the objects if there are no more references to them.</para>
-        /// </summary>
-        public event PropertyChangingEventHandler PropertyChanging
-        {
-            add { _PropertyChanging.Subscribe(value.CastDelegate<EventHandler<PropertyChangingEventArgs>>()); }
-            remove { _PropertyChanging.Unsubscribe(value.CastDelegate<EventHandler<PropertyChangingEventArgs>>()); }
-        }
-
-        private readonly WeakEventSource<PropertyChangedEventArgs> _PropertyChanged = new WeakEventSource<PropertyChangedEventArgs>();
-        /// <summary>
-        /// The <see cref="INotifyPropertyChanged"/> event.  Gives you the property name after
-        /// the value has changed.
-        /// <para>Event references are weak.  Events only fire if the connected
-        /// objects have not been collected by the GC.  <see cref="WeakReference"/>'s don't prevent
-        /// the GC from collecting the objects if there are no more references to them.</para>
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged
-        {
-            add { _PropertyChanged.Subscribe(value.CastDelegate<EventHandler<PropertyChangedEventArgs>>()); }
-            remove { _PropertyChanged.Unsubscribe(value.CastDelegate<EventHandler<PropertyChangedEventArgs>>()); }
-        }
-
         #endregion Events
 
         /// <summary>
@@ -162,17 +106,14 @@ namespace JMW.Collections
         /// using the <see cref="CallerMemberNameAttribute"/> via the magic of C# 6.
         /// </param>
         /// <returns>true/false indicating the success of the operation.  false if the field is null or the value is the same</returns>
-        protected bool Set<T>(ref T field, T value, [CallerMemberName]string property_name = "")
+        protected override bool Set<T>(ref T field, T value, [CallerMemberName]string property_name = "")
         {
             // if the value and the field are the same, then don't bother.
             if (EqualityComparer<T>.Default.Equals(field, value))
                 return false;
 
-            raisePropertyChanging(property_name);
             raiseIndexedPropertyChanging(property_name, field, value);
-            field = value;
-            raisePropertyChanged(property_name);
-            return true;
+            return base.Set(ref field, value, property_name);
         }
 
         #region Private Methods
@@ -180,16 +121,6 @@ namespace JMW.Collections
         private void raiseIndexedPropertyChanging(string prop_name, object before, object after)
         {
             _IndexedPropertyChanged.Raise(this, new IndexedPropertyChangedEventArgs(prop_name, before, after));
-        }
-
-        private void raisePropertyChanged(string prop)
-        {
-            _PropertyChanged.Raise(this, new PropertyChangedEventArgs(prop));
-        }
-
-        private void raisePropertyChanging(string prop)
-        {
-            _PropertyChanging.Raise(this, new PropertyChangingEventArgs(prop));
         }
 
         #endregion Private Methods
