@@ -55,6 +55,7 @@
     <Compile Include="Tags\Include.cs" />
     <Compile Include="Tags\Output.cs" />
     <Compile Include="Tags\Table.cs" />
+    <Compile Include="Tags\Transform.cs" />
     <Compile Include="Tags\Variable.cs" />
     <Compile Include="Tags\Version.cs" />
     <Compile Include="Tags\Timestamp.cs" />

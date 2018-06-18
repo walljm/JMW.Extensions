@@ -52,15 +52,15 @@ namespace JMW.Template.Tags
 
                 if (token.Properties.ContainsKey(ATTR_COLUMN))
                 {
-                    columns = token.Properties[ATTR_COLUMN].Split(new[] { ", " }, StringSplitOptions.None).ToList();
+                    columns = token.Properties[ATTR_COLUMN].Split(new[] { "," }, StringSplitOptions.None).ToList();
                 }
 
                 foreach (var column in columns)
                 {
                     if (!string.IsNullOrWhiteSpace(column))
                     {
-                        var retriever = column.ParseToLastIndexOf(":");
-                        var col = column.ParseAfterLastIndexOf_PlusLength(":");
+                        var retriever = column.ParseToLastIndexOf(":").Trim();
+                        var col = column.ParseAfterLastIndexOf_PlusLength(":").Trim();
                         values.Add(_retrievers[retriever.ToLower()](col.ToLower()));
                     }
                 }

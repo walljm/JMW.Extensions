@@ -841,7 +841,7 @@ namespace JMW.Template.Tests
                 Assert.AreEqual("blah | flaw\r\nfloo | blue\r\nblah | flaw\r\nfloo | blue\r\n", output);
             }
         }
-        
+
         [Test]
         public void TestNamedIncludesError1()
         {
@@ -870,7 +870,6 @@ namespace JMW.Template.Tests
             }
         }
 
-        
         [Test]
         public void TestNamedIncludesError2()
         {
@@ -1334,16 +1333,86 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
                 Assert.AreEqual("Variable: 'jason' already exists.", ex.Message);
             }
         }
-    }
 
-    public class TestHandler : TagHandlerBase
-    {
-        public override string TagName { get; } = "test";
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string>();
-
-        public override void Handler(Tag token, Interpreter interp)
+        [Test]
+        public void TestTransform1()
         {
-            interp.OutputStream.Write(token.Children.First().TokenText.ToUpper());
+            var sb = new StringBuilder();
+            using (var wr = new StringWriter(sb))
+            {
+                var i = new Interpreter(wr);
+                i.AddVariable("walljm", "wooooo");
+
+                var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+                var tbl = new Table(data, i);
+                i.AddHandler(tbl);
+
+                i.Eval(@"
+<table name=""test"">
+<transform columns='foo,bar' exp='x1+""|""+x2' />\n
+</table>
+");
+                var output = sb.ToString();
+                Assert.AreEqual("blah|flaw\r\nfloo|blue\r\nblah|flaw\r\nfloo|blue\r\n", output);
+            }
         }
+
+        [Test]
+        public void TestTransform2()
+        {
+            var sb = new StringBuilder();
+            using (var wr = new StringWriter(sb))
+            {
+                var i = new Interpreter(wr);
+                i.AddVariable("walljm", "wooooo");
+
+                var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+                var tbl = new Table(data, i);
+                i.AddHandler(tbl);
+
+                i.Eval(@"
+<table name=""test"">
+<trans columns='foo,bar' exp='x1+""|""+x2' />\n
+</table>
+");
+                var output = sb.ToString();
+                Assert.AreEqual("blah|flaw\r\nfloo|blue\r\nblah|flaw\r\nfloo|blue\r\n", output);
+            }
+        }
+
+        
+        [Test]
+        public void TestTransform3()
+        {
+            var sb = new StringBuilder();
+            using (var wr = new StringWriter(sb))
+            {
+                var i = new Interpreter(wr);
+                i.AddVariable("walljm", "wooooo");
+
+                var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+                var tbl = new Table(data, i);
+                i.AddHandler(tbl);
+
+                i.Eval(@"
+<table name=""test"">
+<tr columns='foo,bar' exp='x1+""|""+x2' />\n
+</table>
+");
+                var output = sb.ToString();
+                Assert.AreEqual("blah|flaw\r\nfloo|blue\r\nblah|flaw\r\nfloo|blue\r\n", output);
+            }
+        }
+}
+
+public class TestHandler : TagHandlerBase
+{
+    public override string TagName { get; } = "test";
+    public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string>();
+
+    public override void Handler(Tag token, Interpreter interp)
+    {
+        interp.OutputStream.Write(token.Children.First().TokenText.ToUpper());
     }
+}
 }

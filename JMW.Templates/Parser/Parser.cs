@@ -38,6 +38,7 @@ namespace JMW.Template
         {
             // add the default tags
             AddTag(new Conditional());
+            AddTag(new Transform());
             AddTag(new Output());
             AddTag(new Table());
             AddTag(new Variable());

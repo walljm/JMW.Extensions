@@ -1,11 +1,11 @@
-﻿using Jint;
-using JMW.Extensions.Enumerable;
-using JMW.Extensions.String;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Jint;
+using JMW.Extensions.Enumerable;
+using JMW.Extensions.String;
 
 namespace JMW.Template.Tags
 {
@@ -15,7 +15,7 @@ namespace JMW.Template.Tags
         {
             foreach (var tag in tags)
             {
-                if (Conditional.IsConditional(tag))
+                if (Conditional.IsConditional(tag) || Transform.IsTransform(tag))
                 {
                     PrefixIfColumns(tag, sheet_name);
                 }
@@ -42,10 +42,24 @@ namespace JMW.Template.Tags
 
         public static void PrefixIfColumns(Tag tag, string name)
         {
-            var columns = tag.Properties[Conditional.ATTR_COLUMN].Split(',').ToList();
+            var columns = new List<string>();
+            var attr = string.Empty;
+
+            if (Transform.IsTransform(tag))
+            {
+                columns = tag.Properties[Transform.ATTR_COLUMN].Split(',').ToList();
+                attr = Transform.ATTR_COLUMN;
+            }
+            else if (Conditional.IsConditional(tag))
+            {
+                columns = tag.Properties[Conditional.ATTR_COLUMN].Split(',').ToList();
+                attr = Conditional.ATTR_COLUMN;
+            }
+
             if (columns.Count > 1)
             {
-                tag.Properties[Conditional.ATTR_COLUMN] = string.Empty;
+                tag.Properties[attr] = string.Empty;
+
                 for (var i = 0; i < columns.Count; i++)
                 {
                     var column = columns[i].Trim();
@@ -55,16 +69,19 @@ namespace JMW.Template.Tags
                         {
                             column = name + ":" + column;
                         }
-                        tag.Properties[Conditional.ATTR_COLUMN] += column + ", ";
+
+                        tag.Properties[attr] += column + ", ";;
                     }
                 }
-                if (tag.Properties[Conditional.ATTR_COLUMN].Contains(", "))
-                    tag.Properties[Conditional.ATTR_COLUMN] = tag.Properties[Conditional.ATTR_COLUMN].ParseToLastIndexOf(", ");
+
+                if (tag.Properties[attr].Contains(", "))
+                    tag.Properties[attr] = tag.Properties[attr].ParseToLastIndexOf(", ");
             }
+
             // If name of column is not prefixed, conditional belongs in current sheet.
-            else if (!tag.Properties[Conditional.ATTR_COLUMN].Contains(":"))
+            else if (!tag.Properties[attr].Contains(":"))
             {
-                tag.Properties[Conditional.ATTR_COLUMN] = name + ":" + tag.Properties[Conditional.ATTR_COLUMN];
+                tag.Properties[attr] = name + ":" + tag.Properties[attr];
             }
         }
 
@@ -190,6 +207,5 @@ namespace JMW.Template.Tags
 
             return result;
         }
-
     }
 }

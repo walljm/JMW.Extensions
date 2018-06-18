@@ -45,6 +45,7 @@ namespace JMW.Template
             _textHandler = new Text();
 
             AddHandler(new Conditional(Retrievers));
+            AddHandler(new Transform(Retrievers));
             AddHandler(_varHandler);
             AddHandler(new Timestamp());
             AddHandler(new Version());
@@ -99,6 +100,11 @@ namespace JMW.Template
                                 tag_name = tag.Properties[Table.ATTR_NAME].ToLower();
                             else
                                 tag_name = Table.ANON_TABLE_NAME;
+                        }
+
+                        if (tag.Name == Transform.TAGALT1 || tag.Name == Transform.TAGALT2)
+                        {
+                            tag_name = Transform.TAG;
                         }
 
                         // Join tag handlers are built when they are found using table data
@@ -156,7 +162,9 @@ namespace JMW.Template
                         if (Handlers.ContainsKey(tag_name))
                             Handlers[tag_name].Handler(tag, this);
                         else if (tag_name.Contains(":") && Handlers.ContainsKey(tag_name.ParseToIndexOf(":"))) // handle variables
+                        {
                             Handlers[tag_name.ParseToIndexOf(":")].Handler(tag, this);
+                        }
                         else
                             DefaultHandler.Do(h => h(tag, this));
                         break;
