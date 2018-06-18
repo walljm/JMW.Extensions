@@ -39,6 +39,8 @@ namespace Lambda.Generic
                 return -a;
             }
 
+            public int NegativeOne { get { return -1; } }
+
             public T Multiply(T a, T b)
             {
                 return a * b;
@@ -164,6 +166,8 @@ namespace Lambda.Generic
             {
                 return -a;
             }
+
+            public long NegativeOne { get { return -1; } }
 
             public T Multiply(T a, T b)
             {

@@ -65,7 +65,7 @@
     <Compile Include="Templates\TagTest.cs" />
     <Compile Include="Templates\ParserTest.cs" />
     <Compile Include="Templates\TokenizerTest.cs" />
-    <Compile Include="Types\IntegerRangeCollectionTests.cs" />
+    <Compile Include="Collections\RangeCollectionTests.cs" />
     <Compile Include="MaybeTests.cs" />
     <Compile Include="Networking\JunosParsingTest.cs" />
     <Compile Include="Parsing\SectionReaderTest.cs" />

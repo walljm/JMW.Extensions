@@ -48,6 +48,8 @@ namespace Lambda.Generic.Arithmetic
     public interface INegater<T>
     {
         T Negate(T a);
+
+        T NegativeOne { get; }
     }
 
     public interface IMultiplier<T>

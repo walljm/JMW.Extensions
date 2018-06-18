@@ -57,7 +57,7 @@
     <Compile Include="IO\FileExtensions.cs" />
     <Compile Include="IO\LineTrackingReader.cs" />
     <Compile Include="Types\Range.cs" />
-    <Compile Include="Types\RangeCollection.cs" />
+    <Compile Include="Collections\RangeCollection.cs" />
     <Compile Include="Types\Pair.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions\Reflection.cs" />

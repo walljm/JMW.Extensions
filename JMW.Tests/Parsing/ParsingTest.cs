@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using JMW.Collections;
 using JMW.Extensions.String;
 using JMW.Parsing.Compile;
 using JMW.Parsing.Expressions;
 using JMW.Parsing.Extractors;
 using JMW.Parsing.Handlers;
 using NUnit.Framework;
+using Base = JMW.Parsing.Expressions.Base;
+using Contains = JMW.Parsing.Expressions.Contains;
 
 namespace JMW.Parsing.Tests
 {
@@ -151,7 +154,7 @@ start
 ";
             try
             {
-                var i = Compiler.Compile(json);
+                Compiler.Compile(json);
                 Assert.Fail();
             }
             catch (ParseException)
@@ -171,7 +174,7 @@ start
 ";
             try
             {
-                var i = Compiler.Compile(json);
+                Compiler.Compile(json);
                 Assert.Fail();
             }
             catch (ParseException)
@@ -494,6 +497,7 @@ free      bird   is      awesome
 
             try
             {
+                // ReSharper disable once ObjectCreationAsStatement
                 new Property(new Parser().Parse(exp_text).First());
                 Assert.Fail();
             }
@@ -507,6 +511,7 @@ free      bird   is      awesome
 
             try
             {
+                // ReSharper disable once ObjectCreationAsStatement
                 new Property(new Parser().Parse(exp_text).First());
                 Assert.Fail();
             }
@@ -533,45 +538,45 @@ free      bird   is      awesome
             var exp_text = @" reg {
                                 s:[""foo""]i #required
                               }";
-            Expressions.Base.ToExpression(new Parser().Parse(exp_text).First());
+            Base.ToExpression(new Parser().Parse(exp_text).First());
             exp_text = @" starts {
                                 s:[""foo""]i #required
                               }";
-            Expressions.Base.ToExpression(new Parser().Parse(exp_text).First());
+            Base.ToExpression(new Parser().Parse(exp_text).First());
             exp_text = @" endswith {
                                 s:[""foo""]i #required
                               }";
-            Expressions.Base.ToExpression(new Parser().Parse(exp_text).First());
+            Base.ToExpression(new Parser().Parse(exp_text).First());
             exp_text = @" contains {
                                 s:[""foo""]i #required
                               }";
-            Expressions.Base.ToExpression(new Parser().Parse(exp_text).First());
+            Base.ToExpression(new Parser().Parse(exp_text).First());
             exp_text = @" count {
                                 s:[""foo""]i #required
                                 rng: ""1-4,6-10"" #required
                             }";
-            Expressions.Base.ToExpression(new Parser().Parse(exp_text).First());
+            Base.ToExpression(new Parser().Parse(exp_text).First());
             exp_text = @" look {
                                     a:[""bar""]i # optional
                                     s:[""foo""]ni #required
                                     b:[""baz""]i # optional
                                   }";
-            Expressions.Base.ToExpression(new Parser().Parse(exp_text).First());
+            Base.ToExpression(new Parser().Parse(exp_text).First());
             exp_text = @" and {
                                     contains {s:[""foo""]i}
                                     contains {s: [""bar""]i}
                                  }";
-            Expressions.Base.ToExpression(new Parser().Parse(exp_text).First());
+            Base.ToExpression(new Parser().Parse(exp_text).First());
             exp_text = @"or {
                                     contains {s:[""foo""]i}
                                     contains {s: [""bar""]i}
                                  }";
-            Expressions.Base.ToExpression(new Parser().Parse(exp_text).First());
+            Base.ToExpression(new Parser().Parse(exp_text).First());
             try
             {
                 exp_text = @"jason {a:[""Foo""]ni }";
 
-                Expressions.Base.ToExpression(new Parser().Parse(exp_text).First());
+                Base.ToExpression(new Parser().Parse(exp_text).First());
                 Assert.Fail();
             }
             catch (ArgumentException)
@@ -694,54 +699,54 @@ free      bird   is      awesome
         [Test]
         public void ExpresssionTest_Contains()
         {
-            var exp = new Expressions.Contains(new List<string> { "foo" }, "i");
+            var exp = new Contains(new List<string> { "foo" }, "i");
             Assert.IsTrue(exp.Test("Foo bar Foo"));
-            exp = new Expressions.Contains(new List<string> { "foo" }, "in");
+            exp = new Contains(new List<string> { "foo" }, "in");
             Assert.IsFalse(exp.Test("Foo barFoo"));
-            exp = new Expressions.Contains(new List<string> { "foo" }, "");
+            exp = new Contains(new List<string> { "foo" }, "");
             Assert.IsFalse(exp.Test("Foo barFoo"));
-            exp = new Expressions.Contains(new List<string> { "foo" }, "n");
+            exp = new Contains(new List<string> { "foo" }, "n");
             Assert.IsTrue(exp.Test("Foo barFoo"));
 
             var exp_text = @" contains {
                                 s:[""foo""]i #required
                               }";
-            exp = new Expressions.Contains(new Parser().Parse(exp_text).First());
+            exp = new Contains(new Parser().Parse(exp_text).First());
             Assert.IsTrue(exp.Test("Foo bar Foo"));
             exp_text = @" contains {
                                 s:[""foo""]in #required
                               }";
-            exp = new Expressions.Contains(new Parser().Parse(exp_text).First());
+            exp = new Contains(new Parser().Parse(exp_text).First());
             Assert.IsFalse(exp.Test("Foo barFoo"));
 
             exp_text = @" contains {
                                 s:[""foo""] #required
                               }";
-            exp = new Expressions.Contains(new Parser().Parse(exp_text).First());
+            exp = new Contains(new Parser().Parse(exp_text).First());
             Assert.IsFalse(exp.Test("Foo barFoo"));
 
             exp_text = @" contains {
                                 s:[""foo""]n #required
                               }";
-            exp = new Expressions.Contains(new Parser().Parse(exp_text).First());
+            exp = new Contains(new Parser().Parse(exp_text).First());
             Assert.IsTrue(exp.Test("Foo barFoo"));
         }
 
         [Test]
         public void ExpresssionTest_Count()
         {
-            var exp = new Count(new List<string> { "foo" }, new Types.IntegerRangeCollection("1-4,6-10"), "i");
+            var exp = new Count(new List<string> { "foo" }, new IntegerRangeCollection("1-4,6-10"), "i");
             Assert.IsTrue(exp.Test("Foo bar Foo"));
-            exp = new Count(new List<string> { "Foo" }, new Types.IntegerRangeCollection("1,4,6-10"), "");
+            exp = new Count(new List<string> { "Foo" }, new IntegerRangeCollection("1,4,6-10"), "");
             Assert.IsFalse(exp.Test("Foo barFoo"));
-            exp = new Count(new List<string> { "foo" }, new Types.IntegerRangeCollection("1,4,6-10"), "i");
+            exp = new Count(new List<string> { "foo" }, new IntegerRangeCollection("1,4,6-10"), "i");
             Assert.IsFalse(exp.Test("Foo barFoo foo foo foo"));
-            exp = new Count(new List<string> { "foo" }, new Types.IntegerRangeCollection("1,4,6-10"), "i");
+            exp = new Count(new List<string> { "foo" }, new IntegerRangeCollection("1,4,6-10"), "i");
             Assert.IsTrue(exp.Test("Foo bar"));
-            exp = new Count(new List<string> { "foo" }, new Types.IntegerRangeCollection("1,4,6-10"), "i");
+            exp = new Count(new List<string> { "foo" }, new IntegerRangeCollection("1,4,6-10"), "i");
             Assert.IsTrue(exp.Test("bar foo Foo  foo foo  foo foo foo foo"));
 
-            exp = new Count(new List<string> { "foo", "bar" }, new Types.IntegerRangeCollection("1,4,6-8,10"), "i");
+            exp = new Count(new List<string> { "foo", "bar" }, new IntegerRangeCollection("1,4,6-8,10"), "i");
             Assert.IsFalse(exp.Test("bar foo Foo  foo foo  foo foo foo foo"));
 
             var exp_text = @"count {
@@ -868,8 +873,8 @@ free      bird   is      awesome
         [Test]
         public void ExpresssionTest_And()
         {
-            var exp1 = new Expressions.Contains(new List<string> { "foo" }, "i");
-            var exp2 = new Expressions.Contains(new List<string> { "bar" }, "i");
+            var exp1 = new Contains(new List<string> { "foo" }, "i");
+            var exp2 = new Contains(new List<string> { "bar" }, "i");
             var and1 = new And(new List<IExpression> { exp1, exp2 });
 
             Assert.IsTrue(and1.Test("blah foo blah bar blah"));
@@ -888,8 +893,8 @@ free      bird   is      awesome
         [Test]
         public void ExpresssionTest_Or()
         {
-            var exp1 = new Expressions.Contains(new List<string> { "foo" }, "i");
-            var exp2 = new Expressions.Contains(new List<string> { "bar" }, "i");
+            var exp1 = new Contains(new List<string> { "foo" }, "i");
+            var exp2 = new Contains(new List<string> { "bar" }, "i");
             var exp = new Or(new List<IExpression> { exp1, exp2 });
 
             Assert.IsTrue(exp.Test("blah foo blah "));
@@ -1053,15 +1058,15 @@ free      bird   is      awesome
         public void Extractor_Column()
         {
             var ext = new Column(1);
-            ext.Positions = new List<Handlers.ColumnPosition>();
-            ext.Positions.Add(new Handlers.ColumnPosition
+            ext.Positions = new List<ColumnPosition>();
+            ext.Positions.Add(new ColumnPosition
             {
                 Name = "Jason",
                 Key = "Jason",
                 Start = 2,
                 Length = 5
             });
-            ext.Positions.Add(new Handlers.ColumnPosition
+            ext.Positions.Add(new ColumnPosition
             {
                 Name = "Wall",
                 Key = "Wall",
@@ -1075,15 +1080,15 @@ free      bird   is      awesome
                                         n: ""Jason"" #optional
                                     }";
             ext = new Column(new Parser().Parse(exp_text).First());
-            ext.Positions = new List<Handlers.ColumnPosition>();
-            ext.Positions.Add(new Handlers.ColumnPosition
+            ext.Positions = new List<ColumnPosition>();
+            ext.Positions.Add(new ColumnPosition
             {
                 Name = "Jason",
                 Key = "Jason",
                 Start = 2,
                 Length = 5
             });
-            ext.Positions.Add(new Handlers.ColumnPosition
+            ext.Positions.Add(new ColumnPosition
             {
                 Name = "Wall",
                 Key = "Wall",
@@ -1099,15 +1104,15 @@ free      bird   is      awesome
                                         n: ""Jason"" #optional
                                     }";
                 ext = new Column(new Parser().Parse(exp_text).First());
-                ext.Positions = new List<Handlers.ColumnPosition>();
-                ext.Positions.Add(new Handlers.ColumnPosition
+                ext.Positions = new List<ColumnPosition>();
+                ext.Positions.Add(new ColumnPosition
                 {
                     Name = "Jason",
                     Key = "Jason",
                     Start = 2,
                     Length = 5
                 });
-                ext.Positions.Add(new Handlers.ColumnPosition
+                ext.Positions.Add(new ColumnPosition
                 {
                     Name = "Wall",
                     Key = "Wall",

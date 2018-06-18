@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JMW.Collections;
 using JMW.Extensions.String;
 using JMW.Parsing.Compile;
 using JMW.Types;

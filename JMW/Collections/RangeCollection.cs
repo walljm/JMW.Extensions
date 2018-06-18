@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using JMW.Extensions.Enumerable;
 using JMW.Extensions.Numbers;
-using JMW.Extensions.String;
+using JMW.Types;
 using Lambda.Generic.Arithmetic;
 
-namespace JMW.Types
+namespace JMW.Collections
 {
     public class LongRangeCollection : RangeCollection<long, LongMath>
     {
@@ -72,7 +72,7 @@ namespace JMW.Types
     }
 
     public class RangeCollection<T, C> : IList<Range<T, C>>
-        where T :  IComparable<T>, IComparable, IFormattable, IConvertible, IEquatable<T>, new()
+        where T : IComparable<T>, IComparable, IFormattable, IConvertible, IEquatable<T>, new()
         where C : ISignedMath<T>, new()
     {
         #region Constructors
@@ -100,12 +100,12 @@ namespace JMW.Types
 
         public RangeCollection(string rng)
         {
-            getCleanInts(rng.Split(',')).Each(i => Ranges.Add(i.Start, i)); // add them to the range.
+            getCleanNumbers(rng.Split(',')).Each(i => Ranges.Add(i.Start, i)); // add them to the range.
         }
 
         public RangeCollection(IEnumerable<string> rng)
         {
-            getCleanInts(rng).Each(i => Ranges.Add(i.Start, i)); // add them to the range.
+            getCleanNumbers(rng).Each(i => Ranges.Add(i.Start, i)); // add them to the range.
         }
 
         public RangeCollection(IEnumerable<Signed<T, C>> rng)
@@ -114,7 +114,7 @@ namespace JMW.Types
                .Each(i => Ranges.Add(i.Start, i)); // add them to the range.
         }
 
-        private static IEnumerable<Range<T, C>> getCleanInts(IEnumerable<string> rng)
+        private static IEnumerable<Range<T, C>> getCleanNumbers(IEnumerable<string> rng)
         {
             var rngs = rng.Select(o => o.Trim()) // trim whitespace
                 .Where(o => o.Length > 0 && (o.Contains('-') || o.IsIntFast())) // eliminate empty strings
@@ -135,45 +135,51 @@ namespace JMW.Types
 
         #region Public Methods
 
-        public void AddUniqueLongsFromRange(IEnumerable<string> lst)
+        public void Add(Range<T, C> item)
         {
-            var lookup = Ranges.Select(v => v.ToString()).ToHashSet();
-            foreach (var i in lst)
-            {
-                if (i.Contains("--") || i.Contains("none")) continue;
-
-                if (i.Contains('-'))
-                {
-                    // its a range, so process each one.
-                    var blocks = i.Split('-');
-                    var start = blocks[0].ToInt();
-                    var end = blocks[1].ToInt();
-                    for (var c = start; c <= end; c++)
-                    {
-                        if (!lookup.Contains(c.ToString()))
-                        {
-                            lookup.Add(c.ToString().Trim());
-                        }
-                    }
-                }
-                else if (!i.Contains("none") && !lookup.Contains(i) && !i.IsEmpty())
-                {
-                    lookup.Add(i.Trim());
-                }
-            }
-
-            AddRange(lookup.Select(v => new Range<T, C>(v)));
+            AddRange(item.ToListOfItem());
         }
 
+        public void AddRange(IEnumerable<Range<T, C>> items)
+        {
+            var lst = mergeVlanRanges(Ranges.Values.ToList(), items.ToList());
+            Ranges.Clear();
+            lst.Each(o => Ranges.Add(o.Start, o));
+        }
+
+        public void AddRange(IEnumerable<string> items)
+        {
+            AddRange(items.Select(i => new Range<T, C>(i)));
+        }
+
+        /// <summary>
+        /// Returns true if the provided int is included in the ranges.
+        /// </summary>
+        /// <param name="num">number to check</param>
         public bool Contains(Signed<T, C> num)
         {
             return IsInRange(num);
         }
 
+        /// <summary>
+        /// Returns true if the provided number or range is included in the ranges.
+        /// </summary>
+        /// <param name="num">number to check</param>
         public bool Contains(string num)
         {
-            if (!num.IsInt()) return false;
-            return IsInRange(Signed<T, C>.Parse(num));
+            return Contains(new Range<T, C>(num));
+        }
+
+        /// <summary>
+        /// Returns true if the provided Range is included in the ranges.
+        /// </summary>
+        /// <param name="item">number to check</param>
+        public bool Contains(Range<T, C> item)
+        {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            return Ranges.Values.Any(i => i.Contains(item));
         }
 
         /// <summary>
@@ -205,7 +211,6 @@ namespace JMW.Types
         /// <param name="num">number to check</param>
         public bool IsInRange(string num)
         {
-            if (!num.IsInt()) return false;
             return IsInRange(Signed<T, C>.Parse(num));
         }
 
@@ -219,9 +224,9 @@ namespace JMW.Types
             return Ranges.Any(o => o.Value.IntersectsWith(rng));
         }
 
-        public List<Signed<T, C>> GetInts()
+        public IEnumerable<Signed<T, C>> GetNumbers()
         {
-            return Ranges.Values.SelectMany(o => o.GetNumbers()).OrderBy(o => o).ToList();
+            return Ranges.Values.SelectMany(o => o.GetNumbers()).OrderBy(o => o);
         }
 
         public override string ToString()
@@ -233,11 +238,10 @@ namespace JMW.Types
 
         #region Public Static
 
-        public static List<string> ExplodeRange(string rng)
+        public static IEnumerable<Signed<T, C>> ExplodeRange(string rng)
         {
-            var lst = new RangeCollection<T, C>();
-            lst.AddUniqueLongsFromRange(rng.Split(','));
-            return lst.SelectMany(v => v.GetNumbers().Select(i => i.ToString())).ToList();
+            var lst = new RangeCollection<T, C>(rng);
+            return lst.GetNumbers();
         }
 
         #endregion Public Static
@@ -278,14 +282,6 @@ namespace JMW.Types
             Ranges.Clear();
         }
 
-        public bool Contains(Range<T, C> item)
-        {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
-
-            return Ranges.Values.Any(i => i.Start == item.Start && i.Stop == item.Stop);
-        }
-
         public void CopyTo(Range<T, C>[] array, int arrayIndex)
         {
             Ranges.Values.CopyTo(array, arrayIndex);
@@ -317,25 +313,6 @@ namespace JMW.Types
         public bool IsFixedSize => false;
 
         #endregion IList
-
-        public void Add(Range<T, C> item)
-        {
-            AddRange(item.ToListOfItem());
-        }
-
-        public void AddRange(IEnumerable<Range<T, C>> items)
-        {
-            var lst = mergeVlanRanges(Ranges.Values.ToList(), items.ToList());
-            Ranges.Clear();
-            lst.Each(o => Ranges.Add(o.Start, o));
-        }
-
-        public void AddRange(IEnumerable<string> items)
-        {
-            var lst = mergeVlanRanges(Ranges.Values.ToList(), new RangeCollection<T, C>(items).ToList());
-            Ranges.Clear();
-            lst.Each(o => Ranges.Add(o.Start, o));
-        }
 
         private static List<Range<T, C>> mergeVlanRanges(IList<Range<T, C>> a, IList<Range<T, C>> b)
         {
