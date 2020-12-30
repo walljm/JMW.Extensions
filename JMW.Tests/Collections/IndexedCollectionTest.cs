@@ -78,11 +78,9 @@ namespace JMW.Collections.Tests
             idx.MaybeGetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
             idx.Add(f1);
 
-            Foo t1;
-            Assert.That(idx.TryGetByUniqueIndex(p => p.Bar, "jeremy", out t1));
+            Assert.That(idx.TryGetByUniqueIndex(p => p.Bar, "jeremy", out var t1));
             Assert.That(t1 == f1);
-            List<Foo> t2;
-            Assert.That(idx.TryGetByIndex(p => p.BarCollection, "one", out t2));
+            Assert.That(idx.TryGetByIndex(p => p.BarCollection, "one", out var t2));
             Assert.That(t2[0] == f1);
 
             Assert.That(!idx.TryGetByUniqueIndex(p => p.BarCollection, "jeremy", out t1));
@@ -129,38 +127,38 @@ namespace JMW.Collections.Tests
             }
             f1.BarCollection = new List<string> { "1", "2", "3" };
 
-            f1.PropertyChanged += F1_PropertyChanged;
-            f1.PropertyChanging += F1_PropertyChanging;
+            f1.PropertyChanged += f1_PropertyChanged;
+            f1.PropertyChanging += f1_PropertyChanging;
             f1.Bar = "blah";
-            f1.PropertyChanged -= F1_PropertyChanged;
-            f1.PropertyChanging -= F1_PropertyChanging;
+            f1.PropertyChanged -= f1_PropertyChanged;
+            f1.PropertyChanging -= f1_PropertyChanging;
 
             idx.Clear();
             Assert.That(idx.Count == 0);
             idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 0), if_exception: null);
 
-            idx.CollectionChanged += Idx_CollectionChanged;
+            idx.CollectionChanged += idx_CollectionChanged;
             idx.Add(f1);
-            idx.CollectionChanged -= Idx_CollectionChanged;
+            idx.CollectionChanged -= idx_CollectionChanged;
             Assert.That(idx.IsReadOnly == false);
 
             idx.Each(item => Assert.That(item.GetType() == typeof(Foo)));
 
-            f1.PropertyChanged += F1_PropertyChanged;
-            f1.PropertyChanging += F1_PropertyChanging;
-            f1.IndexedPropertyChanged += F1_IndexedPropertyChanged;
+            f1.PropertyChanged += f1_PropertyChanged;
+            f1.PropertyChanging += f1_PropertyChanging;
+            f1.IndexedPropertyChanged += f1_IndexedPropertyChanged;
             f1.ClearEvents();
             Assert.That(f1.IndexedPropertyChangedEventCount == 0);
 
-            f1.PropertyChanged += F1_PropertyChanged;
+            f1.PropertyChanged += f1_PropertyChanged;
             f1.ClearPropertyChanged();
             Assert.That(f1.PropertyChangedEventCount == 0);
 
-            f1.PropertyChanging += F1_PropertyChanging;
+            f1.PropertyChanging += f1_PropertyChanging;
             f1.ClearPropertyChanging();
             Assert.That(f1.PropertyChangingEventCount == 0);
 
-            f1.IndexedPropertyChanged += F1_IndexedPropertyChanged;
+            f1.IndexedPropertyChanged += f1_IndexedPropertyChanged;
             f1.ClearIndexedPropertyChanged();
             Assert.That(f1.IndexedPropertyChangedEventCount == 0);
         }
@@ -193,84 +191,84 @@ namespace JMW.Collections.Tests
             Assert.AreEqual("Value violated index 'Bar' using key 'wall'", msg);
         }
 
-        private void F1_IndexedPropertyChanged(object sender, IndexedPropertyChangedEventArgs e)
+        private void f1_IndexedPropertyChanged(object sender, IndexedPropertyChangedEventArgs e)
         {
         }
 
-        private void Idx_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void idx_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             Assert.That(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add);
         }
 
-        private void F1_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
+        private void f1_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
         {
             Assert.That(e.PropertyName == "Bar");
         }
 
-        private void F1_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void f1_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             Assert.That(e.PropertyName == "Bar");
         }
 
         private class Foo : IndexedClass
         {
-            private string _Bar = string.Empty;
+            private string bar = string.Empty;
             [Indexed(IsUnique = true)]
             public string Bar
             {
                 get
                 {
-                    return _Bar;
+                    return bar;
                 }
 
                 set
                 {
-                    Set(ref _Bar, value);
+                    Set(ref bar, value);
                 }
             }
 
-            private List<string> _BarCollection = new List<string>();
+            private List<string> barCollection = new List<string>();
             [Indexed]
             public List<string> BarCollection
             {
                 get
                 {
-                    return _BarCollection;
+                    return barCollection;
                 }
 
                 set
                 {
-                    Set(ref _BarCollection, value);
+                    Set(ref barCollection, value);
                 }
             }
 
-            private string _Baz = string.Empty;
+            private string baz = string.Empty;
             [Indexed]
             public string Baz
             {
                 get
                 {
-                    return _Baz;
+                    return baz;
                 }
 
                 set
                 {
-                    Set(ref _Baz, value);
+                    Set(ref baz, value);
                 }
             }
 
-            private List<int> _BazCollection = new List<int>();
+            private List<int> bazCollection = new List<int>();
             [Indexed(IsUnique = true)]
             public List<int> BazCollection
             {
                 get
                 {
-                    return _BazCollection;
+                    return bazCollection;
                 }
 
                 set
                 {
-                    Set(ref _BazCollection, value);
+                    Set(ref bazCollection, value);
                 }
             }
         }

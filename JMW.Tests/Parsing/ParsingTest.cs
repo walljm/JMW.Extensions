@@ -118,9 +118,6 @@ start
             }
 
             Assert.AreEqual("is is 0 a |start\n this;is is 1 foo|\n this;is is 2 foo|\n this;is is 3 foo|\n this;is is 4 foo|\n this;is is 5 foo|\n this;", output);
-
-            output = string.Empty;
-
             var items = ((Paragraph)i).Parse((StreamReader)null).ToList();
 
             Assert.AreEqual(0, items.Count);
@@ -498,7 +495,7 @@ free      bird   is      awesome
             try
             {
                 // ReSharper disable once ObjectCreationAsStatement
-                new Property(new Parser().Parse(exp_text).First());
+                _ = new Property(new Parser().Parse(exp_text).First());
                 Assert.Fail();
             }
             catch (ParseException) { }
@@ -512,7 +509,7 @@ free      bird   is      awesome
             try
             {
                 // ReSharper disable once ObjectCreationAsStatement
-                new Property(new Parser().Parse(exp_text).First());
+                _ = new Property(new Parser().Parse(exp_text).First());
                 Assert.Fail();
             }
             catch (ParseException) { }
@@ -1057,8 +1054,10 @@ free      bird   is      awesome
         [Test]
         public void Extractor_Column()
         {
-            var ext = new Column(1);
-            ext.Positions = new List<ColumnPosition>();
+            var ext = new Column(1)
+            {
+                Positions = new List<ColumnPosition>()
+            };
             ext.Positions.Add(new ColumnPosition
             {
                 Name = "Jason",
@@ -1079,8 +1078,10 @@ free      bird   is      awesome
                                         i:""1"" #optional
                                         n: ""Jason"" #optional
                                     }";
-            ext = new Column(new Parser().Parse(exp_text).First());
-            ext.Positions = new List<ColumnPosition>();
+            ext = new Column(new Parser().Parse(exp_text).First())
+            {
+                Positions = new List<ColumnPosition>()
+            };
             ext.Positions.Add(new ColumnPosition
             {
                 Name = "Jason",
@@ -1103,8 +1104,10 @@ free      bird   is      awesome
                                         i:""3"" #optional
                                         n: ""Jason"" #optional
                                     }";
-                ext = new Column(new Parser().Parse(exp_text).First());
-                ext.Positions = new List<ColumnPosition>();
+                ext = new Column(new Parser().Parse(exp_text).First())
+                {
+                    Positions = new List<ColumnPosition>()
+                };
                 ext.Positions.Add(new ColumnPosition
                 {
                     Name = "Jason",
@@ -1131,10 +1134,12 @@ free      bird   is      awesome
         [Test]
         public void ColumnPostionTest1()
         {
-            var ext = new ColumnPosition();
-            ext.Name = "Jason";
-            ext.Start = 5;
-            ext.Length = 5;
+            var ext = new ColumnPosition
+            {
+                Name = "Jason",
+                Start = 5,
+                Length = 5
+            };
             Assert.AreEqual("Jason: 5-9", ext.ToString());
             ext.Start = 5;
             ext.Length = -1;

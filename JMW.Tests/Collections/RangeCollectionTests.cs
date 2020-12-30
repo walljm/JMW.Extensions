@@ -52,9 +52,11 @@ namespace JMW.Collections.Tests
             Assert.AreEqual("2-6", rng.ToString());
             Assert.AreEqual("2,3,4,5,6", rng.GetNumbers().ToDelimitedString(','));
 
-            rng = new IntegerRange();
-            rng.Start = 2;
-            rng.Stop = 6;
+            rng = new IntegerRange
+            {
+                Start = 2,
+                Stop = 6
+            };
             Assert.AreEqual(true, rng.IntersectsWith("1,5"));
             Assert.AreEqual(true, rng.IntersectsWith("3:5"));
             Assert.AreEqual(true, rng.IntersectsWith("3-8"));
@@ -82,16 +84,20 @@ namespace JMW.Collections.Tests
             Assert.AreEqual("2-6", rng.ToString());
             Assert.AreEqual("2,3,4,5,6", rng.GetNumbers().ToDelimitedString(','));
 
-            rng = new LongRange();
-            rng.Start = 2;
-            rng.Stop = 6;
+            rng = new LongRange
+            {
+                Start = 2,
+                Stop = 6
+            };
             Assert.AreEqual(true, rng.IntersectsWith("1,5"));
             Assert.AreEqual(true, rng.IntersectsWith("3:5"));
             Assert.AreEqual(true, rng.IntersectsWith("3-8"));
 
-            var rng1 = new LongRange(rng);
-            rng1.Stop = 11;
-            rng1.Start = 6;
+            var rng1 = new LongRange(rng)
+            {
+                Stop = 11,
+                Start = 6
+            };
             Assert.AreEqual(false, rng1.IntersectsWith("1,5"));
             Assert.AreEqual(true, rng1.IntersectsWith("6:8"));
             Assert.AreEqual(true, rng1.IntersectsWith("3-15"));
@@ -102,11 +108,11 @@ namespace JMW.Collections.Tests
 
             try
             {
-                new IntegerRange("3,1");
+                _ = new IntegerRange("3,1");
             }
             catch (ArgumentException ex)
             {
-                Assert.AreEqual("Stop cannot be less than Start\r\nParameter name: rng", ex.Message);
+                Assert.AreEqual("Stop cannot be less than Start (Parameter 'rng')", ex.Message);
             }
         }
 
@@ -127,7 +133,7 @@ namespace JMW.Collections.Tests
 
             var foo1 = new LongRangeCollection("1-4,5,7,10,8, 12-15, 8-10, 19-34, 20-24, 45-50, 40-46");
             Assert.That(foo1.ToString(), Is.EqualTo("1-5,7-10,12-15,19-34,40-50"));
-            foo1 = new LongRangeCollection(new List<LongRange>{
+            _ = new LongRangeCollection(new List<LongRange>{
                 new LongRange(1,5),
                 new LongRange(new Range<long, LongMath>(7,10)),
                 new LongRange(12,15),
@@ -141,9 +147,11 @@ namespace JMW.Collections.Tests
         public void TestAddIntegerRanges()
         {
             // arrange/act
-            var foo = new IntegerRangeCollection("1-4,10,8, 12-15,19");
-            foo.Add(new IntegerRange("3-11"));
-           
+            var foo = new IntegerRangeCollection("1-4,10,8, 12-15,19")
+            {
+                new IntegerRange("3-11")
+            };
+
             // assert
             Assert.That(foo.ToString(), Is.EqualTo("1-15,19"));
             foo.Clear();

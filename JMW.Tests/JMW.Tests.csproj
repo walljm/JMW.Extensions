@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,5 +31,11 @@
     <ProjectReference Include="..\JMW.Parsing\JMW.Parsing.csproj" />
     <ProjectReference Include="..\JMW.Templates\JMW.Templates.csproj" />
     <ProjectReference Include="..\JMW\JMW.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\testpathinclude.tmpl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

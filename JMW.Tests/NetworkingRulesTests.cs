@@ -63,7 +63,7 @@ namespace JMW.Extensions.Tests
 
             var engine = new RulesEngine(new List<Rule> { r0, r1, r2 });
 
-            var lst = engine.Compress(new List<Rule> {r0, r1, r2});
+            var lst = RulesEngine.Compress(new List<Rule> {r0, r1, r2});
             
         }
     }

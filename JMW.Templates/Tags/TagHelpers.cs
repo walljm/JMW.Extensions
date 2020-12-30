@@ -96,11 +96,11 @@ namespace JMW.Template.Tags
 
         public static string RetrieveOctet(string data, string octet_string)
         {
-            var val = data;
             if (!int.TryParse(octet_string, out var octet) || octet > 4 || octet < 1)
             {
                 throw new Exception("The value provided for octet argument was invalid. Must be a number between 1 and 4.");
             }
+            string val;
             if (data.Contains("."))
             {
                 var split = data.Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries);

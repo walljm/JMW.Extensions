@@ -7,14 +7,14 @@ namespace JMW.Networking.Rules
 {
     public class RulesEngine
     {
-        private List<Rule> rules;
+        private readonly List<Rule> rules;
 
         public RulesEngine(IEnumerable<Rule> rules)
         {
             this.rules = rules.ToList();
         }
 
-        public List<Rule> Compress(IEnumerable<Rule> rules)
+        public static List<Rule> Compress(IEnumerable<Rule> rules)
         {
             // loop through each rule, starting at the bottom, removing any rules above that are obviated.
             var lst = rules.ToList();

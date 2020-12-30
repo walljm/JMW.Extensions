@@ -11,9 +11,9 @@ namespace JMW.Parsing.Tests
         [Test]
         public void ParseTest()
         {
-            var dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "..", "Networking", "junos.txt");
+            var dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "..", "..", "Networking", "junos.txt");
             var junos = File.ReadAllText(dir);
-            var tags = new Parser().Parse(junos);
+            _ = new Parser().Parse(junos);
         }
     }
 }

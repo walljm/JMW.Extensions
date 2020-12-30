@@ -79,7 +79,7 @@ namespace JMW.Template.Tests
         public void TestParseExceptionNoEndTag()
         {
             //Act
-            object test_delegate() => new Parser().Parse("<foo>some text");
+            static object test_delegate() => new Parser().Parse("<foo>some text");
 
             //Assert
             Assert.That(test_delegate, Throws.TypeOf<ParseException>(), "Template ended prematurely. Did you forget a </foo>?");
@@ -89,7 +89,7 @@ namespace JMW.Template.Tests
         public void TestParseExceptionInvalidEndTag()
         {
             //Act
-            object test_delegate() => new Parser().Parse("<foo>some text</bar>");
+            static object test_delegate() => new Parser().Parse("<foo>some text</bar>");
 
             //Assert
             Assert.That(test_delegate, Throws.TypeOf<ParseException>(), "Invalid end tag. Line: 1 Column: 15");
@@ -99,7 +99,7 @@ namespace JMW.Template.Tests
         public void TestParseExceptionInvalidTag()
         {
             //Act
-            object test_delegate() => new Parser().Parse("<foo some text</bar>");
+            static object test_delegate() => new Parser().Parse("<foo some text</bar>");
 
             //Assert
             Assert.That(test_delegate, Throws.TypeOf<ParseException>(), "Invalid tag. Did you forget to add a '>'? Line: 1 Column: 15");
@@ -109,7 +109,7 @@ namespace JMW.Template.Tests
         public void TestParseExceptionUnexpectedEqual()
         {
             //Act
-            object test_delegate() => new Parser().Parse("<foo =stuff >some text</foo>");
+            static object test_delegate() => new Parser().Parse("<foo =stuff >some text</foo>");
 
             //Assert
             Assert.That(test_delegate, Throws.TypeOf<ParseException>(), "Unexpected '='. Did you forget a param name? Line: 1 Column: 6");

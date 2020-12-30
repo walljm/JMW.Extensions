@@ -147,7 +147,7 @@ namespace JMW.Extensions.Enumerable.Tests
         public void EachTest()
         {
             var lst = new List<Foo> { new Foo { Value = 1 }, new Foo { Value = 2 }, new Foo { Value = 3 }, new Foo { Value = 4 } };
-            lst.Each(i => i.Value = i.Value * 2);
+            lst.Each(i => i.Value *= 2);
 
             Assert.That(new List<int> { 2, 4, 6, 8 }, Is.EquivalentTo(lst.Select(i => i.Value)));
         }

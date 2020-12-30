@@ -121,9 +121,11 @@ namespace JMW.Template.Tests
         {
             try
             {
-                var t = new Tag();
-                t.Name = "foo";
-                t.TagType = TagTypes.Tag;
+                var t = new Tag
+                {
+                    Name = "foo",
+                    TagType = TagTypes.Tag
+                };
                 t.Properties.Add("foo", "bar");
 
                 TagHelpers.CheckAllowedAttributes(t, new HashSet<string> { "blah" }, new Token());
