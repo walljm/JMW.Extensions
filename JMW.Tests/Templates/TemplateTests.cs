@@ -861,7 +861,7 @@ namespace JMW.Template.Tests
 
             i.Eval(@"
 <table name=""test"">
-<include path="".\Templates\testpathinclude.tmpl""/>
+<include path=""" + Path.Combine(".", "Templates", "testpathinclude.tmpl") + @"""/>
 </table>
 ");
             var output = sb.ToString();
@@ -884,7 +884,7 @@ namespace JMW.Template.Tests
 
                 i.Eval(@"
 <table name=""test"">
-<include path="".\Templates\asdf.tmpl""/>
+<include path=""" + Path.Combine(".", "Templates", "asdf.tmpl") + @"""/>
 </table>
 ");
             }
