@@ -5,17 +5,20 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW", "JMW\JMW.csproj", "{09DE972F-E558-4E4C-9A01-F31E8F99359C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Tests", "JMW.Tests\JMW.Tests.csproj", "{B9EEEF0F-B6D4-41D1-9BCD-AD73C58EBA4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMW.Tests", "JMW.Tests\JMW.Tests.csproj", "{B9EEEF0F-B6D4-41D1-9BCD-AD73C58EBA4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Templates", "JMW.Templates\JMW.Templates.csproj", "{E7A342B5-3191-422B-B2D1-8F23EAD701DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMW.Templates", "JMW.Templates\JMW.Templates.csproj", "{E7A342B5-3191-422B-B2D1-8F23EAD701DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Parsing", "JMW.Parsing\JMW.Parsing.csproj", "{3AA49893-32B0-48D3-A486-C00CF709D276}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMW.Parsing", "JMW.Parsing\JMW.Parsing.csproj", "{3AA49893-32B0-48D3-A486-C00CF709D276}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JMW.Networking", "JMW.Networking\JMW.Networking.csproj", "{958EF8D4-69B5-4FB4-AB0D-A992451D5BE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JMW.Networking", "JMW.Networking\JMW.Networking.csproj", "{958EF8D4-69B5-4FB4-AB0D-A992451D5BE8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C2B64C80-4C9B-4F44-8E05-D5547C11D92A}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\nuget.yml = .github\workflows\nuget.yml
 	EndProjectSection
 EndProject
 Global
