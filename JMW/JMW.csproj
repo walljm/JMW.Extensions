@@ -1,77 +1,28 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{09DE972F-E558-4E4C-9A01-F31E8F99359C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>JMW</RootNamespace>
     <AssemblyName>JMW</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+    <PackageId>JMW.Extensions</PackageId>
+    <Description>
+      Useful Extensions for string manipulation, list manipulation, conversions, as well as Types like the algebraic Maybe{T} and an IndexedCollection for when you need to look up values by more than one property.</Description>
+    <Version>1.0.0</Version>
+    <Authors>Jason Wall</Authors>
+    <Company>walljm</Company>
+    <Copyright>2020 Jason Wall</Copyright>
+    <PackageProjectUrl>https://github.com/walljm/jmw.extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/walljm/jmw.extensions</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <NeutralLanguage>en</NeutralLanguage>
+    </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
+    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Arithmetic\Calculators.cs" />
-    <Compile Include="Arithmetic\Interfaces.cs" />
-    <Compile Include="Arithmetic\Wrappers.cs" />
-    <Compile Include="Collections\IndexedAttribute.cs" />
-    <Compile Include="Collections\ObservableClass.cs" />
-    <Compile Include="Collections\IndexedClass.cs" />
-    <Compile Include="Collections\IndexedCollection.cs" />
-    <Compile Include="Collections\IndexedPropertyEventArgs.cs" />
-    <Compile Include="Collections\IndexViolationEventArgs.cs" />
-    <Compile Include="Collections\RingBuffer.cs" />
-    <Compile Include="Extensions\Conversions.cs" />
-    <Compile Include="Extensions\DateAndTime.cs" />
-    <Compile Include="Extensions\Enumerable.cs" />
-    <Compile Include="Extensions\IO.cs" />
-    <Compile Include="Extensions\Numbers.cs" />
-    <Compile Include="Functional\Maybe.cs" />
-    <Compile Include="Differential.cs" />
-    <Compile Include="Extensions\Object.cs" />
-    <Compile Include="Functional\Optional.cs" />
-    <Compile Include="IO\FileExtensions.cs" />
-    <Compile Include="IO\LineTrackingReader.cs" />
-    <Compile Include="Types\Range.cs" />
-    <Compile Include="Collections\RangeCollection.cs" />
-    <Compile Include="Types\Pair.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Extensions\Reflection.cs" />
-    <Compile Include="Reflection\Linq.cs" />
-    <Compile Include="Extensions\String.cs" />
-    <Compile Include="Types\Variant.cs" />
-    <Compile Include="Types\WeakEvent.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

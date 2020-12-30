@@ -7,11 +7,11 @@ namespace JMW.Networking.Rules
 {
     public class RulesEngine
     {
-        private List<Rule> _rules;
+        private List<Rule> rules;
 
         public RulesEngine(IEnumerable<Rule> rules)
         {
-            _rules = rules.ToList();
+            this.rules = rules.ToList();
         }
 
         public List<Rule> Compress(IEnumerable<Rule> rules)
@@ -23,7 +23,7 @@ namespace JMW.Networking.Rules
             {
                 var r = lst[i];
 
-                var a = Allowed(lst.Skip(i), r.Source, r.Dest, r.Port);
+                var a = allowed(lst.Skip(i), r.Source, r.Dest, r.Port);
                 switch (r.Policy)
                 {
                     case Policy.Deny when !a:
@@ -40,10 +40,10 @@ namespace JMW.Networking.Rules
 
         public bool Allowed(Location source, Location dest, IntegerRange port)
         {
-            return Allowed(_rules, source, dest, port);
+            return allowed(rules, source, dest, port);
         }
 
-        private static bool Allowed(IEnumerable<Rule> rules, Location source, Location dest, IntegerRange port)
+        private static bool allowed(IEnumerable<Rule> rules, Location source, Location dest, IntegerRange port)
         {
             var r = false;
             foreach (var rule in rules)
