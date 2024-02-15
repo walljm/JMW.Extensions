@@ -1,8 +1,7 @@
-namespace JMW.Template
+namespace JMW.Template;
+
+public enum TagTypes
 {
-    public enum TagTypes
-    {
-        Text,
-        Tag
-    }
+    Text,
+    Tag
 }

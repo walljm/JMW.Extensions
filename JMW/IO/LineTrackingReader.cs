@@ -11,7 +11,7 @@ namespace JMW.IO
     public class LineTrackingReader
     {
         private readonly TextReader _reader;
-        private List<char> _buffer = new();
+        private List<char> _buffer = new List<char>();
 
         /// <summary>
         /// The, currently read to, Line in our reader.
@@ -24,7 +24,7 @@ namespace JMW.IO
         /// <value>The column.</value>
         public int Column { get; private set; } = 0;
 
-        private Stack<int> _lineLengths = new();
+        private Stack<int> _lineLengths = new Stack<int>();
 
         public LineTrackingReader(TextReader reader)
         {
@@ -103,7 +103,7 @@ namespace JMW.IO
 
         public void PushBack(char c)
         {
-            PushBack(new[] { c });
+            PushBack([c]);
         }
 
         private void decrementLine()

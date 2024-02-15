@@ -179,7 +179,7 @@ public class Table : Base, IParser, IProperty
         original_column_string = columnnames;
 
         // initialize the field positions dictionary object.
-        var field_positions = new Dictionary<string, ColumnPosition>();
+        var fieldPositions = new Dictionary<string, ColumnPosition>();
         var positions = new List<ColumnPosition>();
 
         // get the field names.  we assume the line has them.
@@ -218,7 +218,7 @@ public class Table : Base, IParser, IProperty
             }
             o.Name = columns[i];
             o.Key = columns[i];
-            field_positions.Add(col, o);
+            fieldPositions.Add(col, o);
             positions.Add(o);
         }
 
@@ -244,12 +244,12 @@ public class Table : Base, IParser, IProperty
                 if (row.Trim().GetCharHistogram().Count > 1) // don't bother with empty lines.
                 {
                     //check to see if the first column starts at the beginning of the line.
-                    while (field_positions[keys[0]].Start != 0 &&
-                        row.Substring(field_positions[keys[0]].Start - 1, 1) != " " &&
-                        row.Substring(field_positions[keys[0]].Start - 1, 1) != "+")
+                    while (fieldPositions[keys[0]].Start != 0 &&
+                        row.Substring(fieldPositions[keys[0]].Start - 1, 1) != " " &&
+                        row.Substring(fieldPositions[keys[0]].Start - 1, 1) != "+")
                     {
-                        field_positions[keys[0]].Start--;
-                        field_positions[keys[0]].Length++;
+                        fieldPositions[keys[0]].Start--;
+                        fieldPositions[keys[0]].Length++;
                     }
 
                     // Adjust the rows if necessary.
@@ -257,44 +257,44 @@ public class Table : Base, IParser, IProperty
                     {
                         var key = keys[j];
 
-                        var start = field_positions[key].Start + field_positions[key].Length - 1;
+                        var start = fieldPositions[key].Start + fieldPositions[key].Length - 1;
 
                         while (start >= 0 && row.Length > start && !whitespace.Contains(row.Substring(start, 1)))
                         {
-                            field_positions[key].Length--; // only decrement the length if its not the last column
-                            field_positions[keys[j + 1]].Start--; // only decrement the starting index of the next column if its not the last column
+                            fieldPositions[key].Length--; // only decrement the length if its not the last column
+                            fieldPositions[keys[j + 1]].Start--; // only decrement the starting index of the next column if its not the last column
 
                             // now deal with the increased col length.
                             if (j + 2 < keys.Count) // its not the second to last
                             {
-                                field_positions[keys[j + 1]].Length++; // only increment the length of the next column if the next colum isn't the last column
+                                fieldPositions[keys[j + 1]].Length++; // only increment the length of the next column if the next colum isn't the last column
                             }
-                            start = field_positions[key].Start + field_positions[key].Length - 1; // reset the start pos.
+                            start = fieldPositions[key].Start + fieldPositions[key].Length - 1; // reset the start pos.
                         }
                     }
                 }
             }
         }
 
-        field_positions = CombineMultiwordColumnNames(positions);
+        fieldPositions = CombineMultiwordColumnNames(positions);
 
         #endregion Validate
 
         // fix the column names.
-        foreach (var kvp in field_positions.ToList())
+        foreach (var kvp in fieldPositions.ToList())
         {
-            field_positions.Remove(kvp.Key);
+            fieldPositions.Remove(kvp.Key);
 
             kvp.Value.Name = kvp.Value.GetColumnValue(original_column_string).Trim();
             var d = 1;
-            while (field_positions.ContainsKey(kvp.Value.Name))
+            while (fieldPositions.ContainsKey(kvp.Value.Name))
             {
                 kvp.Value.Name += d;
             }
-            field_positions.Add(kvp.Value.Name, kvp.Value);
+            fieldPositions.Add(kvp.Value.Name, kvp.Value);
         }
 
-        return new ColumnPositionCollection(field_positions);
+        return new ColumnPositionCollection(fieldPositions);
     }
 
     /// <summary>
@@ -304,7 +304,7 @@ public class Table : Base, IParser, IProperty
     /// </summary>
     /// <param name="positions">A list of the Positions for the columns in order they were found.</param>
     /// <returns></returns>
-    public static Dictionary<string, ColumnPosition> CombineMultiwordColumnNames(List<ColumnPosition> positions)
+    private static Dictionary<string, ColumnPosition> CombineMultiwordColumnNames(List<ColumnPosition> positions)
     {
         // look for columns with a length of 1, as that column is basically a zero length column and should be combined with the column next to it.
         var field_positions = new Dictionary<string, ColumnPosition>();
@@ -364,7 +364,7 @@ public class Table : Base, IParser, IProperty
     /// <param name="columnnames">a string containing the column header</param>
     /// <param name="columns">the array of unique column names</param>
     /// <returns></returns>
-    public static string HandleDuplicateColumnNames(string columnnames, string[] columns)
+    private static string HandleDuplicateColumnNames(string columnnames, string[] columns)
     {
         // now check for uniqueness.
         var cols = columns.Distinct().ToArray();

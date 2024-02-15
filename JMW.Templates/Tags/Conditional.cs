@@ -31,6 +31,7 @@ namespace JMW.Template.Tags
         };
 
         private Dictionary<string, ValueRetriever> _retrievers = new();
+        private static readonly string[] separator = [","];
 
         public Conditional()
         {
@@ -52,7 +53,7 @@ namespace JMW.Template.Tags
 
                 if (token.Properties.ContainsKey(ATTR_COLUMN))
                 {
-                    columns = token.Properties[ATTR_COLUMN].Split(new[] { "," }, StringSplitOptions.None).ToList();
+                    columns = token.Properties[ATTR_COLUMN].Split(separator, StringSplitOptions.None).ToList();
                 }
 
                 foreach (var column in columns)

@@ -31,9 +31,9 @@ namespace JMW.Collections
     /// <typeparam name="T">The type of object being stored in the collection.</typeparam>
     public class IndexedCollection<T> : INotifyCollectionChanged, IList<T> where T : IndexedClass
     {
-        private readonly Dictionary<string, Dictionary<string, List<T>>> _indexCollection = new();
-        private readonly Dictionary<string, Dictionary<string, T>> _uniqueIndexCollection = new();
-        private readonly ObservableCollection<T> _collection = new();
+        private readonly Dictionary<string, Dictionary<string, List<T>>> _indexCollection = new Dictionary<string, Dictionary<string, List<T>>>();
+        private readonly Dictionary<string, Dictionary<string, T>> _uniqueIndexCollection = new Dictionary<string, Dictionary<string, T>>();
+        private readonly ObservableCollection<T> _collection = new ObservableCollection<T>();
         private readonly Dictionary<string, PropInfo> _indexedProps;
 
         public IndexedCollection()

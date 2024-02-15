@@ -12,18 +12,18 @@ namespace JMW.Collections.Tests
             for (var i = 0; i < 15; i++)
                 buff.Add(i);
 
-            Assert.AreEqual(10, buff.Count);
-            Assert.AreEqual(14, buff.Last());
+            Assert.That(10, Is.EqualTo(buff.Count));
+            Assert.That(14, Is.EqualTo(buff.Last()));
 
             var c = 5;
             foreach (var i in buff)
-                Assert.AreEqual(c++, i);
+                Assert.That(c++, Is.EqualTo(i));
 
-            Assert.AreEqual(15, c);
-            Assert.IsTrue(buff.Contains(11));
+            Assert.That(15, Is.EqualTo(c));
+            Assert.That(buff.Contains(11), Is.True);
             buff.Clear();
-            Assert.AreEqual(0, buff.Count);
-            Assert.IsFalse(buff.IsReadOnly);
+            Assert.That(0, Is.EqualTo(buff.Count));
+            Assert.That(buff.IsReadOnly, Is.False);
         }
 
         [Test]
@@ -35,73 +35,73 @@ namespace JMW.Collections.Tests
 
             var c = 14;
             foreach (var i in buff)
-                Assert.AreEqual(c--, i);
+                Assert.That(c--, Is.EqualTo(i));
 
-            Assert.AreEqual(4, c);
-            Assert.AreEqual(10, buff.Count);
+            Assert.That(4, Is.EqualTo(c));
+            Assert.That(10, Is.EqualTo(buff.Count));
         }
 
         [Test]
         public void RingBufferTest2()
         {
-            var buff = new RingBuffer<int>(new[] { 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Assert.AreEqual(10, buff.Count);
-            Assert.IsTrue(buff.Contains(11));
+            var buff = new RingBuffer<int>([3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+            Assert.That(10, Is.EqualTo(buff.Count));
+            Assert.That(buff.Contains(11), Is.True);
             buff.Clear();
-            Assert.AreEqual(0, buff.Count);
+            Assert.That(0, Is.EqualTo(buff.Count));
         }
 
         [Test]
         public void RingBufferTest3()
         {
-            var buff = new RingBuffer<int>(new[] { 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }, true);
+            var buff = new RingBuffer<int>([3, 4, 5, 6, 7, 8, 9, 10, 11, 12], true);
 
             var c = 12;
             foreach (var i in buff)
-                Assert.AreEqual(c--, i);
-            Assert.AreEqual(2, c);
-            Assert.AreEqual(10, buff.Count);
+                Assert.That(c--, Is.EqualTo(i));
+            Assert.That(2, Is.EqualTo(c));
+            Assert.That(10, Is.EqualTo(buff.Count));
         }
 
         [Test]
         public void RingBufferTest4()
         {
-            var buff = new RingBuffer<int>(new[] { 3, 4, 5 });
-            Assert.AreEqual(5, buff.Last());
-            buff = new RingBuffer<int>(new[] { 3, 4, 5 }, true);
-            Assert.AreEqual(3, buff.Last());
+            var buff = new RingBuffer<int>([3, 4, 5]);
+            Assert.That(5, Is.EqualTo(buff.Last()));
+            buff = new RingBuffer<int>([3, 4, 5], true);
+            Assert.That(3, Is.EqualTo(buff.Last()));
 
-            buff = new RingBuffer<int>(10, new[] { 3, 4, 5 });
-            Assert.AreEqual(5, buff.Last());
-            Assert.AreEqual(3, buff.Count);
+            buff = new RingBuffer<int>(10, [3, 4, 5]);
+            Assert.That(5, Is.EqualTo(buff.Last()));
+            Assert.That(3, Is.EqualTo(buff.Count));
 
-            buff = new RingBuffer<int>(10, new[] { 3, 4, 5 }, true);
-            Assert.AreEqual(3, buff.Last());
+            buff = new RingBuffer<int>(10, [3, 4, 5], true);
+            Assert.That(3, Is.EqualTo(buff.Last()));
         }
 
         [Test]
         public void RingBufferTest5()
         {
-            var buff = new RingBuffer<int>(new[] { 3, 4, 5 });
-            Assert.AreEqual(5, buff[2]);
-            Assert.AreEqual(4, buff[1]);
-            Assert.AreEqual(3, buff[0]);
-            Assert.AreEqual(3, buff.First());
-            Assert.AreEqual(5, buff.Last());
+            var buff = new RingBuffer<int>([3, 4, 5]);
+            Assert.That(5, Is.EqualTo(buff[2]));
+            Assert.That(4, Is.EqualTo(buff[1]));
+            Assert.That(3, Is.EqualTo(buff[0]));
+            Assert.That(3, Is.EqualTo(buff.First()));
+            Assert.That(5, Is.EqualTo(buff.Last()));
 
             buff.Add(6);
-            Assert.AreEqual(6, buff[2]);
-            Assert.AreEqual(5, buff[1]);
-            Assert.AreEqual(4, buff[0]);
-            Assert.AreEqual(4, buff.First());
-            Assert.AreEqual(6, buff.Last());
+            Assert.That(6, Is.EqualTo(buff[2]));
+            Assert.That(5, Is.EqualTo(buff[1]));
+            Assert.That(4, Is.EqualTo(buff[0]));
+            Assert.That(4, Is.EqualTo(buff.First()));
+            Assert.That(6, Is.EqualTo(buff.Last()));
 
             buff.Add(7);
-            Assert.AreEqual(7, buff[2]);
-            Assert.AreEqual(6, buff[1]);
-            Assert.AreEqual(5, buff[0]);
-            Assert.AreEqual(5, buff.First());
-            Assert.AreEqual(7, buff.Last());
+            Assert.That(7, Is.EqualTo(buff[2]));
+            Assert.That(6, Is.EqualTo(buff[1]));
+            Assert.That(5, Is.EqualTo(buff[0]));
+            Assert.That(5, Is.EqualTo(buff.First()));
+            Assert.That(7, Is.EqualTo(buff.Last()));
         }
 
         [Test]
@@ -114,11 +114,11 @@ namespace JMW.Collections.Tests
                 5
             };
             var arr2 = buff.ToArray();
-            Assert.AreEqual(arr2.Length, buff.Count);
+            Assert.That(arr2.Length, Is.EqualTo(buff.Count));
 
             buff.ReverseIteration = true;
             arr2 = buff.ToArray();
-            Assert.AreEqual(arr2.Length, buff.Count);
+            Assert.That(arr2.Length, Is.EqualTo(buff.Count));
         }
     }
 }

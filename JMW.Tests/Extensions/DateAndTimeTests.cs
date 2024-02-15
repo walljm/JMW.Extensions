@@ -1,6 +1,5 @@
-﻿using System;
-using JMW.Extensions.DateAndTime;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using System;
 
 namespace JMW.Extensions.DateAndTime.Tests
 {
@@ -10,7 +9,7 @@ namespace JMW.Extensions.DateAndTime.Tests
         [Test]
         public void GetElapsedTimeTest()
         {
-            Assert.AreEqual("01:01:01", new DateTime(2018, 01, 01, 01, 01, 01).GetElapsedTime(new DateTime(2018, 1, 1)));
+            Assert.That("01:01:01", Is.EqualTo(new DateTime(2018, 01, 01, 01, 01, 01).GetElapsedTime(new DateTime(2018, 1, 1))));
         }
     }
 }

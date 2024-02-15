@@ -14,69 +14,68 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace JMW.Extensions.Reflection
+namespace JMW.Extensions.Reflection;
+
+public static class Extensions
 {
-    public static class Extensions
+    public static T CastDelegate<T>(this Delegate src) where T : class
     {
-        public static T CastDelegate<T>(this Delegate src) where T : class
-        {
-            return (T)(object)Delegate.CreateDelegate(typeof(T), src.Target, src.Method, true); // throw on fail
-        }
+        return (T)(object)Delegate.CreateDelegate(typeof(T), src.Target, src.Method, true); // throw on fail
+    }
 
-        /// <summary>
-        /// Gets the list of <see cref="PropertyInfo"/> that have and attribute of type <typeparamref name="T"/>
-        /// </summary>
-        /// <typeparam name="T">The Attribute Type you are filtering on</typeparam>
-        /// <param name="type">The type to search for properties </param>
-        /// <returns><see cref="IEnumerable{PropertyInfo}"/> that have an Attribute of type <typeparamref name="T"/></returns>
-        public static IEnumerable<PropertyInfo> GetPropertiesByAttribute<T>(this Type type) where T : Attribute
-        {
-            return type.GetProperties()
-                       .Where(p => Attribute.IsDefined(p, typeof(T)));
-        }
+    /// <summary>
+    /// Gets the list of <see cref="PropertyInfo"/> that have and attribute of type <typeparamref name="T"/>
+    /// </summary>
+    /// <typeparam name="T">The Attribute Type you are filtering on</typeparam>
+    /// <param name="type">The type to search for properties </param>
+    /// <returns><see cref="IEnumerable{PropertyInfo}"/> that have an Attribute of type <typeparamref name="T"/></returns>
+    public static IEnumerable<PropertyInfo> GetPropertiesByAttribute<T>(this Type type) where T : Attribute
+    {
+        return type.GetProperties()
+                   .Where(p => Attribute.IsDefined(p, typeof(T)));
+    }
 
-        /// <summary>
-        /// Indicates if the provided type implements the Interface of <typeparamref name="T"/>
-        /// </summary>
-        /// <typeparam name="T">Type of Interface to check for</typeparam>
-        /// <param name="type">The type to check</param>
-        /// <returns>Boolean indicated if the type implments the interface.</returns>
-        public static bool HasInterface<T>(this Type type) where T : class
-        {
-            var t_name = typeof(T).Name;
+    /// <summary>
+    /// Indicates if the provided type implements the Interface of <typeparamref name="T"/>
+    /// </summary>
+    /// <typeparam name="T">Type of Interface to check for</typeparam>
+    /// <param name="type">The type to check</param>
+    /// <returns>Boolean indicated if the type implments the interface.</returns>
+    public static bool HasInterface<T>(this Type type) where T : class
+    {
+        var t_name = typeof(T).Name;
 
-            return type.GetInterfaces().Any(t => t.Name == t_name);
-        }
+        return type.GetInterfaces().Any(t => t.Name == t_name);
+    }
 
-        public static T GetValue<T>(this PropertyInfo info, object obj)
-        {
-            return (T)info.GetValue(obj, null);
-        }
+    public static T GetValue<T>(this PropertyInfo info, object obj)
+    {
+        return (T)info.GetValue(obj, null);
+    }
 
-        /// <summary>
-        /// Get the attribute of the specified type from an enum value.
-        /// </summary>
-        /// <typeparam name="TAttribute">The type of the attribute to get.</typeparam>
-        /// <param name="enumVal">The enum value.</param>
-        /// <returns>The first attribute of the given type that exists on the enum value.</returns>
-        public static TAttribute GetAttributeOfType<TAttribute>(this Enum enumVal)
-            where TAttribute : Attribute
-        {
-            var memInfo = enumVal.GetType().GetMember(enumVal.ToString());
-            return memInfo[0].GetAttributeOfType<TAttribute>();
-        }
+    /// <summary>
+    /// Get the attribute of the specified type from an enum value.
+    /// </summary>
+    /// <typeparam name="TAttribute">The type of the attribute to get.</typeparam>
+    /// <param name="enumVal">The enum value.</param>
+    /// <returns>The first attribute of the given type that exists on the enum value.</returns>
+    public static TAttribute GetAttributeOfType<TAttribute>(this Enum enumVal)
+        where TAttribute : Attribute
+    {
+        var memInfo = enumVal.GetType().GetMember(enumVal.ToString());
+        return memInfo[0].GetAttributeOfType<TAttribute>();
+    }
 
-        /// <summary>
-        /// Get the attribute of the specified type from the given <paramref name="provider"/>.
-        /// </summary>
-        /// <typeparam name="TAttribute">The type of the attribute to get.</typeparam>
-        /// <param name="provider">The provider.</param>
-        /// <returns>The first attribute of the given type that exists on the provider.</returns>
-        public static TAttribute GetAttributeOfType<TAttribute>(this ICustomAttributeProvider provider)
-            where TAttribute : Attribute
-        {
-            var attributes = provider.GetCustomAttributes(typeof(TAttribute), true);
-            return attributes.Length > 0 ? attributes[0] as TAttribute : null;
-        }
+    /// <summary>
+    /// Get the attribute of the specified type from the given <paramref name="provider"/>.
+    /// </summary>
+    /// <typeparam name="TAttribute">The type of the attribute to get.</typeparam>
+    /// <param name="provider">The provider.</param>
+    /// <returns>The first attribute of the given type that exists on the provider.</returns>
+    public static TAttribute GetAttributeOfType<TAttribute>(this ICustomAttributeProvider provider)
+        where TAttribute : Attribute
+    {
+        var attributes = provider.GetCustomAttributes(typeof(TAttribute), true);
+        return attributes.Length > 0 ? attributes[0] as TAttribute : null;
     }
 }

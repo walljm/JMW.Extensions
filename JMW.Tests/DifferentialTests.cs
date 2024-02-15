@@ -1,8 +1,9 @@
-﻿using System;
+﻿using JMW.Types;
+using NUnit.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 
 namespace JMW.Differentials.Tests
 {
@@ -32,12 +33,12 @@ namespace JMW.Differentials.Tests
                     return null;
                 });
 
-            Assert.AreEqual(1, diff.OnlyInListA.Count);
-            Assert.AreEqual(1, diff.OnlyInListB.Count);
-            Assert.AreEqual(1, diff.Modified.Count);
-            Assert.AreEqual("b B", diff.Modified.First().Differences.First().Difference);
-            Assert.AreEqual("b", diff.Modified.First().ObjectA);
-            Assert.AreEqual("B", diff.Modified.First().ObjectB);
+            Assert.That(1, Is.EqualTo(diff.OnlyInListA.Count));
+            Assert.That(1, Is.EqualTo(diff.OnlyInListB.Count));
+            Assert.That(1, Is.EqualTo(diff.Modified.Count));
+            Assert.That("b B", Is.EqualTo(diff.Modified.First().Differences.First().Difference));
+            Assert.That("b", Is.EqualTo(diff.Modified.First().ObjectA));
+            Assert.That("B", Is.EqualTo(diff.Modified.First().ObjectB));
         }
 
         [Test]
@@ -51,36 +52,34 @@ namespace JMW.Differentials.Tests
             var p1 = new Pair<string>(o1, o2);
             var p2 = new Pair<string>(o3, o4);
 
-            Assert.AreEqual(p1, p2);
-            Assert.IsTrue(p1.Equals(p2));
-            Assert.IsTrue(p1.Equals((object)p2));
-            Assert.IsTrue(p1.Equals(p1, p2));
+            Assert.That(p1, Is.EqualTo(p2));
+            Assert.That(p1.Equals(p2), Is.True);
+            Assert.That(p1.Equals((object)p2), Is.True);
+            Assert.That(p1.Equals(p1, p2), Is.True);
 
-            Assert.IsTrue(((IStructuralEquatable)p1).Equals(p2));
-            Assert.IsTrue(p1.Equals((object)p2));
+            Assert.That(((IStructuralEquatable)p1).Equals(p2), Is.True);
+            Assert.That(p1.Equals((object)p2), Is.True);
 
-            Assert.IsTrue(((IStructuralEquatable)p1).Equals(p2, EqualityComparer<string>.Default));
-            Assert.IsTrue(p1.Equals((object)p2));
+            Assert.That(((IStructuralEquatable)p1).Equals(p2, EqualityComparer<string>.Default), Is.True);
+            Assert.That(p1.Equals((object)p2), Is.True);
 
+            Assert.That(p1 == p2, Is.True);
+            Assert.That(p1 == p2, Is.True);
+            Assert.That(p1 == p2, Is.True);
+            Assert.That(p1 == p2, Is.True);
 
-            Assert.IsTrue(p1 == p2);
-            Assert.IsTrue(p1 == p2);
-            Assert.IsTrue(p1 == p2);
-            Assert.IsTrue(p1 == p2);
-
-            Assert.AreEqual(0, p1.CompareTo(p2));
+            Assert.That(0, Is.EqualTo(p1.CompareTo(p2)));
 
             o1 = "1Jason";
             p1 = new Pair<string>(o1, o2);
-            Assert.AreEqual(-1, p1.CompareTo(p2));
+            Assert.That(-1, Is.EqualTo(p1.CompareTo(p2)));
             o1 = "Jason1";
             p1 = new Pair<string>(o1, o2);
-            Assert.AreEqual(1, p1.CompareTo(p2));
-            Assert.AreEqual(1, p1.CompareTo(null));
+            Assert.That(1, Is.EqualTo(p1.CompareTo(p2)));
+            Assert.That(1, Is.EqualTo(p1.CompareTo(null)));
 
-            Assert.AreEqual(1, ((IComparable)p1).CompareTo(p2));
-            Assert.AreEqual(1, ((IComparable)p1).CompareTo(null));
-
+            Assert.That(1, Is.EqualTo(((IComparable)p1).CompareTo(p2)));
+            Assert.That(1, Is.EqualTo(((IComparable)p1).CompareTo(null)));
 
             o1 = "Jason";
             o2 = "Wall";
@@ -90,16 +89,15 @@ namespace JMW.Differentials.Tests
             p1 = new Pair<string>(o1, o2);
             p2 = new Pair<string>(o3, o4);
 
-            Assert.AreNotEqual(p1, p2);
-            Assert.IsFalse(p1.Equals(p2));
-            Assert.IsFalse(p1.Equals(null));
-            Assert.IsFalse(null == p1);
-            Assert.IsFalse(p1 == null);
-            Assert.IsFalse((Pair<string>)null != null);
-            Assert.IsTrue(p1 !=p2);
-            Assert.IsTrue(p1 != null);
-            Assert.IsTrue(null != p2);
-
+            Assert.That(p1, Is.Not.EqualTo(p2));
+            Assert.That(p1.Equals(p2), Is.False);
+            Assert.That(p1.Equals(null), Is.False);
+            Assert.That(null == p1, Is.False);
+            Assert.That(p1 == null, Is.False);
+            Assert.That((Pair<string>)null != null, Is.False);
+            Assert.That(p1 != p2, Is.True);
+            Assert.That(p1 != null, Is.True);
+            Assert.That(null != p2, Is.True);
         }
 
         [Test]
@@ -113,41 +111,38 @@ namespace JMW.Differentials.Tests
             var p1 = new Pair<string, int>(o1, o2);
             var p2 = new Pair<string, int>(o3, o4);
 
-            Assert.AreEqual(p1, p2);
+            Assert.That(p1, Is.EqualTo(p2));
 
+            Assert.That(p1, Is.EqualTo(p2));
+            Assert.That(p1.Equals(p2), Is.True);
+            Assert.That(p1.Equals((object)p2), Is.True);
+            Assert.That(p1.Equals(p1, p2), Is.True);
 
-            Assert.AreEqual(p1, p2);
-            Assert.IsTrue(p1.Equals(p2));
-            Assert.IsTrue(p1.Equals((object)p2));
-            Assert.IsTrue(p1.Equals(p1, p2));
+            Assert.That(((IStructuralEquatable)p1).Equals(p2), Is.True);
+            Assert.That(p1.Equals((object)p2), Is.True);
 
-            Assert.IsTrue(((IStructuralEquatable)p1).Equals(p2));
-            Assert.IsTrue(p1.Equals((object)p2));
+            Assert.That(((IStructuralEquatable)p1).Equals(p2, EqualityComparer<string>.Default), Is.True);
+            Assert.That(p1.Equals((object)p2), Is.True);
 
-            Assert.IsTrue(((IStructuralEquatable)p1).Equals(p2, EqualityComparer<string>.Default));
-            Assert.IsTrue(p1.Equals((object)p2));
+            Assert.That(p1 == p2, Is.True);
+            Assert.That(p1 == p2, Is.True);
+            Assert.That(p1 == p2, Is.True);
+            Assert.That(p1 == p2, Is.True);
 
-
-            Assert.IsTrue(p1 == p2);
-            Assert.IsTrue(p1 == p2);
-            Assert.IsTrue(p1 == p2);
-            Assert.IsTrue(p1 == p2);
-
-            Assert.AreEqual(0, p1.CompareTo(p2));
+            Assert.That(0, Is.EqualTo(p1.CompareTo(p2)));
 
             o1 = "1Jason";
             p1 = new Pair<string, int>(o1, o2);
-            Assert.AreEqual(-1, p1.CompareTo(p2));
+            Assert.That(-1, Is.EqualTo(p1.CompareTo(p2)));
             o1 = "Jason1";
             p1 = new Pair<string, int>(o1, o2);
-            Assert.AreEqual(1, p1.CompareTo(p2));
-            Assert.AreEqual(1, p1.CompareTo(null));
+            Assert.That(1, Is.EqualTo(p1.CompareTo(p2)));
+            Assert.That(1, Is.EqualTo(p1.CompareTo(null)));
 
-            Assert.AreEqual(1, ((IComparable)p1).CompareTo(p2));
-            Assert.AreEqual(1, ((IComparable)p1).CompareTo(null));
-            Assert.AreEqual(0, new PairComparer<string, int>().Compare(null, null));
-            Assert.AreEqual(1, new PairComparer<string, int>().Compare(null, p2));
-
+            Assert.That(1, Is.EqualTo(((IComparable)p1).CompareTo(p2)));
+            Assert.That(1, Is.EqualTo(((IComparable)p1).CompareTo(null)));
+            Assert.That(0, Is.EqualTo(new PairComparer<string, int>().Compare(null, null)));
+            Assert.That(1, Is.EqualTo(new PairComparer<string, int>().Compare(null, p2)));
 
             o1 = "Jason";
             o2 = 1;
@@ -157,15 +152,15 @@ namespace JMW.Differentials.Tests
             p1 = new Pair<string, int>(o1, o2);
             p2 = new Pair<string, int>(o3, o4);
 
-            Assert.AreNotEqual(p1, p2);
-            Assert.IsFalse(p1.Equals(p2));
-            Assert.IsFalse(p1.Equals(null));
-            Assert.IsFalse(null == p1);
-            Assert.IsFalse(p1 == null);
-            Assert.IsFalse((Pair<string>)null != null);
-            Assert.IsTrue(p1 != p2);
-            Assert.IsTrue(p1 != null);
-            Assert.IsTrue(null != p2);
+            Assert.That(p1, Is.Not.EqualTo(p2));
+            Assert.That(p1.Equals(p2), Is.False);
+            Assert.That(p1.Equals(null), Is.False);
+            Assert.That(null == p1, Is.False);
+            Assert.That(p1 == null, Is.False);
+            Assert.That((Pair<string>)null != null, Is.False);
+            Assert.That(p1 != p2, Is.True);
+            Assert.That(p1 != null, Is.True);
+            Assert.That(null != p2, Is.True);
         }
 
         private class MyDiff
@@ -196,9 +191,9 @@ namespace JMW.Differentials.Tests
             };
 
             var diff = Differential.RunCollectionDifferential(lst_a, lst_b, p => p.Foo);
-            Assert.AreEqual(2, diff.OnlyInListA.Count);
-            Assert.AreEqual(2, diff.OnlyInListB.Count);
-            Assert.AreEqual(2, diff.Shared.Count);
+            Assert.That(2, Is.EqualTo(diff.OnlyInListA.Count));
+            Assert.That(2, Is.EqualTo(diff.OnlyInListB.Count));
+            Assert.That(2, Is.EqualTo(diff.Shared.Count));
         }
 
         [Test]
@@ -220,9 +215,9 @@ namespace JMW.Differentials.Tests
             };
 
             var diff = Differential.RunCollectionDifferential(lst_a, lst_b, p => p.Foo, p => p.Foo);
-            Assert.AreEqual(2, diff.OnlyInListA.Count);
-            Assert.AreEqual(2, diff.OnlyInListB.Count);
-            Assert.AreEqual(2, diff.Shared.Count);
+            Assert.That(2, Is.EqualTo(diff.OnlyInListA.Count));
+            Assert.That(2, Is.EqualTo(diff.OnlyInListB.Count));
+            Assert.That(2, Is.EqualTo(diff.Shared.Count));
         }
     }
 

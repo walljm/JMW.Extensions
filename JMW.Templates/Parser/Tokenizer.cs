@@ -285,7 +285,7 @@ namespace JMW.Template
                 _eof = true;
                 return setupErrorToken(EOF);
             }
-            _reader.PushBack(new[] { (char)c });
+            _reader.PushBack([(char)c]);
 
             consumeUntil('\n', TokenType.COMMENT);
             Token.Value = Token.Value.TrimEnd('\r', '\n');

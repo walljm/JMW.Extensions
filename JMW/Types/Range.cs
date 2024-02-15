@@ -57,7 +57,7 @@ namespace JMW.Types
         /// <summary>
         /// An instance of the calculator. We will use this to perform the calculations.
         /// </summary>
-        private static C calc = new();
+        private static C calc = new C();
 
         #region Constructors
 

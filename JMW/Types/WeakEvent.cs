@@ -66,7 +66,7 @@ namespace JMW.Types
 
             // ReSharper disable once StaticMemberInGenericType (by design)
             private static readonly ConcurrentDictionary<MethodInfo, OpenEventHandler> _openHandlerCache =
-                new();
+                new ConcurrentDictionary<MethodInfo, OpenEventHandler>();
 
             private static OpenEventHandler CreateOpenHandler(MethodInfo method)
             {

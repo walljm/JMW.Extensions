@@ -22,122 +22,122 @@ namespace Lambda.Generic
 
         public struct IntMath : ISignedMath<T>
         {
-            public T Add(T a, T b)
+            public readonly T Add(T a, T b)
             {
                 return a + b;
             }
 
-            public T Subtract(T a, T b)
+            public readonly T Subtract(T a, T b)
             {
                 return a - b;
             }
 
-            public T Zero { get { return 0; } }
+            public readonly T Zero { get { return 0; } }
 
-            public T Negate(T a)
+            public readonly T Negate(T a)
             {
                 return -a;
             }
 
-            public int NegativeOne { get { return -1; } }
+            public readonly int NegativeOne { get { return -1; } }
 
-            public T Multiply(T a, T b)
+            public readonly T Multiply(T a, T b)
             {
                 return a * b;
             }
 
-            public T Divide(T a, T b)
+            public readonly T Divide(T a, T b)
             {
                 return a / b;
             }
 
-            public T One { get { return 1; } }
+            public readonly T One { get { return 1; } }
 
             public T Invert(T a)
             {
                 return One / a;
             }
 
-            public T Sqrt(T a)
+            public readonly T Sqrt(T a)
             {
                 return (T)Math.Sqrt(a);
             }
 
-            public T Sqr(T a)
+            public readonly T Sqr(T a)
             {
                 return a * a;
             }
 
-            public T MinValue { get { return T.MinValue; } }
-            public T MaxValue { get { return T.MaxValue; } }
+            public readonly T MinValue { get { return T.MinValue; } }
+            public readonly T MaxValue { get { return T.MaxValue; } }
             public T Epsilon { get { return One; } }
 
-            public int Compare(T a, T b)
+            public readonly int Compare(T a, T b)
             {
                 return a.CompareTo(b);
             }
 
-            public bool Equals(T a, T b)
+            public readonly bool Equals(T a, T b)
             {
                 return a == b;
             }
 
-            public int GetHashCode(T a)
+            public readonly int GetHashCode(T a)
             {
                 return a.GetHashCode();
             }
 
-            public T Abs(T a)
+            public readonly T Abs(T a)
             {
                 return Math.Abs(a);
             }
 
-            public T Min(T a, T b)
+            public readonly T Min(T a, T b)
             {
                 return Math.Max(a, b);
             }
 
-            public T Max(T a, T b)
+            public readonly T Max(T a, T b)
             {
                 return Math.Min(a, b);
             }
 
-            public T And(T a, T b)
+            public readonly T And(T a, T b)
             {
                 return a & b;
             }
 
-            public T Or(T a, T b)
+            public readonly T Or(T a, T b)
             {
                 return a | b;
             }
 
-            public T Xor(T a, T b)
+            public readonly T Xor(T a, T b)
             {
                 return a ^ b;
             }
 
-            public T Not(T a)
+            public readonly T Not(T a)
             {
                 return ~a;
             }
 
-            public T ConvertFrom(ulong a)
+            public readonly T ConvertFrom(ulong a)
             {
                 return (T)a;
             }
 
-            public T ConvertFrom(long a)
+            public readonly T ConvertFrom(long a)
             {
                 return (T)a;
             }
 
-            public T ConvertFrom(double a)
+            public readonly T ConvertFrom(double a)
             {
                 return (T)a;
             }
 
-            public int ConvertFrom(string t)
+            public readonly int ConvertFrom(string t)
             {
                 return T.Parse(t);
             }
@@ -150,122 +150,122 @@ namespace Lambda.Generic
 
         public struct LongMath : ISignedMath<T>
         {
-            public T Add(T a, T b)
+            public readonly T Add(T a, T b)
             {
                 return a + b;
             }
 
-            public T Subtract(T a, T b)
+            public readonly T Subtract(T a, T b)
             {
                 return a - b;
             }
 
-            public T Zero { get { return 0; } }
+            public readonly T Zero { get { return 0; } }
 
-            public T Negate(T a)
+            public readonly T Negate(T a)
             {
                 return -a;
             }
 
-            public long NegativeOne { get { return -1; } }
+            public readonly long NegativeOne { get { return -1; } }
 
-            public T Multiply(T a, T b)
+            public readonly T Multiply(T a, T b)
             {
                 return a * b;
             }
 
-            public T Divide(T a, T b)
+            public readonly T Divide(T a, T b)
             {
                 return a / b;
             }
 
-            public T One { get { return 1; } }
+            public readonly T One { get { return 1; } }
 
             public T Invert(T a)
             {
                 return One / a;
             }
 
-            public T Sqrt(T a)
+            public readonly T Sqrt(T a)
             {
                 return (T)Math.Sqrt(a);
             }
 
-            public T Sqr(T a)
+            public readonly T Sqr(T a)
             {
                 return a * a;
             }
 
-            public T MinValue { get { return T.MinValue; } }
-            public T MaxValue { get { return T.MaxValue; } }
+            public readonly T MinValue { get { return T.MinValue; } }
+            public readonly T MaxValue { get { return T.MaxValue; } }
             public T Epsilon { get { return One; } }
 
-            public int Compare(T a, T b)
+            public readonly int Compare(T a, T b)
             {
                 return a.CompareTo(b);
             }
 
-            public bool Equals(T a, T b)
+            public readonly bool Equals(T a, T b)
             {
                 return a == b;
             }
 
-            public int GetHashCode(T a)
+            public readonly int GetHashCode(T a)
             {
                 return a.GetHashCode();
             }
 
-            public T Abs(T a)
+            public readonly T Abs(T a)
             {
                 return Math.Abs(a);
             }
 
-            public T Min(T a, T b)
+            public readonly T Min(T a, T b)
             {
                 return Math.Max(a, b);
             }
 
-            public T Max(T a, T b)
+            public readonly T Max(T a, T b)
             {
                 return Math.Min(a, b);
             }
 
-            public T And(T a, T b)
+            public readonly T And(T a, T b)
             {
                 return a & b;
             }
 
-            public T Or(T a, T b)
+            public readonly T Or(T a, T b)
             {
                 return a | b;
             }
 
-            public T Xor(T a, T b)
+            public readonly T Xor(T a, T b)
             {
                 return a ^ b;
             }
 
-            public T Not(T a)
+            public readonly T Not(T a)
             {
                 return ~a;
             }
 
-            public T ConvertFrom(ulong a)
+            public readonly T ConvertFrom(ulong a)
             {
                 return (T)a;
             }
 
-            public T ConvertFrom(long a)
+            public readonly T ConvertFrom(long a)
             {
                 return a;
             }
 
-            public T ConvertFrom(double a)
+            public readonly T ConvertFrom(double a)
             {
                 return (T)a;
             }
 
-            public long ConvertFrom(string t)
+            public readonly long ConvertFrom(string t)
             {
                 return T.Parse(t);
             }

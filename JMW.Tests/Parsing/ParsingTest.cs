@@ -117,10 +117,10 @@ start
             output += o["jason"] + "|" + o["wall"] + ";";
         }
 
-        Assert.AreEqual("is is 0 a |start\n this;is is 1 foo|\n this;is is 2 foo|\n this;is is 3 foo|\n this;is is 4 foo|\n this;is is 5 foo|\n this;", output);
+        Assert.That("is is 0 a |start\n this;is is 1 foo|\n this;is is 2 foo|\n this;is is 3 foo|\n this;is is 4 foo|\n this;is is 5 foo|\n this;", Is.EqualTo(output));
         var items = ((Paragraph)i).Parse((StreamReader)null).ToList();
 
-        Assert.AreEqual(0, items.Count);
+        Assert.That(0, Is.EqualTo(items.Count));
 
         output = string.Empty;
 
@@ -132,7 +132,7 @@ start
                 output += o[2] + "|" + o[1] + ";";
             }
         }
-        Assert.AreEqual("is is 0 a |start\n this;is is 1 foo|\n this;is is 2 foo|\n this;is is 3 foo|\n this;is is 4 foo|\n this;is is 5 foo|\n this;", output);
+        Assert.That("is is 0 a |start\n this;is is 1 foo|\n this;is is 2 foo|\n this;is is 3 foo|\n this;is is 4 foo|\n this;is is 5 foo|\n this;", Is.EqualTo(output));
     }
 
     [Test]
@@ -208,7 +208,7 @@ free  bird is   awesome
             output += o[0] + ";";
         }
 
-        Assert.AreEqual("Wall;is;bird;", output);
+        Assert.That("Wall;is;bird;", Is.EqualTo(output));
     }
 
     [Test]
@@ -240,7 +240,7 @@ free  bird is   awesome
             output += o["C1"] + ";";
         }
 
-        Assert.AreEqual("Wall;is;bird;", output);
+        Assert.That("Wall;is;bird;", Is.EqualTo(output));
     }
 
     [Test]
@@ -274,7 +274,7 @@ free  bird  is   awesome
             output += o["C1"] + ";";
         }
 
-        Assert.AreEqual(" is   ;bird  ;", output);
+        Assert.That(" is   ;bird  ;", Is.EqualTo(output));
     }
 
     [Test]
@@ -319,10 +319,10 @@ this  is   a    row
                 output += o[0] + ";";
             }
         }
-        Assert.AreEqual("Wall;is;bird;", output);
+        Assert.That("Wall;is;bird;", Is.EqualTo(output));
         var items = ((Table)i).Parse((StreamReader)null).ToList();
 
-        Assert.AreEqual(0, items.Count);
+        Assert.That(0, Is.EqualTo(items.Count));
     }
 
     [Test]
@@ -393,15 +393,15 @@ this  is   a    row
 free  bird is   awesome
 ".ToLines().ToList();
         var pos = Table.DeriveColumnPositions(text);
-        Assert.AreEqual(0, pos.Positions["Jason"].Start);
-        Assert.AreEqual(6, pos.Positions["Wall"].Start);
-        Assert.AreEqual(11, pos.Positions["Col1"].Start);
-        Assert.AreEqual(16, pos.Positions["Col2"].Start);
-        Assert.AreEqual(6, pos.Positions["Jason"].Length);
-        Assert.AreEqual(5, pos.Positions["Wall"].Length);
-        Assert.AreEqual(5, pos.Positions["Col1"].Length);
-        Assert.AreEqual(-1, pos.Positions["Col2"].Length);
-        Assert.AreEqual(4, pos.Positions.Count);
+        Assert.That(0, Is.EqualTo(pos.Positions["Jason"].Start));
+        Assert.That(6, Is.EqualTo(pos.Positions["Wall"].Start));
+        Assert.That(11, Is.EqualTo(pos.Positions["Col1"].Start));
+        Assert.That(16, Is.EqualTo(pos.Positions["Col2"].Start));
+        Assert.That(6, Is.EqualTo(pos.Positions["Jason"].Length));
+        Assert.That(5, Is.EqualTo(pos.Positions["Wall"].Length));
+        Assert.That(5, Is.EqualTo(pos.Positions["Col1"].Length));
+        Assert.That(-1, Is.EqualTo(pos.Positions["Col2"].Length));
+        Assert.That(4, Is.EqualTo(pos.Positions.Count));
     }
 
     [Test]
@@ -413,15 +413,15 @@ this  is   a    row
 free  bird is   awesome
 ".ToLines().ToList();
         var pos = Table.DeriveColumnPositions(text, true);
-        Assert.AreEqual(0, pos.Positions["Jason"].Start);
-        Assert.AreEqual(6, pos.Positions["Wall"].Start);
-        Assert.AreEqual(11, pos.Positions["Col1"].Start);
-        Assert.AreEqual(16, pos.Positions["Col2"].Start);
-        Assert.AreEqual(6, pos.Positions["Jason"].Length);
-        Assert.AreEqual(5, pos.Positions["Wall"].Length);
-        Assert.AreEqual(5, pos.Positions["Col1"].Length);
-        Assert.AreEqual(-1, pos.Positions["Col2"].Length);
-        Assert.AreEqual(4, pos.Positions.Count);
+        Assert.That(0, Is.EqualTo(pos.Positions["Jason"].Start));
+        Assert.That(6, Is.EqualTo(pos.Positions["Wall"].Start));
+        Assert.That(11, Is.EqualTo(pos.Positions["Col1"].Start));
+        Assert.That(16, Is.EqualTo(pos.Positions["Col2"].Start));
+        Assert.That(6, Is.EqualTo(pos.Positions["Jason"].Length));
+        Assert.That(5, Is.EqualTo(pos.Positions["Wall"].Length));
+        Assert.That(5, Is.EqualTo(pos.Positions["Col1"].Length));
+        Assert.That(-1, Is.EqualTo(pos.Positions["Col2"].Length));
+        Assert.That(4, Is.EqualTo(pos.Positions.Count));
     }
 
     [Test]
@@ -433,24 +433,24 @@ this  is      the  row
 free  bird  is    awesome
 ".ToLines().ToList();
         var pos = Table.DeriveColumnPositions(text, true);
-        Assert.AreEqual(0, pos.Positions["Jason"].Start);
-        Assert.AreEqual(6, pos.Positions["Wall"].Start);
-        Assert.AreEqual(11, pos.Positions["Col1"].Start);
-        Assert.AreEqual(18, pos.Positions["Col2"].Start);
-        Assert.AreEqual(6, pos.Positions["Jason"].Length);
-        Assert.AreEqual(5, pos.Positions["Wall"].Length);
-        Assert.AreEqual(7, pos.Positions["Col1"].Length);
-        Assert.AreEqual(-1, pos.Positions["Col2"].Length);
-        Assert.AreEqual(4, pos.Positions.Count);
-        Assert.AreEqual(pos.Positions["Jason"].GetColumnValue("this  is      the  row"), "this  ");
-        Assert.AreEqual(pos.Positions["Wall"].GetColumnValue("this  is      the  row"), "is   ");
-        Assert.AreEqual(pos.Positions["Col1"].GetColumnValue("this  is      the  row"), "   the ");
-        Assert.AreEqual(pos.Positions["Col2"].GetColumnValue("this  is      the  row"), " row");
+        Assert.That(0, Is.EqualTo(pos.Positions["Jason"].Start));
+        Assert.That(6, Is.EqualTo(pos.Positions["Wall"].Start));
+        Assert.That(11, Is.EqualTo(pos.Positions["Col1"].Start));
+        Assert.That(18, Is.EqualTo(pos.Positions["Col2"].Start));
+        Assert.That(6, Is.EqualTo(pos.Positions["Jason"].Length));
+        Assert.That(5, Is.EqualTo(pos.Positions["Wall"].Length));
+        Assert.That(7, Is.EqualTo(pos.Positions["Col1"].Length));
+        Assert.That(-1, Is.EqualTo(pos.Positions["Col2"].Length));
+        Assert.That(4, Is.EqualTo(pos.Positions.Count));
+        Assert.That(pos.Positions["Jason"].GetColumnValue("this  is      the  row"), Is.EqualTo("this  "));
+        Assert.That(pos.Positions["Wall"].GetColumnValue("this  is      the  row"), Is.EqualTo("is   "));
+        Assert.That(pos.Positions["Col1"].GetColumnValue("this  is      the  row"), Is.EqualTo("   the "));
+        Assert.That(pos.Positions["Col2"].GetColumnValue("this  is      the  row"), Is.EqualTo(" row"));
 
-        Assert.AreEqual(pos.Positions["Jason"].GetColumnValue("free  bird  is    awesome"), "free  ");
-        Assert.AreEqual(pos.Positions["Wall"].GetColumnValue("free  bird  is    awesome"), "bird ");
-        Assert.AreEqual(pos.Positions["Col1"].GetColumnValue("free  bird  is    awesome"), " is    ");
-        Assert.AreEqual(pos.Positions["Col2"].GetColumnValue("free  bird  is    awesome"), "awesome");
+        Assert.That(pos.Positions["Jason"].GetColumnValue("free  bird  is    awesome"), Is.EqualTo("free  "));
+        Assert.That(pos.Positions["Wall"].GetColumnValue("free  bird  is    awesome"), Is.EqualTo("bird "));
+        Assert.That(pos.Positions["Col1"].GetColumnValue("free  bird  is    awesome"), Is.EqualTo(" is    "));
+        Assert.That(pos.Positions["Col2"].GetColumnValue("free  bird  is    awesome"), Is.EqualTo("awesome"));
     }
 
     [Test]
@@ -463,20 +463,20 @@ this      is      the    row
 free      bird   is      awesome
 ".ToLines().ToList();
         var pos = Table.DeriveColumnPositions(text, true);
-        Assert.AreEqual(0, pos.Positions["The Jason"].Start);
-        Assert.AreEqual(10, pos.Positions["The Jason"].Length);
+        Assert.That(0, Is.EqualTo(pos.Positions["The Jason"].Start));
+        Assert.That(10, Is.EqualTo(pos.Positions["The Jason"].Length));
 
-        Assert.AreEqual(10, pos.Positions["Wall 1"].Start);
-        Assert.AreEqual(7, pos.Positions["Wall 1"].Length);
+        Assert.That(10, Is.EqualTo(pos.Positions["Wall 1"].Start));
+        Assert.That(7, Is.EqualTo(pos.Positions["Wall 1"].Length));
 
-        Assert.AreEqual(17, pos.Positions["Col 1"].Start);
-        Assert.AreEqual(7, pos.Positions["Col 1"].Length);
+        Assert.That(17, Is.EqualTo(pos.Positions["Col 1"].Start));
+        Assert.That(7, Is.EqualTo(pos.Positions["Col 1"].Length));
 
-        Assert.AreEqual(24, pos.Positions["Col 11"].Start);
-        Assert.AreEqual(-1, pos.Positions["Col 11"].Length);
+        Assert.That(24, Is.EqualTo(pos.Positions["Col 11"].Start));
+        Assert.That(-1, Is.EqualTo(pos.Positions["Col 11"].Length));
 
-        Assert.AreEqual(4, pos.Positions.Count);
-        Assert.AreEqual(" the   ", pos.Positions["Col 1"].GetColumnValue("this      is      the    row"));
+        Assert.That(4, Is.EqualTo(pos.Positions.Count));
+        Assert.That(" the   ", Is.EqualTo(pos.Positions["Col 1"].GetColumnValue("this      is      the    row")));
     }
 
     [Test]
@@ -525,8 +525,8 @@ free      bird   is      awesome
                     include_start: 'true'
                 }";
         var inc = new Include(new Parser().Parse(exp_text).First());
-        Assert.AreEqual(true, inc.IncludeStart);
-        Assert.AreEqual(true, inc.IncludeStop);
+        Assert.That(true, Is.EqualTo(inc.IncludeStart));
+        Assert.That(true, Is.EqualTo(inc.IncludeStop));
     }
 
     [Test]
@@ -585,166 +585,166 @@ free      bird   is      awesome
     public void ExpresssionTest_Regex()
     {
         var exp = new RegularExpression(["foo"], "i");
-        Assert.IsTrue(exp.Test("i am Foo"));
+        Assert.That(exp.Test("i am Foo"), Is.True);
         exp = new RegularExpression(["foo"], "in");
-        Assert.IsFalse(exp.Test("i am Foo"));
+        Assert.That(exp.Test("i am Foo"), Is.False);
         exp = new RegularExpression(["foo"], "");
-        Assert.IsFalse(exp.Test("i am Foo"));
+        Assert.That(exp.Test("i am Foo"), Is.False);
         exp = new RegularExpression(["foo"], "n");
-        Assert.IsTrue(exp.Test("i am Foo"));
+        Assert.That(exp.Test("i am Foo"), Is.True);
 
         var exp_text = @" reg {
                                 s:[""foo""]i #required
                               }";
         exp = new RegularExpression(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("i am Foo"));
+        Assert.That(exp.Test("i am Foo"), Is.True);
         exp_text = @" regex {
                                 s:[""foo""]in #required
                               }";
         exp = new RegularExpression(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("i am Foo"));
+        Assert.That(exp.Test("i am Foo"), Is.False);
 
         exp_text = @" reg {
                                 s:[""foo""] #required
                               }";
         exp = new RegularExpression(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("i am Foo"));
+        Assert.That(exp.Test("i am Foo"), Is.False);
 
         exp_text = @" regex {
                                 s:[""foo""]n #required
                               }";
         exp = new RegularExpression(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("i am Foo"));
+        Assert.That(exp.Test("i am Foo"), Is.True);
     }
 
     [Test]
     public void ExpresssionTest_StartsWith()
     {
         var exp = new StartsWith(["foo"], "i");
-        Assert.IsTrue(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo bar"), Is.True);
         exp = new StartsWith(["foo"], "in");
-        Assert.IsFalse(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo bar"), Is.False);
         exp = new StartsWith(["foo"], "");
-        Assert.IsFalse(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo bar"), Is.False);
         exp = new StartsWith(["foo"], "n");
-        Assert.IsTrue(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo bar"), Is.True);
         exp = new StartsWith(["foo"], "n");
-        Assert.IsTrue(exp.Test("bar foo bar"));
+        Assert.That(exp.Test("bar foo bar"), Is.True);
 
         var exp_text = @" starts {
                                 s:[""foo""]i #required
                               }";
         exp = new StartsWith(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo bar"), Is.True);
         exp_text = @" startswith {
                                 s:[""foo""]in #required
                               }";
         exp = new StartsWith(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo bar"), Is.False);
 
         exp_text = @" starts {
                                 s:[""foo""] #required
                               }";
         exp = new StartsWith(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo bar"), Is.False);
 
         exp_text = @" startswith {
                                 s:[""foo""]n #required
                               }";
         exp = new StartsWith(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo bar"), Is.True);
     }
 
     [Test]
     public void ExpresssionTest_EndsWith()
     {
         var exp = new EndsWith(["foo"], "i");
-        Assert.IsTrue(exp.Test("Foo bar Foo"));
+        Assert.That(exp.Test("Foo bar Foo"), Is.True);
         exp = new EndsWith(["foo"], "in");
-        Assert.IsFalse(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
         exp = new EndsWith(["foo"], "");
-        Assert.IsFalse(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
         exp = new EndsWith(["foo"], "n");
-        Assert.IsTrue(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.True);
         exp = new EndsWith(["foo"], "n");
-        Assert.IsTrue(exp.Test("bar foo Foo"));
+        Assert.That(exp.Test("bar foo Foo"), Is.True);
 
         var exp_text = @" endswith {
                                 s:[""foo""]i #required
                               }";
         exp = new EndsWith(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("Foo bar Foo"));
+        Assert.That(exp.Test("Foo bar Foo"), Is.True);
         exp_text = @" ends {
                                 s:[""foo""]in #required
                               }";
         exp = new EndsWith(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
 
         exp_text = @" endswith {
                                 s:[""foo""] #required
                               }";
         exp = new EndsWith(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
 
         exp_text = @" ends {
                                 s:[""foo""]n #required
                               }";
         exp = new EndsWith(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.True);
     }
 
     [Test]
     public void ExpresssionTest_Contains()
     {
         var exp = new Contains(["foo"], "i");
-        Assert.IsTrue(exp.Test("Foo bar Foo"));
+        Assert.That(exp.Test("Foo bar Foo"), Is.True);
         exp = new Contains(["foo"], "in");
-        Assert.IsFalse(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
         exp = new Contains(["foo"], "");
-        Assert.IsFalse(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
         exp = new Contains(["foo"], "n");
-        Assert.IsTrue(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.True);
 
         var exp_text = @" contains {
                                 s:[""foo""]i #required
                               }";
         exp = new Contains(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("Foo bar Foo"));
+        Assert.That(exp.Test("Foo bar Foo"), Is.True);
         exp_text = @" contains {
                                 s:[""foo""]in #required
                               }";
         exp = new Contains(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
 
         exp_text = @" contains {
                                 s:[""foo""] #required
                               }";
         exp = new Contains(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
 
         exp_text = @" contains {
                                 s:[""foo""]n #required
                               }";
         exp = new Contains(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.True);
     }
 
     [Test]
     public void ExpresssionTest_Count()
     {
         var exp = new Count(["foo"], new IntegerRangeCollection("1-4,6-10"), "i");
-        Assert.IsTrue(exp.Test("Foo bar Foo"));
+        Assert.That(exp.Test("Foo bar Foo"), Is.True);
         exp = new Count(["Foo"], new IntegerRangeCollection("1,4,6-10"), "");
-        Assert.IsFalse(exp.Test("Foo barFoo"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
         exp = new Count(["foo"], new IntegerRangeCollection("1,4,6-10"), "i");
-        Assert.IsFalse(exp.Test("Foo barFoo foo foo foo"));
+        Assert.That(exp.Test("Foo barFoo foo foo foo"), Is.False);
         exp = new Count(["foo"], new IntegerRangeCollection("1,4,6-10"), "i");
-        Assert.IsTrue(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo bar"), Is.True);
         exp = new Count(["foo"], new IntegerRangeCollection("1,4,6-10"), "i");
-        Assert.IsTrue(exp.Test("bar foo Foo  foo foo  foo foo foo foo"));
+        Assert.That(exp.Test("bar foo Foo  foo foo  foo foo foo foo"), Is.True);
 
         exp = new Count(["foo", "bar"], new IntegerRangeCollection("1,4,6-8,10"), "i");
-        Assert.IsFalse(exp.Test("bar foo Foo  foo foo  foo foo foo foo"));
+        Assert.That(exp.Test("bar foo Foo  foo foo  foo foo foo foo"), Is.False);
 
         var exp_text = @"count {
                                 s:[""foo""]i #required
@@ -752,16 +752,16 @@ free      bird   is      awesome
                             }";
 
         exp = new Count(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("Foo bar Foo"));
+        Assert.That(exp.Test("Foo bar Foo"), Is.True);
         exp_text = @"count {
                                 s:[""foo""]i #required
                                 rng: ""1,4,6-10"" #required
                             }";
 
         exp = new Count(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("Foo barFoo"));
-        Assert.IsFalse(exp.Test("Foo barFoo foo foo foo"));
-        Assert.IsTrue(exp.Test("Foo bar"));
+        Assert.That(exp.Test("Foo barFoo"), Is.False);
+        Assert.That(exp.Test("Foo barFoo foo foo foo"), Is.False);
+        Assert.That(exp.Test("Foo bar"), Is.True);
 
         try
         {
@@ -794,9 +794,9 @@ free      bird   is      awesome
     public void ExpresssionTest_Look()
     {
         var exp = new Look(["bar"], "", ["foo"], "", ["baz"], "");
-        Assert.IsTrue(exp.Test("foo bar baz"));
+        Assert.That(exp.Test("foo bar baz"), Is.True);
         exp = new Look(["bar"], "i", ["Foo"], "i", ["Baz"], "i");
-        Assert.IsTrue(exp.Test("foo Bar baz"));
+        Assert.That(exp.Test("foo Bar baz"), Is.True);
 
         var exp_text = @"look {
                                     a:[""bar""]i # optional
@@ -805,7 +805,7 @@ free      bird   is      awesome
                                   }";
 
         exp = new Look(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("bar foo baz"));
+        Assert.That(exp.Test("bar foo baz"), Is.True);
         exp_text = @"look {
                                     a:[""bar""]i # optional
                                     s:[""Foo""]ni #required
@@ -813,7 +813,7 @@ free      bird   is      awesome
                                   }";
 
         exp = new Look(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("foo Bar baz"));
+        Assert.That(exp.Test("foo Bar baz"), Is.True);
 
         exp_text = @"look {
                                     s:[""Foo""]ni #required
@@ -821,7 +821,7 @@ free      bird   is      awesome
                                   }";
 
         exp = new Look(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("foo Bar baz"));
+        Assert.That(exp.Test("foo Bar baz"), Is.True);
 
         exp_text = @"look {
                                     a:[""bar""]i # optional
@@ -829,37 +829,37 @@ free      bird   is      awesome
                                   }";
 
         exp = new Look(new Parser().Parse(exp_text).First());
-        Assert.IsTrue(exp.Test("foo Bar baz"));
+        Assert.That(exp.Test("foo Bar baz"), Is.True);
 
         exp_text = @"look {s:[""Foo""]ni }";
 
         exp = new Look(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("foo Bar baz"));
+        Assert.That(exp.Test("foo Bar baz"), Is.False);
 
         exp_text = @"look {s:[""Woo""] }";
 
         exp = new Look(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("foo Bar baz"));
+        Assert.That(exp.Test("foo Bar baz"), Is.False);
 
         exp_text = @"look {  a:[""bar""]i # optional
                                  s:[""Foo""]ni #required
                               }";
 
         exp = new Look(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("foo jar baz"));
+        Assert.That(exp.Test("foo jar baz"), Is.False);
 
         exp_text = @"look {  b:[""bar""]i # optional
                                  s:[""Foo""]ni #required
                               }";
 
         exp = new Look(new Parser().Parse(exp_text).First());
-        Assert.IsFalse(exp.Test("foo jar baz"));
+        Assert.That(exp.Test("foo jar baz"), Is.False);
         try
         {
             exp_text = @"look {a:[""Foo""]ni }";
 
             exp = new Look(new Parser().Parse(exp_text).First());
-            Assert.IsFalse(exp.Test("foo Bar baz"));
+            Assert.That(exp.Test("foo Bar baz"), Is.False);
             Assert.Fail();
         }
         catch (ArgumentException)
@@ -874,8 +874,8 @@ free      bird   is      awesome
         var exp2 = new Contains(["bar"], "i");
         var and1 = new And(new[] { exp1, exp2 });
 
-        Assert.IsTrue(and1.Test("blah foo blah bar blah"));
-        Assert.IsFalse(and1.Test("blah foo blah ar blah"));
+        Assert.That(and1.Test("blah foo blah bar blah"), Is.True);
+        Assert.That(and1.Test("blah foo blah ar blah"), Is.False);
 
         var exp_text = @" and {
                                     contains {s:[""foo""]i}
@@ -883,8 +883,8 @@ free      bird   is      awesome
                                  }";
         var tags = new Parser().Parse(exp_text);
         var and2 = new And(tags.First());
-        Assert.IsTrue(and2.Test("blah foo blah bar blah"));
-        Assert.IsFalse(and2.Test("blah foo blah ar blah"));
+        Assert.That(and2.Test("blah foo blah bar blah"), Is.True);
+        Assert.That(and2.Test("blah foo blah ar blah"), Is.False);
     }
 
     [Test]
@@ -894,9 +894,9 @@ free      bird   is      awesome
         var exp2 = new Contains(["bar"], "i");
         var exp = new Or(new[] { exp1, exp2 });
 
-        Assert.IsTrue(exp.Test("blah foo blah "));
-        Assert.IsTrue(exp.Test("blah bar blah "));
-        Assert.IsFalse(exp.Test("blah blah "));
+        Assert.That(exp.Test("blah foo blah "), Is.True);
+        Assert.That(exp.Test("blah bar blah "), Is.True);
+        Assert.That(exp.Test("blah blah "), Is.False);
 
         var exp_text = @" or {
                                     contains {s:[""foo""]i}
@@ -904,9 +904,9 @@ free      bird   is      awesome
                                  }";
         var tags = new Parser().Parse(exp_text);
         var or2 = new Or(tags.First());
-        Assert.IsTrue(or2.Test("blah foo blah "));
-        Assert.IsTrue(or2.Test("blah bar blah "));
-        Assert.IsFalse(or2.Test("blah blah "));
+        Assert.That(or2.Test("blah foo blah "), Is.True);
+        Assert.That(or2.Test("blah bar blah "), Is.True);
+        Assert.That(or2.Test("blah blah "), Is.False);
     }
 
     [Test]
@@ -975,50 +975,50 @@ free      bird   is      awesome
     public void Extractor_After()
     {
         var ext = new After(["foo"], "i", -1);
-        Assert.AreEqual("foo blah ", ext.Parse("blah foo blah "));
+        Assert.That("foo blah ", Is.EqualTo(ext.Parse("blah foo blah ")));
 
         ext = new After(["foo"], "iw", -1);
-        Assert.AreEqual(" blah ", ext.Parse("blah Foo blah "));
+        Assert.That(" blah ", Is.EqualTo(ext.Parse("blah Foo blah ")));
         ext = new After(["foo"], "iwt", -1);
-        Assert.AreEqual("blah", ext.Parse("blah Foo blah "));
+        Assert.That("blah", Is.EqualTo(ext.Parse("blah Foo blah ")));
         ext = new After(["foo"], "iwtl", -1);
-        Assert.AreEqual("what", ext.Parse("blah Foo blah foo what "));
+        Assert.That("what", Is.EqualTo(ext.Parse("blah Foo blah foo what ")));
 
         ext = new After(["foo"], "iwtl", 2);
-        Assert.AreEqual("what foo ho", ext.Parse("blah Foo blah foo what foo ho "));
+        Assert.That("what foo ho", Is.EqualTo(ext.Parse("blah Foo blah foo what foo ho ")));
     }
 
     [Test]
     public void Extractor_To()
     {
         var ext = new To(["foo"], "i", -1);
-        Assert.AreEqual("blah ", ext.Parse("blah foo blah "));
+        Assert.That("blah ", Is.EqualTo(ext.Parse("blah foo blah ")));
 
         ext = new To(["foo"], "iw", -1);
-        Assert.AreEqual("blah Foo", ext.Parse("blah Foo blah "));
+        Assert.That("blah Foo", Is.EqualTo(ext.Parse("blah Foo blah ")));
         ext = new To(["foo"], "iwt", -1);
-        Assert.AreEqual("blah Foo", ext.Parse("blah Foo blah "));
+        Assert.That("blah Foo", Is.EqualTo(ext.Parse("blah Foo blah ")));
         ext = new To(["foo"], "iwtl", -1);
-        Assert.AreEqual("blah Foo blah foo", ext.Parse("blah Foo blah foo what "));
+        Assert.That("blah Foo blah foo", Is.EqualTo(ext.Parse("blah Foo blah foo what ")));
 
         ext = new To(["foo"], "iwtl", 2);
-        Assert.AreEqual("blah Foo blah foo", ext.Parse("blah Foo blah foo what foo ho "));
+        Assert.That("blah Foo blah foo", Is.EqualTo(ext.Parse("blah Foo blah foo what foo ho ")));
     }
 
     [Test]
     public void Extractor_Split()
     {
         var ext = new Split(["foo"], "i", 0);
-        Assert.AreEqual("blah ", ext.Parse("blah foo blue "));
+        Assert.That("blah ", Is.EqualTo(ext.Parse("blah foo blue ")));
         ext = new Split(["foo"], "it", 1);
-        Assert.AreEqual("blue", ext.Parse("blah Foo blue "));
+        Assert.That("blue", Is.EqualTo(ext.Parse("blah Foo blue ")));
         ext = new Split(["foo"], "ir", 1);
-        Assert.AreEqual(" blue ", ext.Parse("blah foofoo blue "));
+        Assert.That(" blue ", Is.EqualTo(ext.Parse("blah foofoo blue ")));
 
         try
         {
             ext = new Split(["foo"], "", -1);
-            Assert.AreEqual(" blue ", ext.Parse("blah foofoo blue "), "");
+            Assert.That(" blue ", Is.EqualTo(ext.Parse("blah foofoo blue ")));
             Assert.Fail();
         }
         catch (ArgumentException)
@@ -1072,7 +1072,7 @@ free      bird   is      awesome
             Start = 8,
             Length = 4
         });
-        Assert.AreEqual("Wall", ext.Parse("  Jason Wall "));
+        Assert.That("Wall", Is.EqualTo(ext.Parse("  Jason Wall ")));
 
         var exp_text = @" col {
                                         i:""1"" #optional
@@ -1096,7 +1096,7 @@ free      bird   is      awesome
             Start = 8,
             Length = 4
         });
-        Assert.AreEqual("Wall", ext.Parse("  Jason Wall "));
+        Assert.That("Wall", Is.EqualTo(ext.Parse("  Jason Wall ")));
 
         try
         {
@@ -1138,20 +1138,20 @@ free      bird   is      awesome
             Start = 5,
             Length = 5
         };
-        Assert.AreEqual("Jason: 5-9", ext.ToString());
+        Assert.That("Jason: 5-9", Is.EqualTo(ext.ToString()));
         ext.Start = 5;
         ext.Length = -1;
-        Assert.AreEqual("Jason: 5", ext.ToString());
+        Assert.That("Jason: 5", Is.EqualTo(ext.ToString()));
         ext.Start = 5;
         ext.Length = 0;
-        Assert.AreEqual("Jason: 5-5", ext.ToString());
+        Assert.That("Jason: 5-5", Is.EqualTo(ext.ToString()));
 
-        Assert.AreEqual("", ext.GetColumnValue("test"));
+        Assert.That("", Is.EqualTo(ext.GetColumnValue("test")));
         ext.Start = 5;
         ext.Length = 2;
-        Assert.AreEqual("56", ext.GetColumnValue("0123456789"));
+        Assert.That("56", Is.EqualTo(ext.GetColumnValue("0123456789")));
         ext.Start = 5;
         ext.Length = 20;
-        Assert.AreEqual("56789", ext.GetColumnValue("0123456789"));
+        Assert.That("56789", Is.EqualTo(ext.GetColumnValue("0123456789")));
     }
 }

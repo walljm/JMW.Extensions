@@ -1,21 +1,19 @@
+namespace JMW.Template;
 
-namespace JMW.Template
+public class Token
 {
-    public class Token
+    public string Value;
+    public TokenType Type;
+    public int Line;
+    public int Column;
+
+    public string LocationToString()
     {
-        public string Value;
-        public TokenType Type;
-        public int Line;
-        public int Column;
+        return "Line: " + (Line + 1) + " Column: " + (Column + 1);
+    }
 
-        public string LocationToString()
-        {
-            return "Line: " + (Line + 1) + " Column: " + (Column + 1);
-        }
-
-        public override string ToString()
-        {
-            return Value + " " + LocationToString();
-        }
+    public override string ToString()
+    {
+        return Value + " " + LocationToString();
     }
 }

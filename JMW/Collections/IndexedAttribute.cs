@@ -11,23 +11,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 using System;
 
-namespace JMW.Collections
-{
-    /// <summary>
-    /// An attribute that indicated the property will be indexed by an <see cref="IndexedCollection{T}"/>
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public class Indexed : Attribute
-    {
-        public Indexed(bool is_unique = false)
-        {
-            IsUnique = is_unique;
-        }
+namespace JMW.Collections;
 
-        /// <summary>
-        /// Indicates if the property will be indexed uniquely.  When true, an exception will be thrown if two of the
-        /// same value are added to the <see cref="IndexedCollection{T}"/>.
-        /// </summary>
-        public bool IsUnique { get; set; }
+/// <summary>
+/// An attribute that indicated the property will be indexed by an <see cref="IndexedCollection{T}"/>
+/// </summary>
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public class Indexed : Attribute
+{
+    public Indexed(bool is_unique = false)
+    {
+        IsUnique = is_unique;
     }
+
+    /// <summary>
+    /// Indicates if the property will be indexed uniquely.  When true, an exception will be thrown if two of the
+    /// same value are added to the <see cref="IndexedCollection{T}"/>.
+    /// </summary>
+    public bool IsUnique { get; set; }
 }

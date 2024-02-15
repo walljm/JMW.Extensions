@@ -11,7 +11,7 @@ namespace JMW.Functional.Tests
         {
             string v = null;
             var c = new Maybe<string>(v);
-            Assert.AreEqual(false, c.Success);
+            Assert.That(false, Is.EqualTo(c.Success));
         }
 
         [Test]
@@ -47,8 +47,8 @@ namespace JMW.Functional.Tests
             var m1 = new Maybe<string>("jason");
             var m2 = new Maybe<string>(new Exception("broke"));
 
-            Assert.AreEqual("jason", m1.Do(if_success: v => v, if_exception: null));
-            Assert.AreEqual("wat!?", m2.Do(if_success: null, if_exception: err => "wat!?"));
+            Assert.That("jason", Is.EqualTo(m1.Do(if_success: v => v, if_exception: null)));
+            Assert.That("wat!?", Is.EqualTo(m2.Do(if_success: null, if_exception: err => "wat!?")));
             try
             {
                 m2.Do((Func<string, string>)null, (Func<Exception, string>)null);

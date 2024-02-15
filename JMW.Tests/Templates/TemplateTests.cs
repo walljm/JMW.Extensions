@@ -37,7 +37,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("blah\r\n1.1.1.1\r\nwooooo\r\nwo\r\nfloo\r\nblue\r\nwooooo\r\nwo\r\n", output);
+            Assert.That("blah\r\n1.1.1.1\r\nwooooo\r\nwo\r\nfloo\r\nblue\r\nwooooo\r\nwo\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("blah\r\n1.1.1.1\r\nwooooo\r\nwo\r\nfloo\r\nblue\r\nwooooo\r\nwo\r\n", output);
+            Assert.That("blah\r\n1.1.1.1\r\nwooooo\r\nwo\r\nfloo\r\nblue\r\nwooooo\r\nwo\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The 'oct' attribute is currently incompatible with multiple arguments for the 'if' tag.", ex.Message);
+                Assert.That("The 'oct' attribute is currently incompatible with multiple arguments for the 'if' tag.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -120,7 +120,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Missing attribute: 'value' Line: 2 Column: 1", ex.Message);
+                Assert.That("Missing attribute: 'value' Line: 2 Column: 1", Is.EqualTo(ex.Message));
             }
         }
 
@@ -146,7 +146,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Missing attribute: 'type' Line: 2 Column: 1", ex.Message);
+                Assert.That("Missing attribute: 'type' Line: 2 Column: 1", Is.EqualTo(ex.Message));
             }
         }
 
@@ -172,7 +172,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Missing attribute.  You must have either a 'type' and a 'value' attribute or an 'exp' attribute. Line: 2 Column: 1", ex.Message);
+                Assert.That("Missing attribute.  You must have either a 'type' and a 'value' attribute or an 'exp' attribute. Line: 2 Column: 1", Is.EqualTo(ex.Message));
             }
         }
 
@@ -198,7 +198,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Invalid property value for 'type' property on 'if' tag. Allowed values: 'equals', 'notequals', 'contains', 'notcontains', 'startswith', 'notstartswith', 'endswith', 'notendswith', 'eq', 'neq', 'cnt', 'ncnt', 'strt', 'nstrt', 'ends', 'nends'. Line: 2 Column: 1", ex.Message);
+                Assert.That("Invalid property value for 'type' property on 'if' tag. Allowed values: 'equals', 'notequals', 'contains', 'notcontains', 'startswith', 'notstartswith', 'endswith', 'notendswith', 'eq', 'neq', 'cnt', 'ncnt', 'strt', 'nstrt', 'ends', 'nends'. Line: 2 Column: 1", Is.EqualTo(ex.Message));
             }
         }
 
@@ -215,44 +215,44 @@ namespace JMW.Template.Tests
             i.AddHandler(tbl);
 
             var output = runTableIf(sb, i, "equals", "flaw");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
             output = runTableIf(sb, i, "eq", "flaw");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
 
             output = runTableIf(sb, i, "notequals", "blue");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
             output = runTableIf(sb, i, "neq", "blue");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
 
             output = runTableIf(sb, i, "strt", "fl");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
             output = runTableIf(sb, i, "startswith", "fl");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
 
             output = runTableIf(sb, i, "nstrt", "bl");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
             output = runTableIf(sb, i, "notstartswith", "bl");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
 
             output = output = runTableIf(sb, i, "ends", "aw");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
             output = output = runTableIf(sb, i, "endswith", "aw");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
 
             output = output = runTableIf(sb, i, "nends", "ue");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
             output = output = runTableIf(sb, i, "notendswith", "ue");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
 
             output = output = runTableIf(sb, i, "contains", "la");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
             output = output = runTableIf(sb, i, "cnt", "la");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
 
             output = output = runTableIf(sb, i, "notcontains", "lu");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
             output = output = runTableIf(sb, i, "ncnt", "lu");
-            Assert.AreEqual("flaw\r\n", output);
+            Assert.That("flaw\r\n", Is.EqualTo(output));
         }
 
         private static string runTableIf(StringBuilder sb, Interpreter i, string type, string value)
@@ -291,7 +291,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("floo\r\nfloo\r\n|||\r\nblah\r\nfloo\r\nblah\r\nfloo\r\n", output);
+            Assert.That("floo\r\nfloo\r\n|||\r\nblah\r\nfloo\r\nblah\r\nfloo\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -313,7 +313,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("blah\r\nfloo\r\n", output);
+            Assert.That("blah\r\nfloo\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -335,7 +335,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("ablah\r\nbfloo\r\ncblah\r\ndfloo\r\n", output);
+            Assert.That("ablah\r\nbfloo\r\ncblah\r\ndfloo\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -357,7 +357,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("dfloo\r\ncblah\r\nbfloo\r\nablah\r\n", output);
+            Assert.That("dfloo\r\ncblah\r\nbfloo\r\nablah\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -383,7 +383,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("f\r\nf\r\n|||\r\n1.1.2.1\r\n1.2.4.4\r\n10.130.1.12\r\n192.168.13.56\r\n", output);
+            Assert.That("f\r\nf\r\n|||\r\n1.1.2.1\r\n1.2.4.4\r\n10.130.1.12\r\n192.168.13.56\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -409,7 +409,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("f\r\nf\r\n|||\r\n1.1.2.1\r\n1.2.4.4\r\n10.130.1.12\r\n192.168.13.56\r\n", output);
+            Assert.That("f\r\nf\r\n|||\r\n1.1.2.1\r\n1.2.4.4\r\n10.130.1.12\r\n192.168.13.56\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -441,7 +441,7 @@ namespace JMW.Template.Tests
 ");
 
                 var output = sb.ToString();
-                Assert.AreEqual("greenflaw\r\nblueblue\r\nredflaw\r\nblackblue\r\n|||\r\ngreenyellow\r\nbluepurple\r\nredpink\r\nblackbrown\r\n", output);
+                Assert.That("greenflaw\r\nblueblue\r\nredflaw\r\nblackblue\r\n|||\r\ngreenyellow\r\nbluepurple\r\nredpink\r\nblackbrown\r\n", Is.EqualTo(output));
             }
 
             sb = new StringBuilder();
@@ -470,7 +470,7 @@ namespace JMW.Template.Tests
 ");
 
                 var output = sb.ToString();
-                Assert.AreEqual("greenflaw\r\nblueblue\r\nredflaw\r\nblackblue\r\n|||\r\ngreenyellow\r\nbluepurple\r\nredpink\r\nblackbrown\r\n", output);
+                Assert.That("greenflaw\r\nblueblue\r\nredflaw\r\nblackblue\r\n|||\r\ngreenyellow\r\nbluepurple\r\nredpink\r\nblackbrown\r\n", Is.EqualTo(output));
             }
 
             sb = new StringBuilder();
@@ -495,7 +495,7 @@ namespace JMW.Template.Tests
 ");
 
                 var output = sb.ToString();
-                Assert.AreEqual("green1.1.2.1\r\nblue1.1.2.1\r\nred1.1.2.1\r\nblack1.1.2.1\r\n", output);
+                Assert.That("green1.1.2.1\r\nblue1.1.2.1\r\nred1.1.2.1\r\nblack1.1.2.1\r\n", Is.EqualTo(output));
             }
         }
 
@@ -527,7 +527,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Specified table: 'test3' in 'left_table' attribute does not exist.", ex.Message);
+                Assert.That("Specified table: 'test3' in 'left_table' attribute does not exist.", Is.EqualTo(ex.Message));
             }
 
             try
@@ -555,7 +555,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Specified table: 'test3' in 'right_table' attribute does not exist.", ex.Message);
+                Assert.That("Specified table: 'test3' in 'right_table' attribute does not exist.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -587,7 +587,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Key expression does not produce a unique key.  Please provide a key expression that produces a unique key.  Duplicate key: 'foo'", ex.Message);
+                Assert.That("Key expression does not produce a unique key.  Please provide a key expression that produces a unique key.  Duplicate key: 'foo'", Is.EqualTo(ex.Message));
             }
 
             try
@@ -615,7 +615,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Require attribute is missing. A 'left_key_exp' or a 'left_key' attribute is required.", ex.Message);
+                Assert.That("Require attribute is missing. A 'left_key_exp' or a 'left_key' attribute is required.", Is.EqualTo(ex.Message));
             }
 
             try
@@ -643,7 +643,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Require attribute is missing. A 'left_key_exp' or a 'left_key' attribute is required.", ex.Message);
+                Assert.That("Require attribute is missing. A 'left_key_exp' or a 'left_key' attribute is required.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -668,7 +668,7 @@ namespace JMW.Template.Tests
 </table>
 ");
             var output = File.ReadAllText("foo.txt");
-            Assert.AreEqual("blah\r\nfloo\r\nblah\r\nfloo\r\n", output);
+            Assert.That("blah\r\nfloo\r\nblah\r\nfloo\r\n", Is.EqualTo(output));
             "foo.txt".IfExists(File.Delete);
         }
 
@@ -698,7 +698,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Unknown attribute file for 'mode'.  Allowed values are: 'new' and 'append'", ex.Message);
+                Assert.That("Unknown attribute file for 'mode'.  Allowed values are: 'new' and 'append'", Is.EqualTo(ex.Message));
             }
         }
 
@@ -728,7 +728,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The 'filename' attribute is required.", ex.Message);
+                Assert.That("The 'filename' attribute is required.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -753,19 +753,19 @@ namespace JMW.Template.Tests
 </table>
 ");
             var output = File.ReadAllText("foo0.txt");
-            Assert.AreEqual("blah\r\n", output);
+            Assert.That("blah\r\n", Is.EqualTo(output));
             "foo0.txt".IfExists(File.Delete);
 
             output = File.ReadAllText("foo1.txt");
-            Assert.AreEqual("floo\r\n", output);
+            Assert.That("floo\r\n", Is.EqualTo(output));
             "foo1.txt".IfExists(File.Delete);
 
             output = File.ReadAllText("foo2.txt");
-            Assert.AreEqual("blah\r\n", output);
+            Assert.That("blah\r\n", Is.EqualTo(output));
             "foo2.txt".IfExists(File.Delete);
 
             output = File.ReadAllText("foo3.txt");
-            Assert.AreEqual("floo\r\n", output);
+            Assert.That("floo\r\n", Is.EqualTo(output));
             "foo3.txt".IfExists(File.Delete);
         }
 
@@ -790,7 +790,7 @@ namespace JMW.Template.Tests
 </table>
 ");
             var output = sb.ToString();
-            Assert.AreEqual("blah | flaw\r\nfloo | blue\r\nblah | flaw\r\nfloo | blue\r\n", output);
+            Assert.That("blah | flaw\r\nfloo | blue\r\nblah | flaw\r\nfloo | blue\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -815,7 +815,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The <include> tag referenced named include 'foo' which does not exist in the template.", ex.Message);
+                Assert.That("The <include> tag referenced named include 'foo' which does not exist in the template.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -841,7 +841,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The <include> tag requires either a 'name' attribute or a 'path' attribute.", ex.Message);
+                Assert.That("The <include> tag requires either a 'name' attribute or a 'path' attribute.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -864,7 +864,7 @@ namespace JMW.Template.Tests
 </table>
 ");
             var output = sb.ToString();
-            Assert.AreEqual("blah | flaw\r\nfloo | blue\r\nblah | flaw\r\nfloo | blue\r\n", output);
+            Assert.That("blah | flaw\r\nfloo | blue\r\nblah | flaw\r\nfloo | blue\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -889,7 +889,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex.Message.Contains("The <include> tag refers to a template which does not exist"));
+                Assert.That(ex.Message.Contains("The <include> tag refers to a template which does not exist"), Is.True);
             }
         }
 
@@ -918,7 +918,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("blueblue\r\nblackblue\r\n", output);
+            Assert.That("blueblue\r\nblackblue\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -943,7 +943,7 @@ namespace JMW.Template.Tests
 ");
 
             var output = sb.ToString();
-            Assert.AreEqual("blueblue1.1.2.1\r\nblackblue1.1.2.1\r\n", output);
+            Assert.That("blueblue1.1.2.1\r\nblackblue1.1.2.1\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -971,7 +971,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Specified table: 'test2' in 'table' attribute does not exist.", ex.Message);
+                Assert.That("Specified table: 'test2' in 'table' attribute does not exist.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -1000,7 +1000,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Require attribute is missing. A 'key_exp' or 'key_col' attribute is required.", ex.Message);
+                Assert.That("Require attribute is missing. A 'key_exp' or 'key_col' attribute is required.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -1029,7 +1029,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The 'key' attribute is required.", ex.Message);
+                Assert.That("The 'key' attribute is required.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -1046,7 +1046,7 @@ version: <version/>
 ");
 
                 var output = sb.ToString();
-                Assert.IsTrue(output.Contains("version: Templating Engine Version "));
+                Assert.That(output.Contains("version: Templating Engine Version "), Is.True);
             }
             sb = new StringBuilder();
             using (var wr = new StringWriter(sb))
@@ -1058,7 +1058,7 @@ version: <version prefix=""TE: "" />
 ");
 
                 var output = sb.ToString();
-                Assert.IsTrue(output.Contains("version: TE: "));
+                Assert.That(output.Contains("version: TE: "), Is.True);
             }
 
             sb = new StringBuilder();
@@ -1071,7 +1071,7 @@ version: <version prefix=""TE: "" exp=""x1.substr(0, 7)""/>
 ");
 
                 var output = sb.ToString();
-                Assert.IsTrue(output.Contains("version: TE: "));
+                Assert.That(output.Contains("version: TE: "), Is.True);
             }
         }
 
@@ -1088,7 +1088,7 @@ datetime: <timestamp/>
 ");
 
                 var output = sb.ToString();
-                Assert.IsTrue(output.StartsWith("datetime: " + DateTime.Now.ToString("M/d/yyyy hh:mm")));
+                Assert.That(output.StartsWith("datetime: " + DateTime.Now.ToString("M/d/yyyy hh:mm")), Is.True);
             }
 
             sb = new StringBuilder();
@@ -1101,7 +1101,7 @@ datetime: <timestamp format=""M-d-yy""/>
 ");
 
                 var output = sb.ToString();
-                Assert.AreEqual(output, "datetime: " + DateTime.Now.ToString("M-d-yy"));
+                Assert.That(output, Is.EqualTo("datetime: " + DateTime.Now.ToString("M-d-yy")));
             }
 
             sb = new StringBuilder();
@@ -1114,7 +1114,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
 ");
 
                 var output = sb.ToString();
-                Assert.AreEqual(output, "datetime: " + DateTime.Now.ToString("M-d-yy"));
+                Assert.That(output, Is.EqualTo("datetime: " + DateTime.Now.ToString("M-d-yy")));
             }
         }
 
@@ -1132,7 +1132,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Unable to interpret tag 'timestamp' with format: '123!@*(&^$@(^%'. Error Message: Input string was not in a correct format.", ex.Message);
+                Assert.That("Unable to interpret tag 'timestamp' with format: '123!@*(&^$@(^%'. Error Message: Input string was not in a correct format.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -1147,7 +1147,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
                 i.Eval(@"<jason/>");
 
                 var output = sb.ToString();
-                Assert.AreEqual(string.Empty, output);
+                Assert.That(string.Empty, Is.EqualTo(output));
             }
 
             sb = new StringBuilder();
@@ -1161,7 +1161,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
                 i.Eval(@"<jason/>");
 
                 var output = sb.ToString();
-                Assert.AreEqual("jason", output);
+                Assert.That("jason", Is.EqualTo(output));
             }
         }
 
@@ -1175,7 +1175,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
             i.Eval(@"<test>jason</test>");
 
             var output = sb.ToString();
-            Assert.AreEqual("JASON", output);
+            Assert.That("JASON", Is.EqualTo(output));
         }
 
         [Test]
@@ -1192,7 +1192,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The 'store' attribute value 'atrue' was invalid. Value must be either 'true' or 'false'.", ex.Message);
+                Assert.That("The 'store' attribute value 'atrue' was invalid. Value must be either 'true' or 'false'.", Is.EqualTo(ex.Message));
             }
 
             try
@@ -1206,7 +1206,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The 'print' attribute value 'afalse' was invalid. Value must be either 'true' or 'false'.", ex.Message);
+                Assert.That("The 'print' attribute value 'afalse' was invalid. Value must be either 'true' or 'false'.", Is.EqualTo(ex.Message));
             }
 
             try
@@ -1220,7 +1220,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("'var' tag requires both 'name' and 'value' attributes.", ex.Message);
+                Assert.That("'var' tag requires both 'name' and 'value' attributes.", Is.EqualTo(ex.Message));
             }
 
             var sb1 = new StringBuilder();
@@ -1230,7 +1230,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
                 i.AddVariable("IP", "1.1.1.1");
 
                 i.Eval(@"<var:ip exp='x1+10' oct='4' />");
-                Assert.AreEqual("1.1.1.11", sb1.ToString());
+                Assert.That("1.1.1.11", Is.EqualTo(sb1.ToString()));
             }
 
             sb1 = new StringBuilder();
@@ -1240,7 +1240,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
                 i.AddVariable("IP", "1.1.1.1");
 
                 i.Eval(@"<var:ip store='true' value='2.2.2.2'/>");
-                Assert.AreEqual("2.2.2.2", sb1.ToString());
+                Assert.That("2.2.2.2", Is.EqualTo(sb1.ToString()));
             }
         }
 
@@ -1255,7 +1255,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Variable: 'jason' already exists.", ex.Message);
+                Assert.That("Variable: 'jason' already exists.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -1277,7 +1277,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
 </table>
 ");
             var output = sb.ToString();
-            Assert.AreEqual("blah|flaw\r\nfloo|blue\r\nblah|flaw\r\nfloo|blue\r\n", output);
+            Assert.That("blah|flaw\r\nfloo|blue\r\nblah|flaw\r\nfloo|blue\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -1298,7 +1298,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
 </table>
 ");
             var output = sb.ToString();
-            Assert.AreEqual("blah|flaw\r\nfloo|blue\r\nblah|flaw\r\nfloo|blue\r\n", output);
+            Assert.That("blah|flaw\r\nfloo|blue\r\nblah|flaw\r\nfloo|blue\r\n", Is.EqualTo(output));
         }
 
         [Test]
@@ -1319,7 +1319,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
 </table>
 ");
             var output = sb.ToString();
-            Assert.AreEqual("blah|flaw\r\nfloo|blue\r\nblah|flaw\r\nfloo|blue\r\n", output);
+            Assert.That("blah|flaw\r\nfloo|blue\r\nblah|flaw\r\nfloo|blue\r\n", Is.EqualTo(output));
         }
     }
 

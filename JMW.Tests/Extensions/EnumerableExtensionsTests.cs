@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using NUnit.Framework;
+using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 
 namespace JMW.Extensions.Enumerable.Tests
 {
@@ -10,7 +10,7 @@ namespace JMW.Extensions.Enumerable.Tests
         [Test]
         public void ReverseOrderTest()
         {
-            CollectionAssert.AreEqual(new List<int> { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 }, new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }.ReverseOrder().ToList());
+            Assert.That(new List<int> { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 }, Is.EqualTo(new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }.ReverseOrder().ToList()));
         }
 
         [Test]
@@ -18,11 +18,11 @@ namespace JMW.Extensions.Enumerable.Tests
         {
             var lst = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-            CollectionAssert.AreEqual(new List<int> { 6, 7, 8, 9, 10 }, lst.Last(5));
-            CollectionAssert.AreEqual(new List<int> { 8, 9, 10 }, lst.Last(3));
-            Assert.AreEqual(0, lst.Last(-3).Count());
-            Assert.AreEqual(0, lst.Last(0).Count());
-            CollectionAssert.AreEqual(lst, lst.Last(30));
+            Assert.That(new List<int> { 6, 7, 8, 9, 10 }, Is.EqualTo(lst.Last(5)));
+            Assert.That(new List<int> { 8, 9, 10 }, Is.EqualTo(lst.Last(3)));
+            Assert.That(0, Is.EqualTo(lst.Last(-3).Count()));
+            Assert.That(0, Is.EqualTo(lst.Last(0).Count()));
+            Assert.That(lst, Is.EqualTo(lst.Last(30)));
         }
 
         [Test]
@@ -31,8 +31,8 @@ namespace JMW.Extensions.Enumerable.Tests
             var lst = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             var hsh = lst.ToHashSet();
 
-            Assert.AreEqual(10, hsh.Count);
-            Assert.AreEqual(typeof(HashSet<int>), hsh.GetType());
+            Assert.That(10, Is.EqualTo(hsh.Count));
+            Assert.That(typeof(HashSet<int>), Is.EqualTo(hsh.GetType()));
         }
 
         [Test]
@@ -43,16 +43,16 @@ namespace JMW.Extensions.Enumerable.Tests
 
             var lst = lst1.Merge(lst2);
 
-            Assert.AreEqual(15, lst.Count);
+            Assert.That(15, Is.EqualTo(lst.Count));
             lst.Merge(11);
-            Assert.AreEqual(15, lst.Count);
+            Assert.That(15, Is.EqualTo(lst.Count));
             lst.Merge(16);
-            Assert.AreEqual(16, lst.Count);
+            Assert.That(16, Is.EqualTo(lst.Count));
 
             lst.Merge(lst2.ToList());
-            Assert.AreEqual(16, lst.Count);
+            Assert.That(16, Is.EqualTo(lst.Count));
             lst.Merge(new List<int> { 3, 5, 18, 19 });
-            Assert.AreEqual(18, lst.Count);
+            Assert.That(18, Is.EqualTo(lst.Count));
         }
 
         [Test]
@@ -62,75 +62,77 @@ namespace JMW.Extensions.Enumerable.Tests
 
             var lst = lst1.CreateHistogram(i => i.ToString());
 
-            Assert.AreEqual(10, lst.Count);
-            Assert.AreEqual(3, lst["1"].Count);
-            Assert.AreEqual(1, lst["2"].Count);
-            Assert.AreEqual(2, lst["3"].Count);
-            Assert.AreEqual(4, lst["4"].Count);
-            Assert.AreEqual(3, lst["5"].Count);
-            Assert.AreEqual(2, lst["6"].Count);
-            Assert.AreEqual(1, lst["7"].Count);
-            Assert.AreEqual(1, lst["8"].Count);
-            Assert.AreEqual(2, lst["9"].Count);
-            Assert.AreEqual(1, lst["10"].Count);
+            Assert.That(10, Is.EqualTo(lst.Count));
+            Assert.That(3, Is.EqualTo(lst["1"].Count));
+            Assert.That(1, Is.EqualTo(lst["2"].Count));
+            Assert.That(2, Is.EqualTo(lst["3"].Count));
+            Assert.That(4, Is.EqualTo(lst["4"].Count));
+            Assert.That(3, Is.EqualTo(lst["5"].Count));
+            Assert.That(2, Is.EqualTo(lst["6"].Count));
+            Assert.That(1, Is.EqualTo(lst["7"].Count));
+            Assert.That(1, Is.EqualTo(lst["8"].Count));
+            Assert.That(2, Is.EqualTo(lst["9"].Count));
+            Assert.That(1, Is.EqualTo(lst["10"].Count));
 
             var lst2 = lst1.CreateHistogram(i => i);
 
-            Assert.AreEqual(10, lst2.Count);
-            Assert.AreEqual(3, lst2[1].Count);
-            Assert.AreEqual(1, lst2[2].Count);
-            Assert.AreEqual(2, lst2[3].Count);
-            Assert.AreEqual(4, lst2[4].Count);
-            Assert.AreEqual(3, lst2[5].Count);
-            Assert.AreEqual(2, lst2[6].Count);
-            Assert.AreEqual(1, lst2[7].Count);
-            Assert.AreEqual(1, lst2[8].Count);
-            Assert.AreEqual(2, lst2[9].Count);
-            Assert.AreEqual(1, lst2[10].Count);
+            Assert.That(10, Is.EqualTo(lst2.Count));
+            Assert.That(3, Is.EqualTo(lst2[1].Count));
+            Assert.That(1, Is.EqualTo(lst2[2].Count));
+            Assert.That(2, Is.EqualTo(lst2[3].Count));
+            Assert.That(4, Is.EqualTo(lst2[4].Count));
+            Assert.That(3, Is.EqualTo(lst2[5].Count));
+            Assert.That(2, Is.EqualTo(lst2[6].Count));
+            Assert.That(1, Is.EqualTo(lst2[7].Count));
+            Assert.That(1, Is.EqualTo(lst2[8].Count));
+            Assert.That(2, Is.EqualTo(lst2[9].Count));
+            Assert.That(1, Is.EqualTo(lst2[10].Count));
         }
 
         [Test]
         public void ToDelimitedStringTest()
         {
             var lst = new HashSet<int> { 1, 2, 3, 4 };
-            Assert.AreEqual("1,2,3,4", lst.ToDelimitedString(','));
-            Assert.AreEqual("1,2,3,4,", lst.ToDelimitedString(',', false));
+            Assert.That("1,2,3,4", Is.EqualTo(lst.ToDelimitedString(',')));
+            Assert.That("1,2,3,4,", Is.EqualTo(lst.ToDelimitedString(',', false)));
 
-            Assert.AreEqual("1,,2,,3,,4", lst.ToDelimitedString(",,"));
-            Assert.AreEqual("1,,2,,3,,4,,", lst.ToDelimitedString(",,", false));
+            Assert.That("1,,2,,3,,4", Is.EqualTo(lst.ToDelimitedString(",,")));
+            Assert.That("1,,2,,3,,4,,", Is.EqualTo(lst.ToDelimitedString(",,", false)));
         }
+
+        private static readonly int[] sourceArray = [1, 2, 3, 4];
 
         [Test]
         public void IslastTest()
         {
-            Assert.AreEqual(true, new List<int> { 1, 2, 3, 4 }.IsLast(3));
-            Assert.AreEqual(true, new[] { 1, 2, 3, 4 }.IsLast(3));
-            Assert.AreEqual(true, new[] { 1, 2, 3, 4 }.Select(i => i).IsLast(3));
+            Assert.That(true, Is.EqualTo(sourceArray.IsLast(3)));
+            Assert.That(true, Is.EqualTo(sourceArray.IsLast(3)));
+            Assert.That(true, Is.EqualTo(sourceArray.Select(i => i).IsLast(3)));
 
-            Assert.AreEqual(false, new List<int> { 1, 2, 3, 4 }.Select(i => i).IsLast(2));
-            Assert.AreEqual(false, new List<int> { 1, 2, 3, 4 }.IsLast(2));
-            Assert.AreEqual(false, new[] { 1, 2, 3, 4 }.IsLast(2));
+            Assert.That(false, Is.EqualTo(sourceArray.Select(i => i).IsLast(2)));
+            Assert.That(false, Is.EqualTo(sourceArray.IsLast(2)));
+            Assert.That(false, Is.EqualTo(sourceArray.IsLast(2)));
         }
 
         [Test]
         public void ToListOfItemTest()
         {
             var lst = 1.ToListOfItem();
-            Assert.AreEqual(1, lst.Count);
+            Assert.That(1, Is.EqualTo(lst.Count));
         }
 
         [Test]
         public void YieldTest()
         {
             var lst = 1.Yield();
-            Assert.AreEqual(1, lst.Count());
+            Assert.That(1, Is.EqualTo(lst.Count()));
         }
 
         [Test]
         public void ShimTest()
         {
             var lst = new List<object> { 1 }.Shim<int>();
-            Assert.AreEqual(1, lst.Count());
+            Assert.That(1, Is.EqualTo(lst.Count()));
         }
 
         [Test]
@@ -286,7 +288,6 @@ namespace JMW.Extensions.Enumerable.Tests
             Assert.That(dict[10].Count, Is.EqualTo(5));
         }
 
-        
         [Test]
         public void GetDuplicatesTest()
         {
@@ -299,7 +300,6 @@ namespace JMW.Extensions.Enumerable.Tests
             Assert.That(dict.Count, Is.EqualTo(8));
         }
 
-        
         [Test]
         public void DisctinctTest()
         {
@@ -320,7 +320,7 @@ namespace JMW.Extensions.Enumerable.Tests
 
             Assert.That(dict.Count, Is.EqualTo(2));
         }
-        
+
         //[Test]
         //public void ShuffleTest()
         //{
@@ -332,7 +332,7 @@ namespace JMW.Extensions.Enumerable.Tests
 
         //    Assert.That(lst[0] != 1);
         //}
-        
+
         [Test]
         public void IfHasKeyTest()
         {
@@ -353,13 +353,13 @@ namespace JMW.Extensions.Enumerable.Tests
 
             dict.IfHasKey(0, o =>
             {
-                Assert.AreEqual(0, o.Value);
-                Assert.AreEqual(10, o.Bar);
+                Assert.That(0, Is.EqualTo(o.Value));
+                Assert.That(10, Is.EqualTo(o.Bar));
             });
             dict.IfHasKey(99, o => { Assert.Fail(); });
 
             var did = dict.TryAdd(0, new Foo());
-            Assert.IsFalse(did);
+            Assert.That(did, Is.False);
         }
 
         private class Foo

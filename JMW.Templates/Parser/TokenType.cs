@@ -1,16 +1,13 @@
+namespace JMW.Template;
 
-namespace JMW.Template
+public enum TokenType
 {
-    public enum TokenType
-    {
-        OPENTAG,
-        ENDTAG,
-        SINGLEClOSE,
-        PARAMNAME,
-        PARAMVALUE,
-        TEXT,
-        ERROR,
-        COMMENT
-    }
+    OPENTAG,
+    ENDTAG,
+    SINGLEClOSE,
+    PARAMNAME,
+    PARAMVALUE,
+    TEXT,
+    ERROR,
+    COMMENT
 }
-

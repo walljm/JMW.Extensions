@@ -22,6 +22,7 @@ namespace JMW.Template.Tags
         public const string ATTR_COLUMN = "columns";
 
         private Dictionary<string, ValueRetriever> _retrievers = new();
+        private static readonly string[] separator = [","];
 
         public Transform()
         {
@@ -43,7 +44,7 @@ namespace JMW.Template.Tags
 
                     if (token.Properties.ContainsKey(ATTR_COLUMN))
                     {
-                        columns = token.Properties[ATTR_COLUMN].Split(new[] { "," }, StringSplitOptions.None).ToList();
+                        columns = token.Properties[ATTR_COLUMN].Split(separator, StringSplitOptions.None).ToList();
                     }
 
                     foreach (var column in columns)

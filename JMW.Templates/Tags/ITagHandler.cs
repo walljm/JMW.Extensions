@@ -1,11 +1,10 @@
-﻿namespace JMW.Template.Tags
+﻿namespace JMW.Template.Tags;
+
+public interface ITagHandler
 {
-    public interface ITagHandler
-    {
-        void Handler(Tag token, Interpreter interp);
+    void Handler(Tag token, Interpreter interp);
 
-        void Validate(Tag tag, Token token);
+    void Validate(Tag tag, Token token);
 
-        string TagName { get; }
-    }
+    string TagName { get; }
 }

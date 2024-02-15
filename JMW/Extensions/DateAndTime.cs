@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace JMW.Extensions.DateAndTime
+namespace JMW.Extensions.DateAndTime;
+
+public static class Extensions
 {
-    public static class Extensions
+    public static string GetElapsedTime(this DateTime curr, DateTime time)
     {
-        public static string GetElapsedTime(this DateTime curr, DateTime time)
-        {
-            return new TimeSpan(curr.Ticks - time.Ticks).ToString(@"hh\:mm\:ss");
-        }
+        return new TimeSpan(curr.Ticks - time.Ticks).ToString(@"hh\:mm\:ss");
     }
 }

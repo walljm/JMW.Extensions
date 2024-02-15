@@ -12,14 +12,14 @@ namespace JMW.Extensions.Tests
         [Test]
         public void TestAllowed1()
         {
-            var r0 = new Rule
+            var r0 = new FirewallRule
             {
                 Source = new Location { IsWildcard = true },
                 Dest = new Location { IsWildcard = true },
                 Port = new IntegerRange(0, 1000000000),
                 Policy = Policy.Deny
             };
-            var r1 = new Rule
+            var r1 = new FirewallRule
             {
                 Source = new Location(IPAddress.Parse("192.168.1.1")),
                 Dest = new Location(),
@@ -27,17 +27,16 @@ namespace JMW.Extensions.Tests
                 Policy = Policy.Permit
             };
 
-            var engine = new RulesEngine(new List<Rule> { r0, r1 });
+            var engine = new RulesEngine(new List<FirewallRule> { r0, r1 });
 
-            Assert.IsTrue(engine.Allowed(new Location(IPAddress.Parse("192.168.1.1")), new Location(IPAddress.Parse("10.110.1.1")), new IntegerRange(22,22)));
-            Assert.IsFalse(engine.Allowed(new Location(IPAddress.Parse("192.168.1.2")), new Location(IPAddress.Parse("10.110.1.1")), new IntegerRange(22, 22)));
+            Assert.That(engine.Allowed(new Location(IPAddress.Parse("192.168.1.1")), new Location(IPAddress.Parse("10.110.1.1")), new IntegerRange(22, 22)), Is.True);
+            Assert.That(engine.Allowed(new Location(IPAddress.Parse("192.168.1.2")), new Location(IPAddress.Parse("10.110.1.1")), new IntegerRange(22, 22)), Is.False);
         }
-
 
         [Test]
         public void TestCompress1()
         {
-            var r0 = new Rule
+            var r0 = new FirewallRule
             {
                 Source = new Location { IsWildcard = true },
                 Dest = new Location { IsWildcard = true },
@@ -45,7 +44,7 @@ namespace JMW.Extensions.Tests
                 Policy = Policy.Deny
             };
 
-            var r1 = new Rule
+            var r1 = new FirewallRule
             {
                 Source = new Location(IPAddress.Parse("192.168.1.1")),
                 Dest = new Location(),
@@ -53,7 +52,7 @@ namespace JMW.Extensions.Tests
                 Policy = Policy.Permit
             };
 
-            var r2 = new Rule
+            var r2 = new FirewallRule
             {
                 Source = new Location(IPAddress.Parse("192.168.1.1")),
                 Dest = new Location(),
@@ -61,10 +60,9 @@ namespace JMW.Extensions.Tests
                 Policy = Policy.Permit
             };
 
-            var engine = new RulesEngine(new List<Rule> { r0, r1, r2 });
+            var engine = new RulesEngine(new List<FirewallRule> { r0, r1, r2 });
 
-            var lst = RulesEngine.Compress(new List<Rule> {r0, r1, r2});
-            
+            var lst = RulesEngine.Compress(new List<FirewallRule> { r0, r1, r2 });
         }
     }
 }

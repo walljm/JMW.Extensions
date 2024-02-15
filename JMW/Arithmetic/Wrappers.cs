@@ -117,17 +117,17 @@ namespace Lambda.Generic.Arithmetic
             return o.Compare(a, b) > 0;
         }
 
-        public int CompareTo(T other)
+        public readonly int CompareTo(T other)
         {
             return value.CompareTo(other);
         }
 
-        public bool Equals(T other)
+        public readonly bool Equals(T other)
         {
             return value.Equals(other);
         }
 
-        public override bool Equals(object a)
+        public override readonly bool Equals(object a)
         {
             switch (a)
             {
@@ -141,22 +141,22 @@ namespace Lambda.Generic.Arithmetic
             return false;
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return o.GetHashCode(value);
         }
 
-        public string ToString(string format, IFormatProvider formatProvider)
+        public readonly string ToString(string format, IFormatProvider formatProvider)
         {
             return value.ToString(format, formatProvider);
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return value.ToString();
         }
 
-        public int CompareTo(object obj)
+        public readonly int CompareTo(object obj)
         {
             switch (obj)
             {
@@ -172,87 +172,87 @@ namespace Lambda.Generic.Arithmetic
 
         #region Implementation of IConvertible
 
-        public TypeCode GetTypeCode()
+        public readonly TypeCode GetTypeCode()
         {
             return value.GetTypeCode();
         }
 
-        public bool ToBoolean(IFormatProvider provider)
+        public readonly bool ToBoolean(IFormatProvider provider)
         {
             return value.ToBoolean(provider);
         }
 
-        public char ToChar(IFormatProvider provider)
+        public readonly char ToChar(IFormatProvider provider)
         {
             return value.ToChar(provider);
         }
 
-        public sbyte ToSByte(IFormatProvider provider)
+        public readonly sbyte ToSByte(IFormatProvider provider)
         {
             return value.ToSByte(provider);
         }
 
-        public byte ToByte(IFormatProvider provider)
+        public readonly byte ToByte(IFormatProvider provider)
         {
             return value.ToByte(provider);
         }
 
-        public short ToInt16(IFormatProvider provider)
+        public readonly short ToInt16(IFormatProvider provider)
         {
             return value.ToInt16(provider);
         }
 
-        public ushort ToUInt16(IFormatProvider provider)
+        public readonly ushort ToUInt16(IFormatProvider provider)
         {
             return value.ToUInt16(provider);
         }
 
-        public int ToInt32(IFormatProvider provider)
+        public readonly int ToInt32(IFormatProvider provider)
         {
             return value.ToInt32(provider);
         }
 
-        public uint ToUInt32(IFormatProvider provider)
+        public readonly uint ToUInt32(IFormatProvider provider)
         {
             return value.ToUInt32(provider);
         }
 
-        public long ToInt64(IFormatProvider provider)
+        public readonly long ToInt64(IFormatProvider provider)
         {
             return value.ToInt64(provider);
         }
 
-        public ulong ToUInt64(IFormatProvider provider)
+        public readonly ulong ToUInt64(IFormatProvider provider)
         {
             return value.ToUInt64(provider);
         }
 
-        public float ToSingle(IFormatProvider provider)
+        public readonly float ToSingle(IFormatProvider provider)
         {
             return value.ToSingle(provider);
         }
 
-        public double ToDouble(IFormatProvider provider)
+        public readonly double ToDouble(IFormatProvider provider)
         {
             return value.ToDouble(provider);
         }
 
-        public decimal ToDecimal(IFormatProvider provider)
+        public readonly decimal ToDecimal(IFormatProvider provider)
         {
             return value.ToDecimal(provider);
         }
 
-        public DateTime ToDateTime(IFormatProvider provider)
+        public readonly DateTime ToDateTime(IFormatProvider provider)
         {
             return value.ToDateTime(provider);
         }
 
-        public string ToString(IFormatProvider provider)
+        public readonly string ToString(IFormatProvider provider)
         {
             return value.ToString(provider);
         }
 
-        public object ToType(Type conversionType, IFormatProvider provider)
+        public readonly object ToType(Type conversionType, IFormatProvider provider)
         {
             return value.ToType(conversionType, provider);
         }

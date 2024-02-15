@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using JMW.Template.Tags;
+﻿using JMW.Template.Tags;
 using NUnit.Framework;
+using System;
 
 namespace JMW.Template.Tests
 {
@@ -17,7 +16,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The expression:\nx1.substr(0,2)\ndid not evaluate to a boolean value.", ex.Message);
+                Assert.That("The expression:\nx1.substr(0,2)\ndid not evaluate to a boolean value.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -30,7 +29,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The expression:\nx1.substr(0,2)\ndid not evaluate to a numeric value.", ex.Message);
+                Assert.That("The expression:\nx1.substr(0,2)\ndid not evaluate to a numeric value.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -43,7 +42,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The value provided for octet argument was invalid. Must be a number between 1 and 4.", ex.Message);
+                Assert.That("The value provided for octet argument was invalid. Must be a number between 1 and 4.", Is.EqualTo(ex.Message));
             }
 
             try
@@ -52,7 +51,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The value provided for octet argument was invalid. Must be a number between 1 and 4.", ex.Message);
+                Assert.That("The value provided for octet argument was invalid. Must be a number between 1 and 4.", Is.EqualTo(ex.Message));
             }
 
             try
@@ -61,7 +60,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The value provided for octet argument was invalid. Must be a number between 1 and 4.", ex.Message);
+                Assert.That("The value provided for octet argument was invalid. Must be a number between 1 and 4.", Is.EqualTo(ex.Message));
             }
 
             var data = "1.1.1";
@@ -71,7 +70,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("There was a problem parsing octets from the IP: '" + data + "'. Please check formatting.", ex.Message);
+                Assert.That("There was a problem parsing octets from the IP: '" + data + "'. Please check formatting.", Is.EqualTo(ex.Message));
             }
 
             data = "1.1.1.1.1";
@@ -81,7 +80,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("There was a problem parsing octets from the IP: '" + data + "'. Please check formatting.", ex.Message);
+                Assert.That("There was a problem parsing octets from the IP: '" + data + "'. Please check formatting.", Is.EqualTo(ex.Message));
             }
 
             data = "11111";
@@ -91,15 +90,15 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The provided column value: '" + data + "' is not an IP.", ex.Message);
+                Assert.That("The provided column value: '" + data + "' is not an IP.", Is.EqualTo(ex.Message));
             }
         }
 
         [Test]
         public void ReplaceOctetTest()
         {
-            Assert.AreEqual("1.1.1.255", TagHelpers.ReplaceOctet("1.1.1.1", "4", 2600));
-            Assert.AreEqual("1.1.1.0", TagHelpers.ReplaceOctet("1.1.1.1", "4", -1));
+            Assert.That("1.1.1.255", Is.EqualTo(TagHelpers.ReplaceOctet("1.1.1.1", "4", 2600)));
+            Assert.That("1.1.1.0", Is.EqualTo(TagHelpers.ReplaceOctet("1.1.1.1", "4", -1)));
         }
 
         [Test]
@@ -111,8 +110,8 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The list of arguments provided in:\njason\n is greater that the number of variables listed in the expression: x1.substr(0,2); x2\n" +
-                                "Variables must be specified in the format: x1, x2, x3 etc. and must be equal or less than the argumenst provided.", ex.Message);
+                Assert.That("The list of arguments provided in:\njason\n is greater that the number of variables listed in the expression: x1.substr(0,2); x2\n" +
+                                "Variables must be specified in the format: x1, x2, x3 etc. and must be equal or less than the argumenst provided.", Is.EqualTo(ex.Message));
             }
         }
 
@@ -132,7 +131,7 @@ namespace JMW.Template.Tests
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("Invalid attribute found on tag. Allowed attributes: blah Line: 1 Column: 1", ex.Message);
+                Assert.That("Invalid attribute found on tag. Allowed attributes: blah Line: 1 Column: 1", Is.EqualTo(ex.Message));
             }
         }
     }

@@ -136,16 +136,16 @@ more text at the end.
             var actual = target.Parse(block);
 
             Assert.That(actual.Count, Is.EqualTo(5));
-            Assert.IsTrue(actual[0].TagType == TagTypes.Text);
-            Assert.IsTrue(actual[0].TokenText == @"this is a string");
-            Assert.IsTrue(actual[1].TagType == TagTypes.Tag);
-            Assert.IsTrue(actual[1].Name == "single");
+            Assert.That(actual[0].TagType == TagTypes.Text, Is.True);
+            Assert.That(actual[0].TokenText == @"this is a string", Is.True);
+            Assert.That(actual[1].TagType == TagTypes.Tag, Is.True);
+            Assert.That(actual[1].Name == "single", Is.True);
 
-            Assert.IsTrue(actual[2].TagType == TagTypes.Tag);
-            Assert.IsTrue(actual[2].Name == "tag");
+            Assert.That(actual[2].TagType == TagTypes.Tag, Is.True);
+            Assert.That(actual[2].Name == "tag", Is.True);
 
             Assert.That(actual[2].TokenText, Is.EqualTo(""));
-            Assert.IsTrue(actual[2].HasChildren);
+            Assert.That(actual[2].HasChildren, Is.True);
             Assert.That(actual[2].Children.Count, Is.EqualTo(4));
             Assert.That(actual[2].Children[0].TagType, Is.EqualTo(TagTypes.Text));
             Assert.That(actual[2].Children[0].TokenText, Is.EqualTo("some text"));
@@ -161,15 +161,15 @@ more text at the end.
             Assert.That(child.Children.Count, Is.EqualTo(1));
             Assert.That(child.Children[0].TagType, Is.EqualTo(TagTypes.Text));
             Assert.That(child.Children[0].TokenText, Is.EqualTo(" whee "));
-            Assert.IsTrue(actual[2].Properties.Count == 1);
-            Assert.IsTrue(actual[2].Properties["location"] == @"c:\path\to\file.txt");
-            Assert.IsTrue(actual[3].TagType == TagTypes.Tag);
-            Assert.IsTrue(actual[3].Name == "jason");
+            Assert.That(actual[2].Properties.Count == 1, Is.True);
+            Assert.That(actual[2].Properties["location"] == @"c:\path\to\file.txt", Is.True);
+            Assert.That(actual[3].TagType == TagTypes.Tag, Is.True);
+            Assert.That(actual[3].Name == "jason", Is.True);
             Assert.That(actual[3].HasChildren, Is.True);
             Assert.That(actual[3].Children.Count, Is.EqualTo(1));
             Assert.That(actual[3].Children[0].TokenText, Is.EqualTo(" wall "));
-            Assert.IsTrue(actual[4].TagType == TagTypes.Text);
-            Assert.IsTrue(actual[4].TokenText == @"more text at the end.");
+            Assert.That(actual[4].TagType == TagTypes.Text, Is.True);
+            Assert.That(actual[4].TokenText == @"more text at the end.", Is.True);
         }
 
         [Test]

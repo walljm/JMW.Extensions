@@ -26,6 +26,8 @@ namespace JMW.Template.Tags
         public TableData TableData { get; }
         public int CurrentRow { get; set; }
 
+        private static readonly char[] separator = [','];
+
         public Table()
         {
         }
@@ -93,7 +95,7 @@ namespace JMW.Template.Tags
         {
             if (tag.Properties.ContainsKey(ATTR_DISTINCT))
             {
-                var cols = tag.Properties[ATTR_DISTINCT].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var cols = tag.Properties[ATTR_DISTINCT].Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
                 var dict = new Dictionary<string, List<string>>();
                 foreach (var row in table_data.Data)

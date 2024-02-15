@@ -9,7 +9,7 @@ namespace JMW.Networking.Parsers.JunosConfig;
 /// </summary>
 public class Parser
 {
-    private readonly Stack<Tag> stack = new();
+    private readonly Stack<Tag> _stack = new Stack<Tag>();
 
     public Parser()
     {
@@ -37,7 +37,7 @@ public class Parser
             switch (token.Type)
             {
                 case TokenType.ObjectStart:
-                    var o_names = CollapseWords();
+                    var o_names = collapseWords();
                     if (o_names.Count > 0)
                     {
                         tag.Name = o_names.First().Value.Trim();
@@ -48,47 +48,47 @@ public class Parser
 
                     tag.TagType = TagTypes.Object;
                     tag.Children = new Stack<Tag>();
-                    stack.Push(tag);
+                    _stack.Push(tag);
                     break;
 
                 case TokenType.ArrayStart:
-                    if (stack.Count > 0)
-                        stack.Pop(); // you don't need the current word.
+                    if (_stack.Count > 0)
+                        _stack.Pop(); // you don't need the current word.
                     tag.TagType = TagTypes.Array;
                     tag.Name = token.Value.ToLower().Trim();
                     tag.Children = new Stack<Tag>();
-                    stack.Push(tag);
+                    _stack.Push(tag);
                     break;
 
                 case TokenType.ArrayStop:
                     {
-                        var curr = stack.Pop();
-                        if (stack.Count == 0)
+                        var curr = _stack.Pop();
+                        if (_stack.Count == 0)
                         {
                             ast.Add(curr);
                         }
                         else
                         {
-                            stack.Peek().Children.Push(curr);
+                            _stack.Peek().Children.Push(curr);
                         }
                         break;
                     }
                 case TokenType.ObjectStop:
                     {
-                        var curr = stack.Pop();
+                        var curr = _stack.Pop();
                         last = curr;
-                        if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Array)
+                        if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Array)
                         {
-                            stack.Peek().Children.Push(curr);
+                            _stack.Peek().Children.Push(curr);
                             break;
                         }
-                        if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Object)
+                        if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Object)
                         {
-                            stack.Peek().Children.Push(curr);
+                            _stack.Peek().Children.Push(curr);
                             break;
                         }
 
-                        if (stack.Count == 0)
+                        if (_stack.Count == 0)
                         {
                             ast.Add(curr);
                         }
@@ -96,14 +96,14 @@ public class Parser
                     }
                 case TokenType.LineStop:
                     {
-                        if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Array)
+                        if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Array)
                         {
                             tag.TagType = TagTypes.Word;
                             tag.Name = string.Empty;
                             tag.Value = token.Value;
-                            stack.Peek().Children.Push(tag);
+                            _stack.Peek().Children.Push(tag);
                         }
-                        else if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Object)
+                        else if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Object)
                         {
                             if (token.Value.Length == 0)
                                 break;
@@ -111,11 +111,11 @@ public class Parser
                             tag.TagType = TagTypes.Word;
                             tag.Name = string.Empty;
                             tag.Value = token.Value;
-                            stack.Peek().Children.Push(tag);
+                            _stack.Peek().Children.Push(tag);
                         }
-                        else if (stack.Count > 0)
+                        else if (_stack.Count > 0)
                         {
-                            var words = CollapseWords();
+                            var words = collapseWords();
                             tag.TagType = TagTypes.Property;
 
                             if (words.Count > 2)
@@ -134,9 +134,9 @@ public class Parser
                                 tag.Name = words[0].Value;
                             }
 
-                            if (stack.Count > 0)
+                            if (_stack.Count > 0)
                             {
-                                stack.Peek().Children.Push(tag);
+                                _stack.Peek().Children.Push(tag);
                             }
                             else
                                 ast.Add(tag);
@@ -147,12 +147,12 @@ public class Parser
                     {
                         tag.TagType = TagTypes.Word;
                         tag.Value = token.Value;
-                        if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Array)
+                        if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Array)
                         {
-                            stack.Peek().Children.Push(tag);
+                            _stack.Peek().Children.Push(tag);
                         }
                         else
-                            stack.Push(tag);
+                            _stack.Push(tag);
                     }
                     break;
             }
@@ -162,18 +162,18 @@ public class Parser
         {
             throw new ParseException(tokenizer.Token);
         }
-        if (stack.Count != 0)
+        if (_stack.Count != 0)
         {
             throw new ParseException("Parsing code ended prematurely. Did you forget a closing }?", tokenizer.Token);
         }
         return ast;
     }
 
-    private List<Tag> CollapseWords()
+    private List<Tag> collapseWords()
     {
         var words = new List<Tag>();
-        while (stack.Count > 0 && stack.Peek().TagType == TagTypes.Word)
-            words.Add(stack.Pop());
+        while (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Word)
+            words.Add(_stack.Pop());
         return words;
     }
 }

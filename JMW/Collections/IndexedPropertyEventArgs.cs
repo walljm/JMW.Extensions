@@ -11,33 +11,32 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 using System;
 
-namespace JMW.Collections
+namespace JMW.Collections;
+
+/// <summary>
+/// Encapsulated information needed by the IndexedPropertyChanged event
+/// </summary>
+public class IndexedPropertyChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Encapsulated information needed by the IndexedPropertyChanged event
+    /// The Value of the object before it was changed
     /// </summary>
-    public class IndexedPropertyChangedEventArgs : EventArgs
+    public object Before { get; }
+
+    /// <summary>
+    /// The Value of the object after it was changed
+    /// </summary>
+    public object After { get; }
+
+    /// <summary>
+    /// The name of the property being changed
+    /// </summary>
+    public string PropertyName { get; }
+
+    public IndexedPropertyChangedEventArgs(string prop_name, object before, object after)
     {
-        /// <summary>
-        /// The Value of the object before it was changed
-        /// </summary>
-        public object Before { get; }
-
-        /// <summary>
-        /// The Value of the object after it was changed
-        /// </summary>
-        public object After { get; }
-
-        /// <summary>
-        /// The name of the property being changed
-        /// </summary>
-        public string PropertyName { get; }
-
-        public IndexedPropertyChangedEventArgs(string prop_name, object before, object after)
-        {
-            Before = before;
-            After = after;
-            PropertyName = prop_name;
-        }
+        Before = before;
+        After = after;
+        PropertyName = prop_name;
     }
 }

@@ -184,11 +184,11 @@ namespace JMW.Collections.Tests
             }
             catch (OperationCanceledException ex)
             {
-                Assert.AreEqual("Operation was cancelled due to an index violation. The Index may have been violated.", ex.Message);
+                Assert.That("Operation was cancelled due to an index violation. The Index may have been violated.", Is.EqualTo(ex.Message));
             }
 
-            Assert.AreEqual(1, cnt);
-            Assert.AreEqual("Value violated index 'Bar' using key 'wall'", msg);
+            Assert.That(1,Is.EqualTo(cnt));
+            Assert.That("Value violated index 'Bar' using key 'wall'", Is.EqualTo(msg));
         }
 
         private void f1_IndexedPropertyChanged(object sender, IndexedPropertyChangedEventArgs e)

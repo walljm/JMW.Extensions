@@ -17,10 +17,7 @@
     </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\JMW.Parsing\JMW.Parsing.csproj" />
     <ProjectReference Include="..\JMW\JMW.csproj" />
   </ItemGroup>
 </Project>

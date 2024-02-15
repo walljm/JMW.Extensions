@@ -1,18 +1,17 @@
-﻿using NUnit.Framework;
+﻿using JMW.Tests;
+using NUnit.Framework;
 using System.IO;
-using System.Reflection;
 
-namespace JMW.Parsing.Tests
+namespace JMW.Parsing.Tests;
+
+[TestFixture]
+public class JunosParsingTest : TestBase
 {
-    [TestFixture]
-    public class JunosParsingTest
+    [Test]
+    public void ParseTest()
     {
-        [Test]
-        public void ParseTest()
-        {
-            var dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "..", "..", "Networking", "junos.txt");
-            var junos = File.ReadAllText(dir);
-            _ = new JMW.Networking.Parsers.JunosConfig.Parser().Parse(junos);
-        }
+        var dir = Path.Combine(ExecutionPath, "Networking", "junos.txt");
+        var junos = File.ReadAllText(dir);
+        _ = new JMW.Networking.Parsers.JunosConfig.Parser().Parse(junos);
     }
 }
