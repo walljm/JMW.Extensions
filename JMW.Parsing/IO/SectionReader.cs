@@ -8,8 +8,8 @@ public class SectionReader
 {
     private readonly StreamReader reader;
 
-    private readonly IExpression start;
-    private readonly IExpression stop;
+    private readonly IExpression? start;
+    private readonly IExpression? stop;
 
     private readonly bool includeStartLine = false;
     private readonly bool includeStopLine = false;
@@ -19,7 +19,7 @@ public class SectionReader
 
     #region Constructors
 
-    public SectionReader(StreamReader stream, IExpression start, IExpression stop) : this(stream, start, stop, false, false)
+    public SectionReader(StreamReader stream, IExpression? start, IExpression? stop) : this(stream, start, stop, false, false)
     {
     }
 
@@ -32,7 +32,7 @@ public class SectionReader
         this.includeStopLine = include.IncludeStop;
     }
 
-    public SectionReader(StreamReader stream, IExpression start, IExpression stop, bool include_start_line, bool include_stop_line)
+    public SectionReader(StreamReader stream, IExpression? start, IExpression? stop, bool include_start_line, bool include_stop_line)
     {
         this.reader = stream;
         this.start = start;
@@ -48,9 +48,9 @@ public class SectionReader
     /// <exception cref="T:System.OutOfMemoryException">There is insufficient memory to allocate a buffer for the returned string. </exception>
     /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
     /// <filterpriority>1</filterpriority>
-    public string ReadLine()
+    public string? ReadLine()
     {
-        if (this.start == null && this.stop == null)
+        if (this.start is null && this.stop is null)
         {
             return this.reader.ReadLine();
         }
@@ -60,15 +60,15 @@ public class SectionReader
             return null;
         }
 
-        string line;
-        while ((line = this.reader.ReadLine()) != null)
+        string? line;
+        while ((line = this.reader.ReadLine()) is not null)
         {
-            if (!this.started && this.start != null && !this.start.Test(line))
+            if (!this.started && this.start is not null && !this.start.Test(line))
             {
                 continue;
             }
 
-            if (!this.stopped && this.stop != null && this.stop.Test(line))
+            if (!this.stopped && this.stop is not null && this.stop.Test(line))
             {
                 this.stopped = true;
                 if (!this.includeStopLine)

@@ -49,20 +49,20 @@ namespace JMW.Collections.Tests
             var indices = idx.MaybeGetUniqueIndex(p => p.Bar);
             var indices2 = idx.MaybeGetIndex(p => p.BarCollection);
 
-            indices.Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
-            indices2.Do(if_success: d => Assert.That(d.Count == 3), if_exception: null);
+            indices.Do(ifSuccess: d => Assert.That(d.Count == 2), ifException: null);
+            indices2.Do(ifSuccess: d => Assert.That(d.Count == 3), ifException: null);
 
             // make sure the indices can be modified without modifying the original.
-            indices.Do(if_success: d => d.Remove("jeremy"), if_exception: null);
-            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            indices.Do(ifSuccess: d => d.Remove("jeremy"), ifException: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(ifSuccess: d => Assert.That(d.Count == 2), ifException: null);
 
             Assert.That(idx.First() == f1);
             Assert.That(idx.First(d => d.Bar == "jeremy") == f1);
-            idx.MaybeGetByUniqueIndex(p => p.Bar, "jeremy").Do(if_success: d => Assert.That(d == f1), if_exception: null);
-            idx.MaybeGetByIndex(p => p.BarCollection, "two").Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.MaybeGetByUniqueIndex(p => p.Bar, "jeremy").Do(ifSuccess: d => Assert.That(d == f1), ifException: null);
+            idx.MaybeGetByIndex(p => p.BarCollection, "two").Do(ifSuccess: d => Assert.That(d.Count == 2), ifException: null);
 
-            idx.MaybeGetByUniqueIndex(p => p.BarCollection, "jeremy").Do(if_success: null, if_exception: d => Assert.That(d.GetType() == typeof(ArgumentException)));
-            idx.MaybeGetByIndex(p => p.Bar, "two").Do(if_success: null, if_exception: d => Assert.That(d.GetType() == typeof(ArgumentException)));
+            idx.MaybeGetByUniqueIndex(p => p.BarCollection, "jeremy").Do(ifSuccess: null, ifException: d => Assert.That(d.GetType() == typeof(ArgumentException)));
+            idx.MaybeGetByIndex(p => p.Bar, "two").Do(ifSuccess: null, ifException: d => Assert.That(d.GetType() == typeof(ArgumentException)));
 
             var en = idx.GetEnumerator();
             while (en.MoveNext())
@@ -70,12 +70,12 @@ namespace JMW.Collections.Tests
                 Assert.That(typeof(Foo) == en.Current.GetType());
             }
 
-            idx.MaybeGetUniqueIndex(p => p.BarCollection).Do(if_success: null, if_exception: ex => Assert.That(ex.GetType() == typeof(ArgumentException)));
-            idx.MaybeGetIndex(p => p.Bar).Do(if_success: null, if_exception: ex => Assert.That(ex.GetType() == typeof(ArgumentException)));
+            idx.MaybeGetUniqueIndex(p => p.BarCollection).Do(ifSuccess: null, ifException: ex => Assert.That(ex.GetType() == typeof(ArgumentException)));
+            idx.MaybeGetIndex(p => p.Bar).Do(ifSuccess: null, ifException: ex => Assert.That(ex.GetType() == typeof(ArgumentException)));
 
             idx.Remove(f1);
-            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
-            idx.MaybeGetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(ifSuccess: d => Assert.That(d.Count == 1), ifException: null);
+            idx.MaybeGetIndex(p => p.BarCollection).Do(ifSuccess: d => Assert.That(d.Count == 2), ifException: null);
             idx.Add(f1);
 
             Assert.That(idx.TryGetByUniqueIndex(p => p.Bar, "jeremy", out var t1));
@@ -87,13 +87,13 @@ namespace JMW.Collections.Tests
             Assert.That(!idx.TryGetByIndex(p => p.Bar, "one", out t2));
 
             idx.Remove(p => p.Bar == "jeremy");
-            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
-            idx.MaybeGetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(ifSuccess: d => Assert.That(d.Count == 1), ifException: null);
+            idx.MaybeGetIndex(p => p.BarCollection).Do(ifSuccess: d => Assert.That(d.Count == 2), ifException: null);
             idx.Add(f1);
 
             idx.RemoveAt(0);
-            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 1), if_exception: null);
-            idx.MaybeGetIndex(p => p.BarCollection).Do(if_success: d => Assert.That(d.Count == 2), if_exception: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(ifSuccess: d => Assert.That(d.Count == 1), ifException: null);
+            idx.MaybeGetIndex(p => p.BarCollection).Do(ifSuccess: d => Assert.That(d.Count == 2), ifException: null);
             idx.Insert(0, f1);
 
             try
@@ -135,7 +135,7 @@ namespace JMW.Collections.Tests
 
             idx.Clear();
             Assert.That(idx.Count == 0);
-            idx.MaybeGetUniqueIndex(p => p.Bar).Do(if_success: d => Assert.That(d.Count == 0), if_exception: null);
+            idx.MaybeGetUniqueIndex(p => p.Bar).Do(ifSuccess: d => Assert.That(d.Count == 0), ifException: null);
 
             idx.CollectionChanged += idx_CollectionChanged;
             idx.Add(f1);
@@ -191,21 +191,25 @@ namespace JMW.Collections.Tests
             Assert.That("Value violated index 'Bar' using key 'wall'", Is.EqualTo(msg));
         }
 
-        private void f1_IndexedPropertyChanged(object sender, IndexedPropertyChangedEventArgs e)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+        private void f1_IndexedPropertyChanged(object? sender, IndexedPropertyChangedEventArgs e)
         {
         }
 
-        private void idx_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+        private void idx_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             Assert.That(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add);
         }
 
-        private void f1_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+        private void f1_PropertyChanging(object? sender, System.ComponentModel.PropertyChangingEventArgs e)
         {
             Assert.That(e.PropertyName == "Bar");
         }
 
-        private void f1_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+        private void f1_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             Assert.That(e.PropertyName == "Bar");
         }

@@ -12,7 +12,7 @@ public static class Extensions
     public static string[] Tail(this TextReader reader, int lineCount)
     {
         var buffer = new RingBuffer<string>(lineCount);
-        string line;
+        string? line;
         while (null != (line = reader.ReadLine()))
         {
             buffer.Add(line);

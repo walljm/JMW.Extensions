@@ -98,12 +98,7 @@ internal class Tokenizer
             {
                 return ConsumeLineStop();
             }
-            if (MaybeReadWord())
-            {
-                return ConsumeWord();
-            }
-
-            return ConsumeWhitespace();
+            return MaybeReadWord() ? ConsumeWord() : ConsumeWhitespace();
         }
         catch (Exception ex)
         {
@@ -335,10 +330,7 @@ internal class Tokenizer
         reader.PushBack(buf.Take(n).ToArray());
 
         var c = buf.First();
-        if (!unacceptableWordChars.Contains(c))
-            return true;
-
-        return false;
+        return !unacceptableWordChars.Contains(c);
     }
 
     private bool MaybeReadCommentStart()
@@ -381,10 +373,7 @@ internal class Tokenizer
         var c = reader.Read();
         reader.PushBack((char)c);
 
-        if (c == '"' || c == '\'')
-            return true;
-
-        return false;
+        return c == '"' || c == '\'';
     }
 
     private bool MaybeReadText(string text)

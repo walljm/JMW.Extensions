@@ -18,7 +18,7 @@ namespace JMW.Collections;
 
 public class RingBuffer<T> : IEnumerable<T>
 {
-    private readonly T[] internalArray;
+    private readonly T?[] internalArray;
     private int index;
 
     public RingBuffer(int size)
@@ -69,10 +69,9 @@ public class RingBuffer<T> : IEnumerable<T>
 
     public IEnumerator<T> GetEnumerator()
     {
-        if (ReverseIteration)
-            return new RingReverseEnumerator<T>(index, internalArray, Count);
-
-        return new RingEnumerator<T>(index, internalArray, Count);
+        return ReverseIteration
+            ? new RingReverseEnumerator<T>(index, internalArray, Count)
+            : new RingEnumerator<T>(index, internalArray, Count);
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -90,15 +89,17 @@ public class RingBuffer<T> : IEnumerable<T>
 
     public T Last()
     {
-        if (ReverseIteration)
-            return internalArray[index];
-
-        return index > 0 ? internalArray[index - 1] : internalArray[Count - 1];
+        return ReverseIteration
+            ? internalArray[index] ?? throw new InvalidOperationException()
+            : index > 0
+                ? internalArray[index - 1] ?? throw new InvalidOperationException()
+                : internalArray[Count - 1] ?? throw new InvalidOperationException()
+                ;
     }
 
     public T First()
     {
-        return internalArray[index];
+        return internalArray[index] ?? throw new InvalidOperationException();
     }
 
     public void Clear()
@@ -140,7 +141,7 @@ public class RingBuffer<T> : IEnumerable<T>
             if (index >= Count)
                 throw new IndexOutOfRangeException("Index: " + index + " is not less than " + Count);
             var idx = this.index + index < this.internalArray.Length ? this.index + index : this.index + index - this.internalArray.Length;
-            return internalArray[idx];
+            return internalArray[idx] ?? throw new InvalidOperationException();
         }
 
         set
@@ -160,9 +161,9 @@ public class RingReverseEnumerator<T> : IEnumerator<T>
     private int index;
     private readonly int origin;
     private readonly int length;
-    private readonly T[] internalArray;
+    private readonly T?[] internalArray;
 
-    public RingReverseEnumerator(int idx, T[] arr, int length)
+    public RingReverseEnumerator(int idx, T?[] arr, int length)
     {
         index = idx; origin = idx;
         internalArray = arr;
@@ -189,8 +190,8 @@ public class RingReverseEnumerator<T> : IEnumerator<T>
         GC.SuppressFinalize(this);
     }
 
-    T IEnumerator<T>.Current => internalArray[index];
-    public object Current => internalArray[index];
+    T IEnumerator<T>.Current => internalArray[index] ?? throw new InvalidOperationException();
+    public object Current => internalArray[index] ?? throw new InvalidOperationException();
 }
 
 public class RingEnumerator<T> : IEnumerator<T>
@@ -199,9 +200,9 @@ public class RingEnumerator<T> : IEnumerator<T>
     private int index;
     private readonly int origin;
     private readonly int length;
-    private readonly T[] internalArray;
+    private readonly T?[] internalArray;
 
-    public RingEnumerator(int idx, T[] arr, int length)
+    public RingEnumerator(int idx, T?[] arr, int length)
     {
         index = idx - 1; origin = idx - 1;
         internalArray = arr;
@@ -224,8 +225,8 @@ public class RingEnumerator<T> : IEnumerator<T>
         index = origin;
     }
 
-    T IEnumerator<T>.Current => internalArray[index];
-    public object Current => internalArray[index];
+    T IEnumerator<T>.Current => internalArray[index] ?? throw new InvalidOperationException();
+    public object Current => internalArray[index] ?? throw new InvalidOperationException();
 
     public void Dispose()
     {

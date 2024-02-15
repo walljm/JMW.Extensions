@@ -57,7 +57,7 @@ namespace JMW.Types
         /// <summary>
         /// An instance of the calculator. We will use this to perform the calculations.
         /// </summary>
-        private static C calc = new C();
+        private static C calc = new();
 
         #region Constructors
 
@@ -86,17 +86,17 @@ namespace JMW.Types
         /// <param name="rng"></param>
         public Range(string rng)
         {
-            if (rng.Contains("-"))
+            if (rng.Contains('-'))
             {
                 Start = Signed<T, C>.Parse(rng.Split('-')[0]);
                 Stop = Signed<T, C>.Parse(rng.Split('-')[1]);
             }
-            else if (rng.Contains(","))
+            else if (rng.Contains(','))
             {
                 Start = Signed<T, C>.Parse(rng.Split(',')[0]);
                 Stop = Signed<T, C>.Parse(rng.Split(',')[1]);
             }
-            else if (rng.Contains(":"))
+            else if (rng.Contains(':'))
             {
                 Start = Signed<T, C>.Parse(rng.Split(':')[0]);
                 Stop = Signed<T, C>.Parse(rng.Split(':')[1]);
@@ -157,8 +157,7 @@ namespace JMW.Types
         public bool Contains(Range<T, C> rng)
         {
             if (Start >= rng.Start && Stop <= rng.Stop) return true;
-            if (rng.Start >= Start && rng.Stop <= Stop) return true;
-            return false;
+            return rng.Start >= Start && rng.Stop <= Stop;
         }
 
         /// <summary>
@@ -168,8 +167,7 @@ namespace JMW.Types
         /// <returns><see cref="bool"/></returns>
         public bool IsInRange(Signed<T, C> num)
         {
-            if (num >= Start && num <= Stop) return true;
-            return false;
+            return num >= Start && num <= Stop;
         }
 
         /// <summary>
@@ -187,8 +185,7 @@ namespace JMW.Types
         /// </summary>
         public string RangeToString()
         {
-            var r = string.Empty;
-
+            string? r;
             if (Start == Stop) r = Start.ToString();
             else r = Start + "-" + Stop;
 
@@ -216,8 +213,7 @@ namespace JMW.Types
             if (Start >= rng.Start && Start <= rng.Stop) return true;
 
             if (rng.Stop >= Start && rng.Stop <= Stop) return true;
-            if (Stop >= rng.Start && Stop <= rng.Stop) return true;
-            return false;
+            return Stop >= rng.Start && Stop <= rng.Stop;
         }
 
         /// <summary>

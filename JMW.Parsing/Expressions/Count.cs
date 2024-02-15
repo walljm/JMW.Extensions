@@ -17,16 +17,20 @@ public class Count : IExpression
 
     public Count(Tag t)
     {
-        if (t.Properties.TryGetValue(Search.SEARCH, out Tag searchTag))
+        if (t.Properties.TryGetValue(Search.SEARCH, out var searchTag))
         {
             foreach (var val in (Stack<Tag>)searchTag.Value)
             {
-                this.Search.Query.Add(val.Value.ToString());
+                if (val.Value.ToString() is null)
+                {
+                    continue;
+                }
+                this.Search.Query.Add(val.Value.ToString() ?? string.Empty);
             }
 
-            if (searchTag.Properties.TryGetValue(Search.MODS, out Tag modsTag))
+            if (searchTag.Properties.TryGetValue(Search.MODS, out var modsTag))
             {
-                this.Search.Mods = modsTag.Value.ToString();
+                this.Search.Mods = modsTag.Value.ToString() ?? string.Empty;
             }
         }
         else
@@ -34,7 +38,7 @@ public class Count : IExpression
             throw new ArgumentException("Required Property Missing: " + Search.SEARCH);
         }
 
-        if (t.Properties.TryGetValue(RNG, out Tag rngTag))
+        if (t.Properties.TryGetValue(RNG, out var rngTag))
         {
             this.Rng = new IntegerRangeCollection(rngTag.Value.ToString());
         }

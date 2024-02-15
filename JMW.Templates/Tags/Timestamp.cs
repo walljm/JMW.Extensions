@@ -8,7 +8,7 @@ namespace JMW.Template.Tags
     {
         public const string TAG = "timestamp";
         public override string TagName { get; } = TAG;
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_FORMAT, ATTR_EXP };
+        public override HashSet<string> ALLOWEDPROPS { get; } = [ATTR_FORMAT, ATTR_EXP];
         public const string ATTR_EXP = "exp";
         private const string ATTR_FORMAT = "format";
 
@@ -25,7 +25,7 @@ namespace JMW.Template.Tags
 
                 if (tag.Properties.ContainsKey(ATTR_EXP))
                 {
-                    value = TagHelpers.EvaluateExpression(tag.Properties[ATTR_EXP], new List<string> { value }).ToString(CultureInfo.InvariantCulture);
+                    value = TagHelpers.EvaluateExpression(tag.Properties[ATTR_EXP], [value]).ToString(CultureInfo.InvariantCulture);
                     interp.OutputStream.Write(value);
                 }
                 else

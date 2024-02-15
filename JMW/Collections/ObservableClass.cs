@@ -72,7 +72,7 @@ namespace JMW.Collections
 
         #region Events
 
-        private readonly WeakEventSource<PropertyChangingEventArgs> _PropertyChanging = new WeakEventSource<PropertyChangingEventArgs>();
+        private readonly WeakEventSource<PropertyChangingEventArgs> _PropertyChanging = new();
         /// <summary>
         /// The <see cref="INotifyPropertyChanging"/> event.  Gives you the property name before
         /// the value is changed.
@@ -81,13 +81,13 @@ namespace JMW.Collections
         /// objects have not been collected by the GC.  <see cref="WeakReference"/>'s don't prevent
         /// the GC from collecting the objects if there are no more references to them.</para>
         /// </summary>
-        public event PropertyChangingEventHandler PropertyChanging
+        public event PropertyChangingEventHandler? PropertyChanging
         {
-            add { _PropertyChanging.Subscribe(value.CastDelegate<EventHandler<PropertyChangingEventArgs>>()); }
-            remove { _PropertyChanging.Unsubscribe(value.CastDelegate<EventHandler<PropertyChangingEventArgs>>()); }
+            add { _PropertyChanging?.Subscribe(value.CastDelegate<EventHandler<PropertyChangingEventArgs>>()); }
+            remove { _PropertyChanging?.Unsubscribe(value.CastDelegate<EventHandler<PropertyChangingEventArgs>>()); }
         }
 
-        private readonly WeakEventSource<PropertyChangedEventArgs> _PropertyChanged = new WeakEventSource<PropertyChangedEventArgs>();
+        private readonly WeakEventSource<PropertyChangedEventArgs> _PropertyChanged = new();
         /// <summary>
         /// The <see cref="INotifyPropertyChanged"/> event.  Gives you the property name after
         /// the value has changed.
@@ -95,10 +95,10 @@ namespace JMW.Collections
         /// objects have not been collected by the GC.  <see cref="WeakReference"/>'s don't prevent
         /// the GC from collecting the objects if there are no more references to them.</para>
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged
         {
-            add { _PropertyChanged.Subscribe(value.CastDelegate<EventHandler<PropertyChangedEventArgs>>()); }
-            remove { _PropertyChanged.Unsubscribe(value.CastDelegate<EventHandler<PropertyChangedEventArgs>>()); }
+            add { _PropertyChanged?.Subscribe(value.CastDelegate<EventHandler<PropertyChangedEventArgs>>()); }
+            remove { _PropertyChanged?.Unsubscribe(value.CastDelegate<EventHandler<PropertyChangedEventArgs>>()); }
         }
 
         #endregion Events
@@ -119,20 +119,20 @@ namespace JMW.Collections
             if (EqualityComparer<T>.Default.Equals(field, value))
                 return false;
 
-            raisePropertyChanging(property_name);
+            RaisePropertyChanging(property_name);
             field = value;
-            raisePropertyChanged(property_name);
+            RaisePropertyChanged(property_name);
             return true;
         }
 
         #region Private Methods
 
-        private void raisePropertyChanged(string prop)
+        private void RaisePropertyChanged(string prop)
         {
             _PropertyChanged.Raise(this, new PropertyChangedEventArgs(prop));
         }
 
-        private void raisePropertyChanging(string prop)
+        private void RaisePropertyChanging(string prop)
         {
             _PropertyChanging.Raise(this, new PropertyChangingEventArgs(prop));
         }

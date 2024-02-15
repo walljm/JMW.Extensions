@@ -8,7 +8,7 @@ namespace JMW.Template.Tags
     {
         public const string TAG = "version";
         public override string TagName { get; } = TAG;
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_PREFIX, ATTR_EXP };
+        public override HashSet<string> ALLOWEDPROPS { get; } = [ATTR_PREFIX, ATTR_EXP];
         public const string ATTR_PREFIX = "prefix";
         public const string ATTR_EXP = "exp";
 
@@ -24,7 +24,7 @@ namespace JMW.Template.Tags
 
             if (token.Properties.ContainsKey(ATTR_EXP))
             {
-                var value = TagHelpers.EvaluateExpression(token.Properties[ATTR_EXP], new List<string> { arguments }).ToString(CultureInfo.InvariantCulture);
+                var value = TagHelpers.EvaluateExpression(token.Properties[ATTR_EXP], [arguments]).ToString(CultureInfo.InvariantCulture);
                 interp.OutputStream.Write(value);
             }
             else

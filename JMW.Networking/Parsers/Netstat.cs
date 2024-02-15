@@ -47,7 +47,7 @@ public static class NetStat
     {
         var sb = new StringBuilder();
         string? line;
-        while ((line = output.ReadLine()) != null)
+        while ((line = output.ReadLine()) is not null)
         {
             if (
                    string.IsNullOrWhiteSpace(line)

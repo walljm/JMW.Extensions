@@ -18,9 +18,11 @@ namespace JMW.Extensions.Reflection;
 
 public static class Extensions
 {
-    public static T CastDelegate<T>(this Delegate src) where T : class
+    public static T? CastDelegate<T>(this Delegate src) where T : class
     {
-        return (T)(object)Delegate.CreateDelegate(typeof(T), src.Target, src.Method, true); // throw on fail
+        var obj = (object?)Delegate.CreateDelegate(typeof(T), src.Target, src.Method, true);
+
+        return (T?)obj; // throw on fail
     }
 
     /// <summary>
@@ -48,9 +50,9 @@ public static class Extensions
         return type.GetInterfaces().Any(t => t.Name == t_name);
     }
 
-    public static T GetValue<T>(this PropertyInfo info, object obj)
+    public static T? GetValue<T>(this PropertyInfo info, object obj)
     {
-        return (T)info.GetValue(obj, null);
+        return (T?)info.GetValue(obj, null);
     }
 
     /// <summary>
@@ -59,7 +61,7 @@ public static class Extensions
     /// <typeparam name="TAttribute">The type of the attribute to get.</typeparam>
     /// <param name="enumVal">The enum value.</param>
     /// <returns>The first attribute of the given type that exists on the enum value.</returns>
-    public static TAttribute GetAttributeOfType<TAttribute>(this Enum enumVal)
+    public static TAttribute? GetAttributeOfType<TAttribute>(this Enum enumVal)
         where TAttribute : Attribute
     {
         var memInfo = enumVal.GetType().GetMember(enumVal.ToString());
@@ -72,7 +74,7 @@ public static class Extensions
     /// <typeparam name="TAttribute">The type of the attribute to get.</typeparam>
     /// <param name="provider">The provider.</param>
     /// <returns>The first attribute of the given type that exists on the provider.</returns>
-    public static TAttribute GetAttributeOfType<TAttribute>(this ICustomAttributeProvider provider)
+    public static TAttribute? GetAttributeOfType<TAttribute>(this ICustomAttributeProvider provider)
         where TAttribute : Attribute
     {
         var attributes = provider.GetCustomAttributes(typeof(TAttribute), true);

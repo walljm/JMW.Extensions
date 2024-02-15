@@ -9,7 +9,7 @@ public class Tag
     private string _Name = string.Empty;
     public string Name { get { return _Name; } set { _Name = value.Trim(); } }
 
-    public Dictionary<string, Tag> Properties { get; set; } = new Dictionary<string, Tag>();
+    public Dictionary<string, Tag> Properties { get; set; } = [];
 
     public string Value { get; set; } = string.Empty;
 

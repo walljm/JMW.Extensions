@@ -26,28 +26,28 @@ public class Table : Base, IParser, IProperty
     public string Name { get; } = NAME;
 
     private readonly Include include = new(null, null);
-    private readonly IExpression headerExp = null;
-    private readonly IExpression rowExp = null;
+    private readonly IExpression? headerExp = null;
+    private readonly IExpression? rowExp = null;
     private readonly bool validate = false;
 
     public Table(Tag token)
     {
         // optional.
-        if (token.Properties.TryGetValue(A_INCLUDE, out Tag includeTag))
+        if (token.Properties.TryGetValue(A_INCLUDE, out var includeTag))
         {
             this.include = new Include(includeTag);
         }
 
         // optional.
-        if (token.Properties.TryGetValue(A_HEADER, out Tag headerTag))
+        if (token.Properties.TryGetValue(A_HEADER, out var headerTag))
         {
             this.headerExp = Expressions.Base.ToExpression(headerTag);
         }
 
         // optional
-        if (token.Properties.TryGetValue(A_VALIDATE, out Tag validateTag))
+        if (token.Properties.TryGetValue(A_VALIDATE, out var validateTag))
         {
-            var v = validateTag.Value.ToString();
+            var v = validateTag.Value.ToString() ?? string.Empty;
             if (
                    !v.Equals("true", StringComparison.CurrentCultureIgnoreCase)
                 && !v.Equals("false", StringComparison.CurrentCultureIgnoreCase)
@@ -59,13 +59,13 @@ public class Table : Base, IParser, IProperty
         }
 
         // find first line that matches.
-        if (!token.Properties.TryGetValue(A_ROW, out Tag rowTag))
+        if (!token.Properties.TryGetValue(A_ROW, out var rowTag))
         {
             throw new ParseException("Missing property: " + A_ROW);
         }
         this.rowExp = Expressions.Base.ToExpression(rowTag);
 
-        if (!token.Properties.TryGetValue(A_PROPS, out Tag propTag))
+        if (!token.Properties.TryGetValue(A_PROPS, out var propTag))
         {
             throw new ParseException("Missing property: " + A_PROPS);
         }
@@ -93,26 +93,31 @@ public class Table : Base, IParser, IProperty
     {
         var sr = new SectionReader(reader, this.include);
 
-        string line;
-        while ((line = sr.ReadLine()) != null)
+        string? line;
+        while ((line = sr.ReadLine()) is not null)
         {
-            if (row != null && row.Test(line))
+            if (row is not null && row.Test(line))
             {
                 yield return line;
             }
         }
     }
 
-    public override IEnumerable<object[]> Parse(StreamReader reader)
+    public override IEnumerable<object[]> Parse(StreamReader? reader)
     {
-        if (reader == null)
+        if (reader is null)
             yield break;
+
+        if (this.rowExp is null)
+        {
+            throw new InvalidOperationException();
+        }
 
         var pos = reader.BaseStream.Position;
 
         // get header row, and handle it
         var cols = this.Props.FindAll(p => p is Property property && property.Extractors.Any(ex => ex is Column));
-        if (this.headerExp != null && cols.Count > 0)
+        if (this.headerExp is not null && cols.Count > 0)
         {
             var exp = this.validate ? new Or(new List<IExpression> { this.headerExp, this.rowExp }) : this.headerExp;
 
@@ -437,11 +442,6 @@ public class ColumnPosition
             return line.Substring(this.Start, this.Length);
         }
 
-        if (line.Length > this.Start)
-        {
-            return line.Substring(this.Start);
-        }
-
-        return string.Empty;
+        return line.Length > this.Start ? line.Substring(this.Start) : string.Empty;
     }
 }

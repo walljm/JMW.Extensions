@@ -14,10 +14,12 @@
     <RepositoryUrl>https://github.com/walljm/jmw.extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>en</NeutralLanguage>
-    </PropertyGroup>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jint" Version="3.0.0" />
+    <PackageReference Include="Jint"
+      Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>

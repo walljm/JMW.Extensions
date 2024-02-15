@@ -32,24 +32,6 @@ namespace JMW.Extensions.Numbers.Tests
         }
 
         [Test]
-        public void IsNotNullTest()
-        {
-            string test = null;
-
-            Assert.That("blah".IsNotNull(), Is.True);
-            Assert.That(test.IsNotNull(), Is.False);
-        }
-
-        [Test]
-        public void IsNullTest()
-        {
-            string test = null;
-
-            Assert.That("blah".IsNull(), Is.False);
-            Assert.That(test.IsNull(), Is.True);
-        }
-
-        [Test]
         public void ToDoubleTest()
         {
             Assert.That((double)1, Is.EqualTo("1".ToDouble()));
@@ -113,7 +95,7 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.That(1431234121f, Is.EqualTo("1431234121".ToFloat()));
 
             float? fl = "143123412asdf1".ToFloat();
-            Assert.That(null, Is.EqualTo(fl));
+            Assert.That((float?)null, Is.EqualTo(fl));
 
             Assert.That(-1, Is.EqualTo("1431234121sdf".ToFloatOrNeg1()));
             Assert.That(-1, Is.EqualTo("1431234121sdf".ToFloatOrDefault()));

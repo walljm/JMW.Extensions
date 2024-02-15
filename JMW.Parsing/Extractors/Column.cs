@@ -13,16 +13,16 @@ public class Column : Base
 
     public const string NAME = "col";
 
-    public List<ColumnPosition> Positions { get; set; }
+    public List<ColumnPosition>? Positions { get; set; }
 
     public override string Parse(string s)
     {
-        if (this.Positions != null && this.Positions.Count < this.Index)
+        if (this.Positions is not null && this.Positions.Count < this.Index)
         {
             throw new ArgumentException($"Provided index ({this.Index}) exceeded the number of columns ({this.Positions.Count}):{this.Positions.Select(c => c.Name).ToDelimitedString(",")}");
         }
 
-        if (this.Positions != null)
+        if (this.Positions is not null)
         {
             return this.Positions[this.Index].GetColumnValue(s);
         }

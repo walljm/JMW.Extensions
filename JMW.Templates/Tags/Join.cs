@@ -9,15 +9,25 @@ namespace JMW.Template.Tags
         private bool _hasBeenJoined = false;
         private string _joinDetails = string.Empty;
 
-        private TableData _leftTableData;
-        private TableData _rightTableData;
+        private readonly TableData? _leftTableData;
+        private readonly TableData? _rightTableData;
 
         public const string TAG = "join";
         public override string TagName { get; } = TAG;
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> {
-            ATTR_LEFT_TABLE, ATTR_LEFT_WHERE,  ATTR_LEFT_KEY_EXP,  ATTR_LEFT_KEY,
-            ATTR_RIGHT_TABLE, ATTR_RIGHT_WHERE, ATTR_RIGHT_KEY_EXP, ATTR_RIGHT_KEY,
-            ATTR_DISTINCT, ATTR_WHERE, ATTR_ORDERBY, ATTR_ORDER };
+
+        public override HashSet<string> ALLOWEDPROPS { get; } = [
+            ATTR_LEFT_TABLE,
+            ATTR_LEFT_WHERE,
+            ATTR_LEFT_KEY_EXP,
+            ATTR_LEFT_KEY,
+            ATTR_RIGHT_TABLE,
+            ATTR_RIGHT_WHERE,
+            ATTR_RIGHT_KEY_EXP,
+            ATTR_RIGHT_KEY,
+            ATTR_DISTINCT,
+            ATTR_WHERE,
+            ATTR_ORDERBY,
+            ATTR_ORDER];
 
         public const string ATTR_LEFT_TABLE = "left_table";
         public const string ATTR_LEFT_WHERE = "left_where";
@@ -34,9 +44,9 @@ namespace JMW.Template.Tags
         public const string ATTR_ORDERBY = "orderby";
         public const string ATTR_ORDER = "order";
 
-        public TableData JoinedTableData { get; private set; }
+        public TableData? JoinedTableData { get; private set; }
 
-        public string Name { get; }
+        public string? Name { get; }
 
         public int CurrentRow { get; set; }
 
@@ -44,33 +54,38 @@ namespace JMW.Template.Tags
         {
         }
 
-        public Join(TableData left_table_data, TableData right_table_data, Interpreter interp)
+        public Join(TableData leftTableData, TableData rightTableData, Interpreter interp)
         {
-            _leftTableData = left_table_data;
-            _rightTableData = right_table_data;
+            _leftTableData = leftTableData;
+            _rightTableData = rightTableData;
 
             Name = _leftTableData.Name + "_" + _rightTableData.Name;
 
-            interp.Retrievers.Add(Name + JoinColumn.LEFT_PREFIX + left_table_data.Name.ToLower(), RetrieveColumnValue);
-            interp.Retrievers.Add(Name + JoinColumn.RIGHT_PREFIX + right_table_data.Name.ToLower(), RetrieveColumnValue);
+            interp.Retrievers.Add(Name + JoinColumn.LEFT_PREFIX + leftTableData.Name.ToLower(), RetrieveColumnValue);
+            interp.Retrievers.Add(Name + JoinColumn.RIGHT_PREFIX + rightTableData.Name.ToLower(), RetrieveColumnValue);
 
-            foreach (var column in left_table_data.Columns)
-                interp.AddHandler(makeColumnHandler(JoinColumn.LEFT_PREFIX + column));
+            foreach (var column in leftTableData.Columns)
+                interp.AddHandler(MakeColumnHandler(JoinColumn.LEFT_PREFIX + column));
 
-            foreach (var column in right_table_data.Columns)
-                interp.AddHandler(makeColumnHandler(JoinColumn.RIGHT_PREFIX + column));
+            foreach (var column in rightTableData.Columns)
+                interp.AddHandler(MakeColumnHandler(JoinColumn.RIGHT_PREFIX + column));
         }
 
         public override void Handler(Tag tag, Interpreter interp)
         {
+            if (Name is null || _leftTableData is null || _rightTableData is null || JoinedTableData is null)
+            {
+                throw new InvalidOperationException();
+            }
+
             TagHelpers.PrefixTags(tag.Children, Name);
 
-            var join_details = (tag.Properties.ContainsKey(ATTR_LEFT_KEY_EXP) ? tag.Properties[ATTR_LEFT_KEY_EXP] : string.Empty) +
-                               (tag.Properties.ContainsKey(ATTR_LEFT_KEY) ? tag.Properties[ATTR_LEFT_KEY] : string.Empty) +
-                               (tag.Properties.ContainsKey(ATTR_LEFT_WHERE) ? tag.Properties[ATTR_LEFT_WHERE] : string.Empty) +
-                               (tag.Properties.ContainsKey(ATTR_RIGHT_KEY) ? tag.Properties[ATTR_RIGHT_KEY] : string.Empty) +
-                               (tag.Properties.ContainsKey(ATTR_RIGHT_KEY_EXP) ? tag.Properties[ATTR_RIGHT_KEY_EXP] : string.Empty) +
-                               (tag.Properties.ContainsKey(ATTR_RIGHT_WHERE) ? tag.Properties[ATTR_RIGHT_WHERE] : string.Empty);
+            var join_details = (tag.Properties.TryGetValue(ATTR_LEFT_KEY_EXP, out var leftKeyExp) ? leftKeyExp : string.Empty) +
+                               (tag.Properties.TryGetValue(ATTR_LEFT_KEY, out var leftKey) ? leftKey : string.Empty) +
+                               (tag.Properties.TryGetValue(ATTR_LEFT_WHERE, out var leftWhere) ? leftWhere : string.Empty) +
+                               (tag.Properties.TryGetValue(ATTR_RIGHT_KEY, out var rightKey) ? rightKey : string.Empty) +
+                               (tag.Properties.TryGetValue(ATTR_RIGHT_KEY_EXP, out var rightKeyExp) ? rightKeyExp : string.Empty) +
+                               (tag.Properties.TryGetValue(ATTR_RIGHT_WHERE, out var rightWhere) ? rightWhere : string.Empty);
 
             if (!_hasBeenJoined || join_details != _joinDetails)
             {
@@ -81,21 +96,21 @@ namespace JMW.Template.Tags
                 // do the join
                 var left = new Dictionary<string, List<string>>();
                 var ldata = _leftTableData.Data;
-                if (tag.Properties.ContainsKey(ATTR_LEFT_WHERE))
-                    ldata = _leftTableData.Data.Where(r => TagHelpers.EvaluateBooleanExpression(tag.Properties[ATTR_LEFT_WHERE], r)).ToList();
+                if (tag.Properties.TryGetValue(ATTR_LEFT_WHERE, out var attrLeftWhere))
+                    ldata = _leftTableData.Data.Where(r => TagHelpers.EvaluateBooleanExpression(attrLeftWhere, r)).ToList();
 
                 foreach (var lr in ldata)
                 {
-                    if (tag.Properties.ContainsKey(ATTR_LEFT_KEY_EXP))
+                    if (tag.Properties.TryGetValue(ATTR_LEFT_KEY_EXP, out var attrLeftKeyExp))
                     {
-                        var key = TagHelpers.EvaluateExpression(tag.Properties[ATTR_LEFT_KEY_EXP], lr);
+                        var key = TagHelpers.EvaluateExpression(attrLeftKeyExp, lr);
                         if (left.ContainsKey(key))
                             throw new Exception("Key expression does not produce a unique key.  Please provide a key expression that produces a unique key.  Duplicate key: '" + key + "'");
                         left.Add(key, lr);
                     }
-                    else if (tag.Properties.ContainsKey(ATTR_LEFT_KEY)) // use the value of the key column
+                    else if (tag.Properties.TryGetValue(ATTR_LEFT_KEY, out var attrLeftkey)) // use the value of the key column
                     {
-                        var col = tag.Properties[ATTR_LEFT_KEY].ToLower();
+                        var col = attrLeftkey.ToLower();
                         left.Add(lr[_leftTableData.ColumnIndexes[col]], lr);
                     }
                     else
@@ -114,18 +129,18 @@ namespace JMW.Template.Tags
                 {
                     var key = string.Empty;
 
-                    if (tag.Properties.ContainsKey(ATTR_RIGHT_KEY_EXP))
+                    if (tag.Properties.TryGetValue(ATTR_RIGHT_KEY_EXP, out var attrRightkeyExp))
                     {
-                        key = TagHelpers.EvaluateExpression(tag.Properties[ATTR_RIGHT_KEY_EXP], rr);
+                        key = TagHelpers.EvaluateExpression(attrRightkeyExp, rr);
                     }
-                    else if (tag.Properties.ContainsKey(ATTR_RIGHT_KEY)) // use the value of the key column
-                        key = rr[_rightTableData.ColumnIndexes[tag.Properties[ATTR_RIGHT_KEY].ToLower()]];
+                    else if (tag.Properties.TryGetValue(ATTR_RIGHT_KEY, out var attrRightKey)) // use the value of the key column
+                        key = rr[_rightTableData.ColumnIndexes[attrRightKey.ToLower()]];
                     else
                         throw new Exception("Require attribute is missing. A '" + ATTR_RIGHT_KEY_EXP + "' or a '" + ATTR_RIGHT_KEY + "' attribute is required.");
 
-                    if (left.ContainsKey(key))
+                    if (left.TryGetValue(key, out List<string>? leftValue))
                     {
-                        var cols = new List<string>(left[key]);
+                        var cols = new List<string>(leftValue);
                         cols.AddRange(rr);
                         joined.Add(cols);
                     }
@@ -154,12 +169,16 @@ namespace JMW.Template.Tags
             }
         }
 
-        public string RetrieveColumnValue(string column)
+        public string RetrieveColumnValue(string? column)
         {
-            return JoinedTableData.Data[CurrentRow][JoinedTableData.ColumnIndexes[column.ToLower()]];
+            if (column is null)
+            {
+                return string.Empty;
+            }
+            return JoinedTableData?.Data[CurrentRow][JoinedTableData.ColumnIndexes[column.ToLower()]] ?? string.Empty;
         }
 
-        private ITagHandler makeColumnHandler(string column_name)
+        private JoinColumn MakeColumnHandler(string column_name)
         {
             return new JoinColumn(Name + ":" + column_name.ToLower().Trim(), this);
         }

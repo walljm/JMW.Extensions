@@ -11,7 +11,7 @@ namespace JMW.Template.Tags
         public const string ATTR_NAME = "name";
         public const string ATTR_DEFINE = "define";
 
-        public static HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_PATH, ATTR_NAME, ATTR_DEFINE };
+        public static HashSet<string> ALLOWEDPROPS { get; } = [ATTR_PATH, ATTR_NAME, ATTR_DEFINE];
 
         public static void ReplaceIncludes(List<Tag> tags, Dictionary<string, Tag> includes)
         {

@@ -28,7 +28,7 @@ public class Parser
     {
         var tokenizer = new Tokenizer(reader);
         var ast = new List<Tag>();
-        Tag last = null;
+        Tag? last = null;
         while (tokenizer.Next() != TokenType.Error)
         {
             var tag = new Tag();
@@ -37,13 +37,13 @@ public class Parser
             {
                 case TokenType.ObjectStart:
                     tag.TagType = TagTypes.Object;
-                    tag.Name = token.Value.ToLower().Trim();
+                    tag.Name = token.Value?.ToLower().Trim() ?? string.Empty;
                     this.stack.Push(tag);
                     break;
 
                 case TokenType.ArrayStart:
                     tag.TagType = TagTypes.Array;
-                    tag.Name = token.Value.ToLower().Trim();
+                    tag.Name = token.Value?.ToLower().Trim() ?? string.Empty;
                     tag.Value = new Stack<Tag>();
                     this.stack.Push(tag);
 
@@ -99,7 +99,7 @@ public class Parser
                         break;
                     }
                 case TokenType.PropertyName:
-                    tag.Name = token.Value.ToLower().Trim();
+                    tag.Name = token.Value?.ToLower().Trim() ?? string.Empty;
                     tag.TagType = TagTypes.Property;
                     this.stack.Push(tag);
 
@@ -107,7 +107,7 @@ public class Parser
 
                 case TokenType.Options:
                     tag.Name = "m";
-                    tag.Value = token.Value;
+                    tag.Value = token.Value ?? string.Empty;
                     tag.TagType = TagTypes.Property;
                     last?.Properties.Add(tag.Name, tag);
                     break;
@@ -120,7 +120,7 @@ public class Parser
                             o = (Stack<Tag>)this.stack.Peek().Value;
 
                         var t = o.Pop();
-                        t.Value = token.Value;
+                        t.Value = token.Value ?? string.Empty;
                         t.TagType = TagTypes.Property;
                         this.stack.Peek().Properties[t.Name] = t;
                     }
@@ -129,7 +129,7 @@ public class Parser
                         var o = (Stack<Tag>)this.stack.Peek().Value;
                         tag.TagType = TagTypes.Word;
                         tag.Name = string.Empty;
-                        tag.Value = token.Value;
+                        tag.Value = token.Value ?? string.Empty;
                         o.Push(tag);
                     }
                     break;
@@ -141,11 +141,8 @@ public class Parser
             throw new ParseException(tokenizer.Token);
         }
 
-        if (this.stack.Count != 0)
-        {
-            throw new ParseException("Parsing code ended prematurely. Did you forget a closing }?", tokenizer.Token);
-        }
-
-        return ast;
+        return this.stack.Count != 0
+            ? throw new ParseException("Parsing code ended prematurely. Did you forget a closing }?", tokenizer.Token)
+            : ast;
     }
 }

@@ -7,14 +7,14 @@ namespace JMW.Template.Tags
 {
     public class Table : TagHandlerBase
     {
-        private string _name;
+        private readonly string _name;
 
         public const string TAG = "table";
         public const string TAB_TAG = "tab";
         public const string ANON_TABLE_NAME = "anon_table";
 
         public override string TagName { get; } = TAG;
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_NAME, ATTR_DISTINCT, ATTR_WHERE, ATTR_ORDERBY, ATTR_ORDER };
+        public override HashSet<string> ALLOWEDPROPS { get; } = [ATTR_NAME, ATTR_DISTINCT, ATTR_WHERE, ATTR_ORDERBY, ATTR_ORDER];
         public const string ATTR_DISTINCT = "distinct";
         public const string ATTR_WHERE = "where";
         public const string ATTR_ORDERBY = "orderby";
@@ -23,13 +23,14 @@ namespace JMW.Template.Tags
 
         public const string ATTR_ORDER_VALUE_DESC = "desc";
 
-        public TableData TableData { get; }
+        public TableData? TableData { get; }
         public int CurrentRow { get; set; }
 
         private static readonly char[] separator = [','];
 
         public Table()
         {
+            _name = string.Empty;
         }
 
         public Table(TableData table_data, Interpreter interp)
@@ -40,11 +41,16 @@ namespace JMW.Template.Tags
             interp.Retrievers.Add(table_data.Name.ToLower(), RetrieveColumnValue);
 
             foreach (var column in table_data.Columns)
-                interp.AddHandler(makeColumnHandler(column));
+                interp.AddHandler(MakeColumnHandler(column));
         }
 
         public override void Handler(Tag tag, Interpreter interp)
         {
+            if (TableData is null)
+            {
+                throw new InvalidOperationException();
+            }
+
             // prefix the names of the columns
             TagHelpers.PrefixTags(tag.Children, _name);
 
@@ -72,30 +78,33 @@ namespace JMW.Template.Tags
 
         public static void FilterOrderBy(Tag tag, TableData table_data)
         {
-            if (tag.Properties.ContainsKey(ATTR_ORDERBY))
+            if (tag.Properties.TryGetValue(ATTR_ORDERBY, out var attrOrderBy))
             {
-                if (tag.Properties.ContainsKey(ATTR_ORDER) && tag.Properties[ATTR_ORDER] == ATTR_ORDER_VALUE_DESC)
+                if (
+                       tag.Properties.TryGetValue(ATTR_ORDER, out var attrOrder) 
+                    && attrOrder == ATTR_ORDER_VALUE_DESC
+                )
                 {
-                    table_data.Data = table_data.Data.OrderByDescending(r => r[table_data.ColumnIndexes[tag.Properties[ATTR_ORDERBY]]]).ToList();
+                    table_data.Data = [.. table_data.Data.OrderByDescending(r => r[table_data.ColumnIndexes[attrOrderBy]])];
                 }
                 else
-                    table_data.Data = table_data.Data.OrderBy(r => r[table_data.ColumnIndexes[tag.Properties[ATTR_ORDERBY]]]).ToList();
+                    table_data.Data = [.. table_data.Data.OrderBy(r => r[table_data.ColumnIndexes[attrOrderBy]])];
             }
         }
 
         public static void FilterWhere(Tag tag, TableData table_data)
         {
-            if (tag.Properties.ContainsKey(ATTR_WHERE))
+            if (tag.Properties.TryGetValue(ATTR_WHERE, out var attrWhere))
             {
-                table_data.Data = table_data.Data.Where(r => TagHelpers.EvaluateBooleanExpression(tag.Properties[ATTR_WHERE], r)).ToList();
+                table_data.Data = table_data.Data.Where(r => TagHelpers.EvaluateBooleanExpression(attrWhere, r)).ToList();
             }
         }
 
         public static void FilterDistinct(Tag tag, TableData table_data)
         {
-            if (tag.Properties.ContainsKey(ATTR_DISTINCT))
+            if (tag.Properties.TryGetValue(ATTR_DISTINCT, out var attrDistinct))
             {
-                var cols = tag.Properties[ATTR_DISTINCT].Split(separator, StringSplitOptions.RemoveEmptyEntries);
+                var cols = attrDistinct.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
                 var dict = new Dictionary<string, List<string>>();
                 foreach (var row in table_data.Data)
@@ -104,16 +113,16 @@ namespace JMW.Template.Tags
                     dict.AddIfNotPresent(key, row);
                 }
 
-                table_data.Data = dict.Values.ToList();
+                table_data.Data = [.. dict.Values];
             }
         }
 
         public string RetrieveColumnValue(string column)
         {
-            return TableData.Data[CurrentRow][TableData.ColumnIndexes[column.ToLower()]];
+            return TableData?.Data[CurrentRow][TableData.ColumnIndexes[column.ToLower()]] ?? string.Empty;
         }
 
-        private ITagHandler makeColumnHandler(string column_name)
+        private TableColumn MakeColumnHandler(string column_name)
         {
             return new TableColumn(_name + ":" + column_name.ToLower().Trim(), this);
         }

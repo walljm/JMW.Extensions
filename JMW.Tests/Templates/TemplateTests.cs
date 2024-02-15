@@ -214,48 +214,48 @@ namespace JMW.Template.Tests
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
-            var output = runTableIf(sb, i, "equals", "flaw");
+            var output = RunTableIf(sb, i, "equals", "flaw");
             Assert.That("flaw\r\n", Is.EqualTo(output));
-            output = runTableIf(sb, i, "eq", "flaw");
-            Assert.That("flaw\r\n", Is.EqualTo(output));
-
-            output = runTableIf(sb, i, "notequals", "blue");
-            Assert.That("flaw\r\n", Is.EqualTo(output));
-            output = runTableIf(sb, i, "neq", "blue");
+            output = RunTableIf(sb, i, "eq", "flaw");
             Assert.That("flaw\r\n", Is.EqualTo(output));
 
-            output = runTableIf(sb, i, "strt", "fl");
+            output = RunTableIf(sb, i, "notequals", "blue");
             Assert.That("flaw\r\n", Is.EqualTo(output));
-            output = runTableIf(sb, i, "startswith", "fl");
-            Assert.That("flaw\r\n", Is.EqualTo(output));
-
-            output = runTableIf(sb, i, "nstrt", "bl");
-            Assert.That("flaw\r\n", Is.EqualTo(output));
-            output = runTableIf(sb, i, "notstartswith", "bl");
+            output = RunTableIf(sb, i, "neq", "blue");
             Assert.That("flaw\r\n", Is.EqualTo(output));
 
-            output = output = runTableIf(sb, i, "ends", "aw");
+            output = RunTableIf(sb, i, "strt", "fl");
             Assert.That("flaw\r\n", Is.EqualTo(output));
-            output = output = runTableIf(sb, i, "endswith", "aw");
-            Assert.That("flaw\r\n", Is.EqualTo(output));
-
-            output = output = runTableIf(sb, i, "nends", "ue");
-            Assert.That("flaw\r\n", Is.EqualTo(output));
-            output = output = runTableIf(sb, i, "notendswith", "ue");
+            output = RunTableIf(sb, i, "startswith", "fl");
             Assert.That("flaw\r\n", Is.EqualTo(output));
 
-            output = output = runTableIf(sb, i, "contains", "la");
+            output = RunTableIf(sb, i, "nstrt", "bl");
             Assert.That("flaw\r\n", Is.EqualTo(output));
-            output = output = runTableIf(sb, i, "cnt", "la");
+            output = RunTableIf(sb, i, "notstartswith", "bl");
             Assert.That("flaw\r\n", Is.EqualTo(output));
 
-            output = output = runTableIf(sb, i, "notcontains", "lu");
+            output = output = RunTableIf(sb, i, "ends", "aw");
             Assert.That("flaw\r\n", Is.EqualTo(output));
-            output = output = runTableIf(sb, i, "ncnt", "lu");
+            output = output = RunTableIf(sb, i, "endswith", "aw");
+            Assert.That("flaw\r\n", Is.EqualTo(output));
+
+            output = output = RunTableIf(sb, i, "nends", "ue");
+            Assert.That("flaw\r\n", Is.EqualTo(output));
+            output = output = RunTableIf(sb, i, "notendswith", "ue");
+            Assert.That("flaw\r\n", Is.EqualTo(output));
+
+            output = output = RunTableIf(sb, i, "contains", "la");
+            Assert.That("flaw\r\n", Is.EqualTo(output));
+            output = output = RunTableIf(sb, i, "cnt", "la");
+            Assert.That("flaw\r\n", Is.EqualTo(output));
+
+            output = output = RunTableIf(sb, i, "notcontains", "lu");
+            Assert.That("flaw\r\n", Is.EqualTo(output));
+            output = output = RunTableIf(sb, i, "ncnt", "lu");
             Assert.That("flaw\r\n", Is.EqualTo(output));
         }
 
-        private static string runTableIf(StringBuilder sb, Interpreter i, string type, string value)
+        private static string RunTableIf(StringBuilder sb, Interpreter i, string type, string value)
         {
             sb.Clear();
 

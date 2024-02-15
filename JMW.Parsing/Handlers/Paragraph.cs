@@ -20,27 +20,27 @@ public class Paragraph : Base, IParser, IProperty
 
     public string Name { get; } = NAME;
 
-    private Include include = new(null, null);
-    private IExpression stop = null;
-    private IExpression start = null;
+    private readonly Include include = new(null, null);
+    private readonly IExpression? stop = null;
+    private readonly IExpression? start = null;
 
     public Paragraph(Tag token)
     {
-        if (!token.Properties.TryGetValue(A_START, out Tag startTag))
+        if (!token.Properties.TryGetValue(A_START, out var startTag))
         {
             throw new ParseException("Missing property: " + A_START);
         }
-        if (!token.Properties.TryGetValue(A_PROPS, out Tag propsTag))
+        if (!token.Properties.TryGetValue(A_PROPS, out var propsTag))
         {
             throw new ParseException("Missing property: " + A_PROPS);
         }
 
-        if (token.Properties.TryGetValue(A_INCLUDE, out Tag includeTag))
+        if (token.Properties.TryGetValue(A_INCLUDE, out var includeTag))
         {
             this.include = new Include(includeTag);
         }
 
-        if (token.Properties.TryGetValue(A_STOP, out Tag stopTag))
+        if (token.Properties.TryGetValue(A_STOP, out var stopTag))
         {
             this.stop = Expressions.Base.ToExpression(stopTag);
         }
@@ -58,9 +58,9 @@ public class Paragraph : Base, IParser, IProperty
         }
     }
 
-    public override IEnumerable<object[]> Parse(StreamReader reader)
+    public override IEnumerable<object[]> Parse(StreamReader? reader)
     {
-        if (reader == null)
+        if (reader is null)
             yield break;
 
         var paras = this.GetParagraphs(reader, this.start, this.stop);
@@ -70,7 +70,7 @@ public class Paragraph : Base, IParser, IProperty
         {
             var record = new List<object>();
 
-            if (lines.Count == 0 || !this.start.Test(lines.First()))
+            if (lines.Count == 0 || this.start is null || !this.start.Test(lines.First()))
                 continue;
 
             // process the properties
@@ -85,27 +85,33 @@ public class Paragraph : Base, IParser, IProperty
         }
     }
 
-    public IEnumerable<List<string>> GetParagraphs(StreamReader reader, IExpression para_start, IExpression para_stop)
+    public IEnumerable<List<string>> GetParagraphs(StreamReader reader, IExpression? paraStart, IExpression? paraStop)
     {
         var sr = new SectionReader(reader, this.include);
 
         var paragraph = new List<string>();
         var started = false;
         string line;
-        while ((line = sr.ReadLine()) != null)
+        while ((line = sr.ReadLine()) is not null)
         {
-            if (paragraph.Count > 0 && ((para_stop != null && para_stop.Test(line)) || para_start.Test(line)))
+            if (
+                   paragraph.Count > 0
+                && (
+                       (paraStop is not null && paraStop.Test(line))
+                    || (paraStart is not null && paraStart.Test(line))
+                )
+            )
             {
                 yield return paragraph;
                 paragraph = [];
             }
 
-            if (!started && this.start != null && !this.start.Test(line))
+            if (!started && this.start is not null && !this.start.Test(line))
                 continue;
 
             started = true;
 
-            if (this.stop != null && this.stop.Test(line))
+            if (this.stop is not null && this.stop.Test(line))
             {
                 started = false;
                 continue;

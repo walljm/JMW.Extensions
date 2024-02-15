@@ -9,7 +9,7 @@ namespace JMW.Functional.Tests
         [Test]
         public void OptionalConstructorTest1()
         {
-            string v = null;
+            string? v = null;
             var c = new Maybe<string>(v);
             Assert.That(false, Is.EqualTo(c.Success));
         }
@@ -17,13 +17,13 @@ namespace JMW.Functional.Tests
         [Test]
         public void ComparisonsTest1()
         {
-            var m1 = new Maybe<string>("blah");
-            var m2 = new Maybe<string>("blah");
+            var m1 = new Maybe<string?>("blah");
+            var m2 = new Maybe<string?>("blah");
 
-            var m3 = new Maybe<string>((string)null);
-            var m4 = new Maybe<string>("blah1");
-            var m5 = new Maybe<string>((Exception)null);
-            Maybe<string> m6 = null;
+            var m3 = new Maybe<string?>((string?)null);
+            var m4 = new Maybe<string?>("blah1");
+            var m5 = new Maybe<string?>((Exception?)null);
+            Maybe<string?>? m6 = null;
 
             Assert.That(m1 == m2);
             Assert.That(m1 != m3);
@@ -31,11 +31,10 @@ namespace JMW.Functional.Tests
             Assert.That(m1 == "blah");
             Assert.That(m1 != m5);
             Assert.That(m1 != m4);
-            Assert.That(null == null);
-            Assert.That((Maybe<string>)null != "woo");
-            Assert.That((Maybe<string>)null == (string)null);
-            Assert.That("woo" != (Maybe<string>)null);
-            Assert.That(m6 == (Maybe<string>)null);
+            Assert.That((Maybe<string?>?)null != "woo");
+            Assert.That((Maybe<string?>?)null == (string?)null);
+            Assert.That("woo" != (Maybe<string?>?)null);
+            Assert.That(m6 == (Maybe<string?>?)null);
             Assert.That("blah" == m1);
             Assert.That(!m5.Equals("woo"));
             Assert.That(m1 != m6);
@@ -47,11 +46,11 @@ namespace JMW.Functional.Tests
             var m1 = new Maybe<string>("jason");
             var m2 = new Maybe<string>(new Exception("broke"));
 
-            Assert.That("jason", Is.EqualTo(m1.Do(if_success: v => v, if_exception: null)));
-            Assert.That("wat!?", Is.EqualTo(m2.Do(if_success: null, if_exception: err => "wat!?")));
+            Assert.That("jason", Is.EqualTo(m1.Do(ifSuccess: v => v, ifException: null)));
+            Assert.That("wat!?", Is.EqualTo(m2.Do(ifSuccess: null, ifException: err => "wat!?")));
             try
             {
-                m2.Do((Func<string, string>)null, (Func<Exception, string>)null);
+                m2.Do(null, null);
             }
             catch (Exception ex)
             {
@@ -59,7 +58,7 @@ namespace JMW.Functional.Tests
             }
             try
             {
-                m1.Do((Func<string, string>)null, (Func<Exception, string>)null);
+                m1.Do(null, null);
             }
             catch (Exception ex)
             {

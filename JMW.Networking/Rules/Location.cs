@@ -16,7 +16,7 @@ public class Location
     }
 
     public bool IsWildcard { get; set; }
-    public IPAddress Address { get; }
+    public IPAddress? Address { get; }
 
     public bool IsMatch(Location loc)
     {
@@ -25,7 +25,7 @@ public class Location
             return true;
         }
 
-        if (!IsWildcard)
+        if (Address is not null)
         {
             if (!loc.IsWildcard && Address.Equals(loc.Address))
                 return true;

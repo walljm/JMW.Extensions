@@ -6,7 +6,7 @@ namespace JMW.Template.Tags
     public class Text : TagHandlerBase
     {
         public override string TagName { get; } = "text";
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string>();
+        public override HashSet<string> ALLOWEDPROPS { get; } = [];
 
         public override void Handler(Tag token, Interpreter interp)
         {

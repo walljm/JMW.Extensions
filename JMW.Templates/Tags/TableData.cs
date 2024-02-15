@@ -15,12 +15,12 @@ namespace JMW.Template
         {
             Name = name;
 
-            Columns = _table[0].Split(',').ToList();
+            Columns = [.. _table[0].Split(',')];
             _table = _table.GetRange(1, _table.Count - 1);
 
             foreach (var line in _table)
             {
-                Data.Add(line.Split(',').ToList());
+                Data.Add([.. line.Split(',')]);
             }
 
             var i = 0;
@@ -56,10 +56,20 @@ namespace JMW.Template
             Name = dt.TableName;
 
             foreach (DataColumn c in dt.Columns)
+            {
                 Columns.Add(c.ColumnName);
+            }
 
             foreach (DataRow r in dt.Rows)
-                Data.Add(r.ItemArray.Select(o => o.ToString()).ToList());
+            {
+                Data.Add(
+                    r.ItemArray
+                     .Select(o => o?.ToString())
+                     .Where(o => o is not null)
+                     .Cast<string>()
+                     .ToList()
+                );
+            }
 
             var i = 0;
             foreach (var column in Columns)
@@ -79,17 +89,17 @@ namespace JMW.Template
         /// <summary>
         /// A list of column names as strings
         /// </summary>
-        public List<string> Columns { get; } = new List<string>();
+        public List<string> Columns { get; } = [];
 
         /// <summary>
         /// The index of the each column name.
         /// </summary>
-        public Dictionary<string, int> ColumnIndexes { get; } = new Dictionary<string, int>();
+        public Dictionary<string, int> ColumnIndexes { get; } = [];
 
         /// <summary>
         /// The data in a nested list.  Rows[Columns[]]
         /// </summary>
-        public List<List<string>> Data { get; set; } = new List<List<string>>();
+        public List<List<string>> Data { get; set; } = [];
 
         #endregion Properties
     }

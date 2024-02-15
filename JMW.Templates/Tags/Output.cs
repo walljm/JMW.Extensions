@@ -6,14 +6,14 @@ namespace JMW.Template.Tags
 {
     public class Output : TagHandlerBase
     {
-        private Dictionary<string, int> _iteration = new();
+        private Dictionary<string, int> _iteration = [];
 
         public const string TAG = "output";
         public override string TagName { get; } = TAG;
 
         #region Properties
 
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_FILENAME, ATTR_MODE };
+        public override HashSet<string> ALLOWEDPROPS { get; } = [ATTR_FILENAME, ATTR_MODE];
 
         public const string ATTR_FILENAME = "filename";
 

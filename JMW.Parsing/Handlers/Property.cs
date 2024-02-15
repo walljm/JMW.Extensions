@@ -1,4 +1,5 @@
 ﻿using JMW.Parsing.Compile;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -15,21 +16,21 @@ public class Property : IProperty
 
     public string Name { get; set; }
     public Stack<Extractors.Base> Extractors { get; set; } = new Stack<Extractors.Base>();
-    public Expressions.IExpression Line { get; set; }
-    public string Split { get; set; }
+    public Expressions.IExpression? Line { get; set; }
+    public string? Split { get; set; }
 
     public Property(Tag token)
     {
-        if (token.Properties.TryGetValue(A_NAME, out Tag nameTag))
+        if (token.Properties.TryGetValue(A_NAME, out var nameTag))
         {
-            this.Name = nameTag.Value.ToString();
+            this.Name = nameTag.Value?.ToString() ?? string.Empty;
         }
         else
         {
             throw new ParseException("Required Attribute Missing: " + A_NAME);
         }
 
-        if (token.Properties.TryGetValue(A_PARSERS, out Tag parsersTag))
+        if (token.Properties.TryGetValue(A_PARSERS, out var parsersTag))
         {
             var parsers = (Stack<Tag>)parsersTag.Value;
             foreach (var p in parsers)
@@ -42,22 +43,27 @@ public class Property : IProperty
             throw new ParseException("Required Attribute Missing: " + A_PARSERS);
         }
 
-        if (token.Properties.TryGetValue(A_LINE, out Tag lineTag))
+        if (token.Properties.TryGetValue(A_LINE, out var lineTag))
         {
             this.Line = Expressions.Base.ToExpression(lineTag);
         }
 
-        if (token.Properties.TryGetValue(A_SPLIT, out Tag splitTag))
+        if (token.Properties.TryGetValue(A_SPLIT, out var splitTag))
         {
-            this.Split = splitTag.Value.ToString();
+            this.Split = splitTag.Value?.ToString() ?? string.Empty;
         }
     }
 
     public object Parse(StreamReader reader)
     {
+        if (Line is null)
+        {
+            throw new InvalidOperationException();
+        }
+
         if (this.Extractors.Count > 0)
         {
-            if (this.Split != null)
+            if (this.Split is not null)
             {
                 var c = 0;
                 while (c != -1)
@@ -101,10 +107,10 @@ public class Property : IProperty
             }
             else
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
+                string? line;
+                while ((line = reader.ReadLine()) is not null)
                 {
-                    if (this.Line != null && !this.Line.Test(line))
+                    if (this.Line is not null && !this.Line.Test(line))
                     {
                         continue;
                     }

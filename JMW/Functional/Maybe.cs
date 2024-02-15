@@ -20,8 +20,8 @@ namespace JMW.Functional;
 /// <typeparam name="T">The type of value</typeparam>
 public class Maybe<T> : IEquatable<T>
 {
-    private readonly T _value;
-    private readonly Exception _exception;
+    private readonly T? internalValue;
+    private readonly Exception? exception;
 
     /// <summary>
     /// Indicates if the conversion was successful.
@@ -32,25 +32,26 @@ public class Maybe<T> : IEquatable<T>
     /// Constructor if the conversion failed.
     /// </summary>
     /// <param name="ex"></param>
-    public Maybe(Exception ex)
+    public Maybe(Exception? ex)
     {
-        _exception = ex; Success = false;
+        exception = ex;
+        Success = false;
     }
 
     /// <summary>
     /// Constructor if the conversion succeeded.
     /// </summary>
     /// <param name="val"></param>
-    public Maybe(T val)
+    public Maybe(T? val)
     {
-        if (val == null)
+        if (val is null)
         {
             Success = false;
-            _exception = new ArgumentNullException(nameof(val));
+            exception = new ArgumentNullException(nameof(val));
         }
         else
         {
-            _value = val;
+            internalValue = val;
             Success = true;
         }
     }
@@ -58,73 +59,95 @@ public class Maybe<T> : IEquatable<T>
     /// <summary>
     /// This function allows you to use the converted value.  Functions are not executed if they are null.
     /// </summary>
-    /// <param name="if_success">The Action to execute on the successfully converted value.</param>
-    public void IfSuccess(Action<T> if_success)
+    /// <param name="ifSuccess">The Action to execute on the successfully converted value.</param>
+    public void IfSuccess(Action<T> ifSuccess)
     {
-        if (Success) if_success?.Invoke(_value);
+        if (Success && internalValue is not null)
+        {
+            ifSuccess?.Invoke(internalValue);
+        }
     }
 
     /// <summary>
     /// This function allows you to use the converted value.  Functions are not executed if they are null.
     /// </summary>
-    /// <param name="if_exception">The Action to execute on the Exception produced by the conversion.</param>
-    public void IfException(Action<Exception> if_exception)
+    /// <param name="ifException">The Action to execute on the Exception produced by the conversion.</param>
+    public void IfException(Action<Exception> ifException)
     {
-        if (!Success) if_exception?.Invoke(_exception);
+        if (!Success && exception is not null)
+        {
+            ifException?.Invoke(exception);
+        }
     }
 
     /// <summary>
     /// This function allows you to use the converted value.  Functions are not executed if they are null.
     /// </summary>
-    /// <param name="if_success">The Action to execute on the successfully converted value.</param>
-    public void Do(Action<T> if_success)
+    /// <param name="ifSuccess">The Action to execute on the successfully converted value.</param>
+    public void Do(Action<T> ifSuccess)
     {
-        IfSuccess(if_success);
+        IfSuccess(ifSuccess);
     }
 
     /// <summary>
     /// This function allows you to use the converted value.  Functions are not executed if they are null.
     /// </summary>
-    /// <param name="if_success">The Action to execute on the successfully converted value.</param>
-    /// <param name="if_exception">The Action to execute on the Exception produced by the conversion.</param>
-    public void Do(Action<T> if_success, Action<Exception> if_exception)
+    /// <param name="ifSuccess">The Action to execute on the successfully converted value.</param>
+    /// <param name="ifException">The Action to execute on the Exception produced by the conversion.</param>
+    public void Do(Action<T>? ifSuccess, Action<Exception>? ifException)
     {
-        if (Success) if_success?.Invoke(_value);
-        else if_exception?.Invoke(_exception);
+        if (Success && internalValue is not null)
+        {
+            ifSuccess?.Invoke(internalValue);
+        }
+        else if (exception is not null)
+        {
+            ifException?.Invoke(exception);
+        }
     }
 
     /// <summary>
     /// This function allows you to use the converted value and return it.
     /// </summary>
-    /// <param name="if_success">A function that gets the converted value and allows you to return it.</param>
-    /// <param name="if_exception">A function that gets the exception and allows you to return a value of type T.</param>
-    public T Do(Func<T, T> if_success, Func<Exception, T> if_exception)
+    /// <param name="ifSuccess">A function that gets the converted value and allows you to return it.</param>
+    /// <param name="ifException">A function that gets the exception and allows you to return a value of type T.</param>
+    public T Do(Func<T, T>? ifSuccess, Func<Exception, T>? ifException)
     {
-        if (Success)
+        if (Success && internalValue is not null)
         {
-            if (if_success == null) throw new ArgumentException("if_success parameter cannot be null.", nameof(if_success));
-            return if_success(_value);
+            return ifSuccess is null
+                ? throw new ArgumentException("if_success parameter cannot be null.", nameof(ifSuccess))
+                : ifSuccess(internalValue);
         }
 
-        if (if_exception == null) throw new ArgumentException("if_exception parameter cannot be null.", nameof(if_exception));
-        return if_exception(_exception);
+        if (ifException is null)
+        {
+            throw new ArgumentException("if_exception parameter cannot be null.", nameof(ifException));
+        }
+
+        return exception is not null ? ifException(exception) : throw new InvalidOperationException();
     }
 
     /// <summary>
     /// This function allows you to use the converted value and return it.
     /// </summary>
-    /// <param name="if_success">A function that gets the converted value and allows you to return it.</param>
-    /// <param name="if_exception">A function that gets the exception and allows you to return a value of type T.</param>
-    public Maybe<T> MaybeDo(Func<T, T> if_success, Func<Exception, T> if_exception)
+    /// <param name="ifSuccess">A function that gets the converted value and allows you to return it.</param>
+    /// <param name="ifException">A function that gets the exception and allows you to return a value of type T.</param>
+    public Maybe<T> MaybeDo(Func<T, T> ifSuccess, Func<Exception, T> ifException)
     {
-        if (Success)
+        if (Success && internalValue is not null)
         {
-            if (if_success == null) throw new ArgumentException("if_success parameter cannot be null.", nameof(if_success));
-            return new Maybe<T>(if_success(_value));
+            return ifSuccess is null
+                ? throw new ArgumentException("if_success parameter cannot be null.", nameof(ifSuccess))
+                : new Maybe<T>(ifSuccess(internalValue));
         }
 
-        if (if_exception == null) throw new ArgumentException("if_exception parameter cannot be null.", nameof(if_exception));
-        return new Maybe<T>(if_exception(_exception));
+        if (ifException is null)
+        {
+            throw new ArgumentException("if_exception parameter cannot be null.", nameof(ifException));
+        }
+
+        return exception is not null ? new Maybe<T>(ifException(exception)) : throw new InvalidOperationException();
     }
 
     /// <summary>
@@ -134,11 +157,9 @@ public class Maybe<T> : IEquatable<T>
     /// </summary>
     /// <param name="other">Value to compare.</param>
     /// <returns>True if the <see cref="Maybe{T}"/> was successful and the value is equal to <paramref name="other"/></returns>
-    public bool Equals(T other)
+    public bool Equals(T? other)
     {
-        if (Success) return _value.Equals(other);
-
-        return false;
+        return Success && internalValue is not null && internalValue.Equals(other);
     }
 
     /// <summary>
@@ -150,28 +171,27 @@ public class Maybe<T> : IEquatable<T>
     {
         var r = false;
 
-        if (Success)
+        if (Success && internalValue is not null)
         {
-            other.Do(if_success: data => r = data.Equals(_value), if_exception: err => { });
+            other.Do(ifSuccess: data => r = data.Equals(internalValue), ifException: err => { });
         }
 
         return r;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != GetType()) return false;
-        return Equals((Maybe<T>)obj);
+        return obj.GetType() == GetType() && Equals((Maybe<T>)obj);
     }
 
     public override int GetHashCode()
     {
         unchecked
         {
-            var hashCode = EqualityComparer<T>.Default.GetHashCode(_value);
-            hashCode = (hashCode * 397) ^ (_exception?.GetHashCode() ?? 0);
+            var hashCode = EqualityComparer<T>.Default.GetHashCode(internalValue);
+            hashCode = (hashCode * 397) ^ (exception?.GetHashCode() ?? 0);
             hashCode = (hashCode * 397) ^ Success.GetHashCode();
             return hashCode;
         }
@@ -185,13 +205,11 @@ public class Maybe<T> : IEquatable<T>
     /// <param name="left">Left side parameter</param>
     /// <param name="right">Right side parameter</param>
     /// <returns>Returns true if both <see cref="Maybe{T}"/> were successful and their values are equal, or if both are null.</returns>
-    public static bool operator ==(Maybe<T> left, Maybe<T> right)
+    public static bool operator ==(Maybe<T?>? left, Maybe<T?>? right)
     {
-        if (ReferenceEquals(left, null) && ReferenceEquals(right, null))
+        if (left is null && right is null)
             return true;
-        if (ReferenceEquals(left, null) || ReferenceEquals(right, null))
-            return false;
-        return left.Equals(right);
+        return left is not null && right is not null && left.Equals(right);
     }
 
     /// <summary>
@@ -200,9 +218,11 @@ public class Maybe<T> : IEquatable<T>
     /// <param name="left">Left side parameter</param>
     /// <param name="right">Right side parameter</param>
     /// <returns>Returns false if both <see cref="Maybe{T}"/> were successful and their values are equal, or if both are null.</returns>
-    public static bool operator !=(Maybe<T> left, Maybe<T> right)
+    public static bool operator !=(Maybe<T?>? left, Maybe<T?>? right)
     {
-        return !(left == right);
+        if (left is null && right is null)
+            return false;
+        return left is null || right is null || !(left == right);
     }
 
     /// <summary>
@@ -211,14 +231,11 @@ public class Maybe<T> : IEquatable<T>
     /// <param name="left">Left side parameter</param>
     /// <param name="right">Right side parameter</param>
     /// <returns>Returns true if the <see cref="Maybe{T}"/> was successful and their values are equal, or if both are null.</returns>
-    public static bool operator ==(Maybe<T> left, T right)
+    public static bool operator ==(Maybe<T?>? left, T? right)
     {
-        if (ReferenceEquals(left, null) && ReferenceEquals(right, null))
+        if (left is null && right is null)
             return true;
-        if (ReferenceEquals(left, null) || ReferenceEquals(right, null))
-            return false;
-
-        return left.Equals(right);
+        return left is not null && right is not null && left.Equals(right);
     }
 
     /// <summary>
@@ -227,7 +244,7 @@ public class Maybe<T> : IEquatable<T>
     /// <param name="left">Left side parameter</param>
     /// <param name="right">Right side parameter</param>
     /// <returns>Returns false if the <see cref="Maybe{T}"/> was successful and their values are equal, or if both are null.</returns>
-    public static bool operator !=(Maybe<T> left, T right)
+    public static bool operator !=(Maybe<T?>? left, T? right)
     {
         return !(left == right);
     }
@@ -238,7 +255,7 @@ public class Maybe<T> : IEquatable<T>
     /// <param name="left">Left side parameter</param>
     /// <param name="right">Right side parameter</param>
     /// <returns>Returns true if the <see cref="Maybe{T}"/> was successful and their values are equal, or if both are null.</returns>
-    public static bool operator ==(T left, Maybe<T> right)
+    public static bool operator ==(T? left, Maybe<T?>? right)
     {
         return right == left;
     }
@@ -249,7 +266,7 @@ public class Maybe<T> : IEquatable<T>
     /// <param name="left">Left side parameter</param>
     /// <param name="right">Right side parameter</param>
     /// <returns>Returns false if the <see cref="Maybe{T}"/> was successful and their values are equal, or if both are null.</returns>
-    public static bool operator !=(T left, Maybe<T> right)
+    public static bool operator !=(T? left, Maybe<T?>? right)
     {
         return !(right == left);
     }

@@ -24,14 +24,14 @@ public readonly struct Optional<T> where T : class
         return new Optional<T>(null);
     }
 
-    private readonly T internalValue;
+    private readonly T? internalValue;
 
-    public Optional(T val)
+    public Optional(T? val)
     {
         internalValue = val;
     }
 
-    public readonly bool Exists => internalValue != null;
+    public readonly bool Exists => internalValue is not null;
 
     /// <summary>
     /// Returns the value. This property may be null. Check Exists first to ensure that
@@ -39,7 +39,7 @@ public readonly struct Optional<T> where T : class
     /// to run your computation safely.
     /// </summary>
     /// <value>The value.</value>
-    public readonly T Value => internalValue;
+    public readonly T? Value => internalValue;
 
     /// <summary>
     /// Monadic Do for this Optional Type.
@@ -48,9 +48,9 @@ public readonly struct Optional<T> where T : class
     /// otherwise it is a noop.
     /// </summary>
     /// <param name="fn">Fn.</param>
-    public readonly void Do(Action<T> fn)
+    public readonly void Do(Action<T>? fn)
     {
-        if (Exists) fn(Value);
+        if (Exists && Value is not null && fn is not null) fn(Value);
     }
 
     ///  <summary>
@@ -61,7 +61,7 @@ public readonly struct Optional<T> where T : class
     ///  </summary>
     ///  <param name="fn">Fn.</param>
     /// <param name="if_null">The action to run if the value is null</param>
-    public readonly void Do(Action<T> fn, Action if_null)
+    public readonly void Do(Action<T?> fn, Action if_null)
     {
         if (Exists) fn(Value);
         else if_null();
@@ -75,7 +75,7 @@ public readonly struct Optional<T> where T : class
     /// </summary>
     /// <param name="fn">Fn.</param>
     /// <typeparam name="R">The 1st type parameter.</typeparam>
-    public readonly Optional<R> Do<R>(Func<T, R> fn) where R : class
+    public readonly Optional<R> Do<R>(Func<T?, R> fn) where R : class
     {
         if (Exists)
             return new Optional<R>(fn(Value));
@@ -89,7 +89,7 @@ public readonly struct Optional<T> where T : class
     /// <param name="fn">Fn.</param>
     /// <param name="if_null"></param>
     /// <typeparam name="R">The 1st type parameter.</typeparam>
-    public readonly R Do<R>(Func<T, R> fn, Func<R> if_null) where R : class
+    public readonly R Do<R>(Func<T?, R> fn, Func<R> if_null) where R : class
     {
         if (Exists)
             return fn(Value);

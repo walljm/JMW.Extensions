@@ -1,5 +1,4 @@
-﻿using JMW.Extensions.Object;
-using JMW.Types;
+﻿using JMW.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +32,7 @@ public static class Differential
         {
             var a_item = lstA[i];
             var b_item = retriever(a_item, lstB);
-            if (b_item != null)
+            if (b_item is not null)
             {
                 // you found an object, so store it and its equivalent form lstB in the "same" collection
                 same.Add(new Tuple<T, T>(a_item, b_item));
@@ -50,7 +49,7 @@ public static class Differential
 
             // you only store the ones that fail because you've already stored the items that are the same
             //   when you iterated through lstA
-            if (a_item == null)
+            if (a_item is null)
                 diff.OnlyInListB.Add(b_item);
         }
 
@@ -59,7 +58,7 @@ public static class Differential
         {
             // for the items that are both in the list, compare to see if they are different.
             var item = comparer(t.Item1, t.Item2);
-            if (item.IsNotNull())
+            if (item is not null)
                 diff.Modified.Add(item);
         }
 
@@ -135,7 +134,7 @@ public static class Differential
         {
             // for the items that are both in the list, compare to see if they are different.
             var d = object_differ(item.A, item.B);
-            if (d.IsNotNull())
+            if (d is not null)
                 diff.Modified.Add(d);
         }
 
@@ -164,7 +163,7 @@ public static class Differential
         foreach (var a_item in lst_a)
         {
             var b_item = retriever_a(a_item, lst_b);
-            if (b_item != null) // you found an object, so store it and its equivalent form lstB in the "same" collection
+            if (b_item is not null) // you found an object, so store it and its equivalent form lstB in the "same" collection
                 diff.Shared.Add(new Pair<Ta, Tb>(a_item, b_item));
             else // no object found, it exists only in lstA
                 diff.OnlyInListA.Add(a_item);
@@ -177,7 +176,7 @@ public static class Differential
 
             // you only store the ones that fail because you've already stored the items that are the same
             //   when you iterated through lstA
-            if (a_item == null)
+            if (a_item is null)
                 diff.OnlyInListB.Add(b_item);
         }
 
@@ -336,7 +335,7 @@ public class CollectionDifferentialSimple<Ta, Tb>
     /// <summary>
     /// The objects that exist only in List A
     /// </summary>
-    public List<Ta> OnlyInListA { get; } = new List<Ta>();
+    public List<Ta> OnlyInListA { get; } = [];
 
     /// <summary>
     /// The objects that were added
@@ -346,12 +345,12 @@ public class CollectionDifferentialSimple<Ta, Tb>
     /// <summary>
     /// The objects that exist only in List B
     /// </summary>
-    public List<Tb> OnlyInListB { get; } = new List<Tb>();
+    public List<Tb> OnlyInListB { get; } = [];
 
     /// <summary>
     /// The objects that exist in both lists
     /// </summary>
-    public List<Pair<Ta, Tb>> Shared { get; } = new List<Pair<Ta, Tb>>();
+    public List<Pair<Ta, Tb>> Shared { get; } = [];
 }
 
 /// <summary>
@@ -373,7 +372,7 @@ public class CollectionDifferentialSimple<T>
     /// <summary>
     /// The objects that exist only in List A
     /// </summary>
-    public List<T> OnlyInListA { get; } = new List<T>();
+    public List<T> OnlyInListA { get; } = [];
 
     /// <summary>
     /// The objects that were added
@@ -383,12 +382,12 @@ public class CollectionDifferentialSimple<T>
     /// <summary>
     /// The objects that exist only in List B
     /// </summary>
-    public List<T> OnlyInListB { get; } = new List<T>();
+    public List<T> OnlyInListB { get; } = [];
 
     /// <summary>
     /// The objects that exist in both lists
     /// </summary>
-    public List<T> Shared { get; } = new List<T>();
+    public List<T> Shared { get; } = [];
 }
 
 /// <summary>
@@ -412,7 +411,7 @@ public class CollectionDifferential<T, M>
     /// <summary>
     /// The objects that exist only in List A
     /// </summary>
-    public List<T> OnlyInListA { get; } = new List<T>();
+    public List<T> OnlyInListA { get; } = [];
 
     /// <summary>
     /// The objects that were added
@@ -422,17 +421,17 @@ public class CollectionDifferential<T, M>
     /// <summary>
     /// The objects that exist only in List B
     /// </summary>
-    public List<T> OnlyInListB { get; } = new List<T>();
+    public List<T> OnlyInListB { get; } = [];
 
     /// <summary>
     /// The objects that exist in both lists
     /// </summary>
-    public List<Pair<T>> Shared { get; } = new List<Pair<T>>();
+    public List<Pair<T>> Shared { get; } = [];
 
     /// <summary>
     /// The objects that exist in both List A and List B, and how they are different.
     /// </summary>
-    public List<ObjectDifferential<T, M>> Modified { get; } = new List<ObjectDifferential<T, M>>();
+    public List<ObjectDifferential<T, M>> Modified { get; } = [];
 }
 
 /// <summary>

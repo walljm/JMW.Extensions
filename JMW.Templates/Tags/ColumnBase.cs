@@ -4,13 +4,14 @@ namespace JMW.Template.Tags
 {
     /// <summary>
     /// This is the base class for column handlers.  This is not intended to be used by itself,
-    /// as it has now way to get data from anything.  
+    /// as it has now way to get data from anything.
     /// </summary>
     public abstract class ColumnBase : TagHandlerBase
     {
-        public static HashSet<string> ALLOWED = new() { ATTR_EXP, ATTR_OCT };
+        public static readonly HashSet<string> ALLOWED = [ATTR_EXP, ATTR_OCT];
+
         // ReSharper disable once UnassignedGetOnlyAutoProperty
-        public override string TagName { get; }
+        public override string? TagName { get; }
 
         public override HashSet<string> ALLOWEDPROPS { get; } = ALLOWED;
 
@@ -19,19 +20,19 @@ namespace JMW.Template.Tags
 
         protected static void HandleColumn(Tag token, Interpreter interp, string data)
         {
-            if (token.Properties.ContainsKey(ATTR_EXP))
+            if (token.Properties.TryGetValue(ATTR_EXP, out var attrExp))
             {
                 var arguments = new List<string>();
-                if (token.Properties.ContainsKey(ATTR_OCT))
+                if (token.Properties.TryGetValue(ATTR_OCT, out var attrOct))
                 {
-                    arguments.Add(TagHelpers.RetrieveOctet(data, token.Properties[ATTR_OCT]));
-                    var octet_result = TagHelpers.EvaluateArithmeticExpression(token.Properties[ATTR_EXP], arguments);
-                    interp.OutputStream.Write(TagHelpers.ReplaceOctet(data, token.Properties[ATTR_OCT], octet_result));
+                    arguments.Add(TagHelpers.RetrieveOctet(data, attrOct));
+                    var octet_result = TagHelpers.EvaluateArithmeticExpression(attrExp, arguments);
+                    interp.OutputStream.Write(TagHelpers.ReplaceOctet(data, attrOct, octet_result));
                 }
                 else
                 {
                     arguments.Add(data);
-                    interp.OutputStream.Write(TagHelpers.EvaluateExpression(token.Properties[ATTR_EXP], arguments));
+                    interp.OutputStream.Write(TagHelpers.EvaluateExpression(attrExp, arguments));
                 }
             }
             else

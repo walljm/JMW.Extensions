@@ -15,8 +15,8 @@ namespace JMW.Template
     public class Parser
     {
         private readonly Stack<Tag> _stack = new();
-        private readonly Dictionary<string, ITagHandler> _tags = new();
-        private readonly HashSet<string> _columnTags = new();
+        private readonly Dictionary<string, ITagHandler> _tags = [];
+        private readonly HashSet<string> _columnTags = [];
 
         public void AddColumnTag(string column)
         {
@@ -156,12 +156,10 @@ namespace JMW.Template
             {
                 throw new ParseException(tokenizer.Token);
             }
-            if (_stack.Count != 0)
-            {
-                throw new ParseException("Template ended prematurely. Did you forget a </" +
-                    _stack.Peek().Name + ">?", tokenizer.Token);
-            }
-            return ast;
+            return _stack.Count != 0
+                ? throw new ParseException("Template ended prematurely. Did you forget a </" +
+                    _stack.Peek().Name + ">?", tokenizer.Token)
+                : ast;
         }
 
         private static string handleNewLines(string current_template)

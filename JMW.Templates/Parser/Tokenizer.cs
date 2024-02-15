@@ -103,12 +103,9 @@ namespace JMW.Template
                 {
                     if (maybeReadText(PARAM_ASSIGN.ToString()))
                     {
-                        if (!_inParam)
-                        {
-                            return setupErrorToken("Unexpected " + PARAM_ASSIGN + ". Did you forget a param name?", Line, Column - 1);
-                        }
-
-                        return consumeParamValue();
+                        return !_inParam
+                            ? setupErrorToken("Unexpected " + PARAM_ASSIGN + ". Did you forget a param name?", Line, Column - 1)
+                            : consumeParamValue();
                     }
 
                     return consumeParamName();

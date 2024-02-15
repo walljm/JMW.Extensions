@@ -14,16 +14,21 @@
     <RepositoryUrl>https://github.com/walljm/jmw.extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>en</NeutralLanguage>
-    </PropertyGroup>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\.editorconfig"
+      Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="4.0.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="NUnit"
+      Version="4.0.1" />
+    <PackageReference Include="NUnit3TestAdapter"
+      Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk"
+      Version="17.9.0" />
   </ItemGroup>
 
   <ItemGroup>

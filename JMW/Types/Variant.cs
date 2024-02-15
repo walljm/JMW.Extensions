@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JMW.Extensions.Object;
 
 namespace JMW.Types;
 
@@ -9,28 +8,28 @@ public class Variant : IEquatable<Variant>
 {
     #region Properties
 
-    public static string StringValueName = nameof(StringValue);
-    private string _stringValue;
-    public string StringValue
+    private string? _stringValue;
+
+    public string? StringValue
     {
         get { return _stringValue; }
-        set { nullify(); _stringValue = value; }
+        set { Nullify(); _stringValue = value; }
     }
 
-    public static string ListValueName = nameof(ListValue);
-    private List<Variant> _listValue;
-    public List<Variant> ListValue
+    private List<Variant>? _listValue;
+
+    public List<Variant>? ListValue
     {
         get { return _listValue; }
-        set { nullify(); _listValue = value; }
+        set { Nullify(); _listValue = value; }
     }
 
-    public static string DictValueName = nameof(DictValue);
-    private Dictionary<string, Variant> _dictValue;
-    public Dictionary<string, Variant> DictValue
+    private Dictionary<string, Variant>? _dictValue;
+
+    public Dictionary<string, Variant>? DictValue
     {
         get { return _dictValue; }
-        set { nullify(); _dictValue = value; }
+        set { Nullify(); _dictValue = value; }
     }
 
     #endregion Properties
@@ -60,22 +59,19 @@ public class Variant : IEquatable<Variant>
 
     #region Is Types
 
-    public static string IsStringName = nameof(IsString);
     public bool IsString
     {
-        get { return _stringValue.IsNotNull(); }
+        get { return _stringValue is not null; }
     }
 
-    public static string IsListName = nameof(IsList);
     public bool IsList
     {
-        get { return _listValue.IsNotNull(); }
+        get { return _listValue is not null; }
     }
 
-    public static string IsDictName = nameof(IsDict);
     public bool IsDict
     {
-        get { return _dictValue.IsNotNull(); }
+        get { return _dictValue is not null; }
     }
 
     #endregion Is Types
@@ -87,17 +83,21 @@ public class Variant : IEquatable<Variant>
         return d.ToString();
     }
 
-    public static explicit operator List<Variant>(Variant d)
+    public static explicit operator List<Variant>?(Variant d)
     {
         return d.ListValue;
     }
 
-    public static explicit operator List<string>(Variant d)
+    public static explicit operator List<string>?(Variant d)
     {
-        return d.ListValue.Select(v => v.StringValue).ToList();
+        return d.ListValue?
+            .Select(v => v.StringValue)
+            .Where(v => v is not null)
+            .Cast<string>()
+            .ToList() ?? null;
     }
 
-    public static explicit operator Dictionary<string, Variant>(Variant d)
+    public static explicit operator Dictionary<string, Variant>?(Variant d)
     {
         return d.DictValue;
     }
@@ -128,7 +128,7 @@ public class Variant : IEquatable<Variant>
 
     #endregion Implicit Conversions string/udo/lst/dict to Variant
 
-    private void nullify()
+    private void Nullify()
     {
         _stringValue = null;
         _listValue = null;
@@ -137,22 +137,33 @@ public class Variant : IEquatable<Variant>
 
     public override string ToString()
     {
-        if (IsString) return _stringValue;
-        if (IsList) return "(List) Count: " + _listValue.Count;
-        if (IsDict) return "(Dict) Count: " + _dictValue.Count;
+        if (IsString)
+        {
+            return _stringValue ?? string.Empty;
+        }
 
-        return string.Empty;
+        if (IsList)
+        {
+            return "(List) Count: " + (_listValue?.Count ?? -1);
+        }
+
+        return IsDict
+            ? "(Dict) Count: " + (_dictValue?.Count ?? -1)
+            : string.Empty;
     }
 
-    public bool Equals(Variant val)
+    public bool Equals(Variant? val)
     {
-        if (val == null)
+        if (val is null)
             return false;
 
         if (IsString && val.IsString) return StringValue == val.StringValue;
         if (IsList && val.IsList)
         {
-            if (ListValue.Count == val.ListValue.Count)
+            if (ListValue is not null
+                && val.ListValue is not null
+                && ListValue.Count == val.ListValue.Count
+            )
             {
                 for (var i = 0; i < ListValue.Count; i++)
                 {
@@ -162,7 +173,11 @@ public class Variant : IEquatable<Variant>
         }
         if (IsDict && val.IsDict)
         {
-            if (DictValue.Count == val.DictValue.Count)
+            if (
+                   DictValue is not null
+                && val.DictValue is not null
+                && DictValue.Count == val.DictValue.Count
+            )
             {
                 foreach (var kv in DictValue)
                 {
@@ -171,8 +186,14 @@ public class Variant : IEquatable<Variant>
                 }
             }
         }
+
         // Theoretically impossible at the time of writing but if we do somehow end
         // up with empty variants later we'll consider them equal.
         return true;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as Variant);
     }
 }

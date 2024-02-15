@@ -18,16 +18,20 @@ public class Look : IExpression
 
     public Look(Tag t)
     {
-        if (t.Properties.TryGetValue(Search.SEARCH, out Tag searchTag))
+        if (t.Properties.TryGetValue(Search.SEARCH, out var searchTag))
         {
             foreach (var val in (Stack<Tag>)searchTag.Value)
             {
-                this.Search.Query.Add(val.Value.ToString());
+                if (val.Value.ToString() is null)
+                {
+                    continue;
+                }
+                this.Search.Query.Add(val.Value.ToString() ?? string.Empty);
             }
 
-            if (searchTag.Properties.TryGetValue(Search.MODS, out Tag modsTag))
+            if (searchTag.Properties.TryGetValue(Search.MODS, out var modsTag))
             {
-                this.Search.Mods = modsTag.Value.ToString();
+                this.Search.Mods = modsTag.Value.ToString() ?? string.Empty;
             }
         }
         else
@@ -35,29 +39,37 @@ public class Look : IExpression
             throw new ArgumentException("Required Property Missing: " + Search.SEARCH);
         }
 
-        if (t.Properties.TryGetValue(AHEAD, out Tag aheadTag))
+        if (t.Properties.TryGetValue(AHEAD, out var aheadTag))
         {
             foreach (var val in (Stack<Tag>)aheadTag.Value)
             {
-                this.Ahead.Query.Add(val.Value.ToString());
+                if (val.Value.ToString() is null)
+                {
+                    continue;
+                }
+                this.Search.Query.Add(val.Value.ToString() ?? string.Empty);
             }
 
-            if (aheadTag.Properties.TryGetValue(Search.MODS, out Tag modsTag))
+            if (aheadTag.Properties.TryGetValue(Search.MODS, out var modsTag))
             {
-                this.Search.Mods = modsTag.Value.ToString();
+                this.Search.Mods = modsTag.Value.ToString() ?? string.Empty;
             }
         }
 
-        if (t.Properties.TryGetValue(BEHIND, out Tag behindTag))
+        if (t.Properties.TryGetValue(BEHIND, out var behindTag))
         {
             foreach (var val in (Stack<Tag>)behindTag.Value)
             {
-                this.Behind.Query.Add(val.Value.ToString());
+                if (val.Value.ToString() is null)
+                {
+                    continue;
+                }
+                this.Search.Query.Add(val.Value.ToString() ?? string.Empty);
             }
 
-            if (behindTag.Properties.TryGetValue(Search.MODS, out Tag modsTag))
+            if (behindTag.Properties.TryGetValue(Search.MODS, out var modsTag))
             {
-                this.Search.Mods = modsTag.Value.ToString();
+                this.Search.Mods = modsTag.Value.ToString() ?? string.Empty;
             }
         }
     }

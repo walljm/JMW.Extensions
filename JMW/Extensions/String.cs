@@ -9,7 +9,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-using JMW.Extensions.Object;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -496,7 +495,7 @@ public static class Extensions
     public static int IndexOf(this string str, string search_string, bool case_insensitive, bool last = false)
     {
         // get the index of our search parameter
-        var idx = -1;
+        int idx;
         if (case_insensitive)
             idx = last ? str.LastIndexOf(search_string.ToLower(), StringComparison.Ordinal) : str.IndexOf(search_string.ToLower(), StringComparison.Ordinal);
         else
@@ -549,7 +548,7 @@ public static class Extensions
         if (start > s.Length) return string.Empty;
 
         // if length isn't provided, return without it.
-        if (length == null) return s.Substring(start);
+        if (length is null) return s.Substring(start);
 
         // if the length is 0 or less, the string should be empty.
         if (length < 1) return string.Empty;
@@ -568,9 +567,9 @@ public static class Extensions
     /// </summary>
     /// <param name="str">String to evaluate</param>
     /// <returns>True or False</returns>
-    public static bool IsEmpty(this string str)
+    public static bool IsEmpty(this string? str)
     {
-        return str.IsNull() || str.Length == 0;
+        return str is null || str.Length == 0;
     }
 
     /// <summary>
@@ -578,7 +577,7 @@ public static class Extensions
     /// </summary>
     /// <param name="str">String to evaluate</param>
     /// <returns>True or False</returns>
-    public static bool IsNotEmpty(this string str)
+    public static bool IsNotEmpty(this string? str)
     {
         return !str.IsEmpty();
     }
@@ -612,7 +611,7 @@ public static class Extensions
         var words = v.Split(' ');
         var r = string.Empty;
         foreach (var w in words)
-            r += w.Substring(0, 1).ToUpper() + w.Substring(1);
+            r += string.Concat(w.Substring(0, 1).ToUpper(), w.AsSpan(1));
         return r;
     }
 
@@ -628,8 +627,8 @@ public static class Extensions
     {
         var s = test + " "; // to avoid geriatrics with strings not ending in a word boundary.
         var cnt = 0;
-        if (respect_word_boundaries) c = c + " ";
-        while (s.IndexOf(c, StringComparison.Ordinal) != -1)
+        if (respect_word_boundaries) c += " ";
+        while (s.Contains(c))
         {
             s = s.Substring(s.IndexOf(c, StringComparison.Ordinal) + c.Length);
             cnt++;
@@ -654,8 +653,8 @@ public static class Extensions
             }
 
             // Only the first whitespace counts we ignore the rest
-            if (hist.ContainsKey(my_char))
-                hist[my_char]++;
+            if (hist.TryGetValue(my_char, out var value))
+                hist[my_char] = ++value;
             else
                 hist[my_char] = 1;
 
@@ -667,13 +666,11 @@ public static class Extensions
 
     public static IEnumerable<string> ToLines(this string s)
     {
-        using (var sr = new StringReader(s))
+        using var sr = new StringReader(s);
+        string? line;
+        while ((line = sr.ReadLine()) is not null)
         {
-            string line;
-            while ((line = sr.ReadLine()) != null)
-            {
-                yield return line;
-            }
+            yield return line;
         }
     }
 }

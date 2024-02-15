@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace JMW.Template.Tags
 {
@@ -6,10 +7,10 @@ namespace JMW.Template.Tags
     {
         public const string TAG = "row";
         public override string TagName { get; } = TAG;
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_KEY };
+        public override HashSet<string> ALLOWEDPROPS { get; } = [ATTR_KEY];
         public const string ATTR_KEY = "key";
 
-        private Lookup _tab;
+        private readonly Lookup? _tab;
 
         public LookupRow()
         {
@@ -23,11 +24,16 @@ namespace JMW.Template.Tags
 
         public override void Handler(Tag tag, Interpreter interp)
         {
+            if (_tab is null || _tab?.Name is null)
+            {
+                throw new InvalidOperationException();
+            }
+
             TagHelpers.PrefixTags(tag.Children, _tab.Name);
 
-            if (tag.Properties.ContainsKey(ATTR_KEY))
+            if (tag.Properties.TryGetValue(ATTR_KEY, out var attrKey))
             {
-                _tab.Key = tag.Properties[ATTR_KEY];
+                _tab.Key = attrKey;
 
                 // Handles all rows in sheet.
                 for (_tab.CurrentRow = 0; _tab.CurrentRow < _tab.LookupTable[_tab.Key].Count; _tab.CurrentRow++)

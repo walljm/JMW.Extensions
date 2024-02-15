@@ -17,9 +17,9 @@ namespace JMW.Template.Tags
         public const string ATTR_VALUE = "value";
         public const string ATTR_TYPE = "type";
 
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_COLUMN, ATTR_VALUE, ATTR_TYPE, ATTR_EXP, ATTR_OCT };
-        public HashSet<string> ALLOWEDPROPVALUES { get; } = new HashSet<string>
-        {
+        public override HashSet<string> ALLOWEDPROPS { get; } = [ATTR_COLUMN, ATTR_VALUE, ATTR_TYPE, ATTR_EXP, ATTR_OCT];
+        public HashSet<string> ALLOWEDPROPVALUES { get; } =
+        [
             "equals", "notequals",
             "contains", "notcontains",
             "startswith", "notstartswith",
@@ -28,9 +28,9 @@ namespace JMW.Template.Tags
             "cnt", "ncnt",
             "strt", "nstrt",
             "ends", "nends"
-        };
+        ];
 
-        private Dictionary<string, ValueRetriever> _retrievers = new();
+        private Dictionary<string, ValueRetriever> _retrievers = [];
         private static readonly string[] separator = [","];
 
         public Conditional()
@@ -53,7 +53,7 @@ namespace JMW.Template.Tags
 
                 if (token.Properties.ContainsKey(ATTR_COLUMN))
                 {
-                    columns = token.Properties[ATTR_COLUMN].Split(separator, StringSplitOptions.None).ToList();
+                    columns = [.. token.Properties[ATTR_COLUMN].Split(separator, StringSplitOptions.None)];
                 }
 
                 foreach (var column in columns)

@@ -118,7 +118,7 @@ start
         }
 
         Assert.That("is is 0 a |start\n this;is is 1 foo|\n this;is is 2 foo|\n this;is is 3 foo|\n this;is is 4 foo|\n this;is is 5 foo|\n this;", Is.EqualTo(output));
-        var items = ((Paragraph)i).Parse((StreamReader)null).ToList();
+        var items = ((Paragraph)i).Parse((StreamReader?)null).ToList();
 
         Assert.That(0, Is.EqualTo(items.Count));
 
@@ -320,7 +320,7 @@ this  is   a    row
             }
         }
         Assert.That("Wall;is;bird;", Is.EqualTo(output));
-        var items = ((Table)i).Parse((StreamReader)null).ToList();
+        var items = ((Table)i).Parse((StreamReader?)null).ToList();
 
         Assert.That(0, Is.EqualTo(items.Count));
     }

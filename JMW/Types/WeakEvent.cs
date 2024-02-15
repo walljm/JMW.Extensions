@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -15,7 +16,7 @@ namespace JMW.Types
 
         public WeakEventSource()
         {
-            _handlers = new List<WeakDelegate>();
+            _handlers = [];
         }
 
         public void Clear()
@@ -66,12 +67,11 @@ namespace JMW.Types
 
             // ReSharper disable once StaticMemberInGenericType (by design)
             private static readonly ConcurrentDictionary<MethodInfo, OpenEventHandler> _openHandlerCache =
-                new ConcurrentDictionary<MethodInfo, OpenEventHandler>();
+                new();
 
             private static OpenEventHandler CreateOpenHandler(MethodInfo method)
             {
-                if (method == null)
-                    throw new ArgumentNullException(nameof(method));
+                ArgumentNullException.ThrowIfNull(method);
 
                 var target = Expression.Parameter(typeof(object), "target");
                 var sender = Expression.Parameter(typeof(object), "sender");
@@ -88,8 +88,8 @@ namespace JMW.Types
                 }
                 else
                 {
-                    if (method.DeclaringType == null)
-                        throw new ArgumentNullException(nameof(method.DeclaringType));
+                    if (method.DeclaringType is null)
+                        throw new InvalidOperationException();
 
                     var expr = Expression.Lambda<OpenEventHandler>(
                         Expression.Call(
@@ -103,39 +103,42 @@ namespace JMW.Types
 
             #endregion Open handler generation and cache
 
-            private readonly WeakReference _weakTarget;
+            private readonly WeakReference? _weakTarget;
             private readonly MethodInfo _method;
             private readonly OpenEventHandler _openHandler;
 
             public WeakDelegate(Delegate handler)
             {
-                _weakTarget = handler.Target != null ? new WeakReference(handler.Target) : null;
+                _weakTarget = handler.Target is not null ? new WeakReference(handler.Target) : null;
                 _method = handler.Method;
                 _openHandler = _openHandlerCache.GetOrAdd(_method, CreateOpenHandler);
             }
 
             public bool Invoke(object sender, TEventArgs e)
             {
-                object target = null;
-                if (_weakTarget != null)
+                object? target = null;
+                if (_weakTarget is not null)
                 {
                     target = _weakTarget.Target;
-                    if (target == null)
+                    if (target is null)
                         return false;
                 }
+
+                if (target is null)
+                {
+                    throw new InvalidOperationException();
+                }
+
                 _openHandler(target, sender, e);
                 return true;
             }
 
             public bool IsMatch(EventHandler<TEventArgs> handler)
             {
-                if (_weakTarget == null && !_method.IsStatic) return false;
-                if (_method.IsStatic)
-                {
-                    return handler.Method.Equals(_method);
-                }
-
-                return ReferenceEquals(handler.Target, _weakTarget?.Target)
+                if (_weakTarget is null && !_method.IsStatic) return false;
+                return _method.IsStatic
+                    ? handler.Method.Equals(_method)
+                    : ReferenceEquals(handler.Target, _weakTarget?.Target)
                     && handler.Method.Equals(_method);
             }
         }

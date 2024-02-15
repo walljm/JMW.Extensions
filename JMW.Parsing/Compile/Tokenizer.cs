@@ -95,12 +95,7 @@ public class Tokenizer
                 return this.ConsumePropertyValue();
             }
 
-            if (this.MaybeReadWord())
-            {
-                return this.ConsumeWord();
-            }
-
-            return this.ConsumeWhitespace();
+            return this.MaybeReadWord() ? this.ConsumeWord() : this.ConsumeWhitespace();
         }
         catch (Exception ex)
         {
@@ -276,10 +271,7 @@ public class Tokenizer
         this.lineReader.PushBack(buf.Take(n).ToArray());
 
         var c = buf.First();
-        if (acceptableWordChars.Contains(c))
-            return true;
-
-        return false;
+        return acceptableWordChars.Contains(c);
     }
 
     private bool MaybeReadCommentStart()
@@ -317,10 +309,7 @@ public class Tokenizer
         var c = this.lineReader.Read();
         this.lineReader.PushBack((char)c);
 
-        if (c == '"' || c == '\'')
-            return true;
-
-        return false;
+        return c == '"' || c == '\'';
     }
 
     private bool MaybeReadText(string text)

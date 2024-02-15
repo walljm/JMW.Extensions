@@ -15,16 +15,20 @@ public abstract class Base : IExpression
 
     public Base(Tag t)
     {
-        if (t.Properties.TryGetValue(Search.SEARCH, out Tag searchTag))
+        if (t.Properties.TryGetValue(Search.SEARCH, out var searchTag))
         {
             foreach (var val in (Stack<Tag>)searchTag.Value)
             {
-                this.Search.Query.Add(val.Value.ToString());
+                if (val.Value.ToString() is null)
+                {
+                    continue;
+                }
+                this.Search.Query.Add(val.Value.ToString() ?? string.Empty);
             }
 
-            if (searchTag.Properties.TryGetValue(Search.MODS, out Tag modsTag))
+            if (searchTag.Properties.TryGetValue(Search.MODS, out var modsTag))
             {
-                this.Search.Mods = modsTag.Value.ToString();
+                this.Search.Mods = modsTag.Value.ToString() ?? string.Empty;
             }
         }
     }

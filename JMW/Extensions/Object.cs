@@ -20,7 +20,7 @@ public static class Extensions
     /// <returns>True or False</returns>
     public static bool IsNull(this object obj)
     {
-        return obj == null;
+        return obj is null;
     }
 
     /// <summary>
@@ -30,6 +30,6 @@ public static class Extensions
     /// <returns>True or False</returns>
     public static bool IsNotNull(this object obj)
     {
-        return obj != null;
+        return obj is not null;
     }
 }

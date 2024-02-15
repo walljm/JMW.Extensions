@@ -129,7 +129,7 @@ namespace JMW.Collections
 
         #region Properties
 
-        public SortedList<Signed<T, C>, Range<T, C>> Ranges { get; set; } = new SortedList<Signed<T, C>, Range<T, C>>();
+        public SortedList<Signed<T, C>, Range<T, C>> Ranges { get; set; } = [];
 
         #endregion Properties
 
@@ -176,8 +176,7 @@ namespace JMW.Collections
         /// <param name="item">number to check</param>
         public bool Contains(Range<T, C> item)
         {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
+            ArgumentNullException.ThrowIfNull(item);
 
             return Ranges.Values.Any(i => i.Contains(item));
         }
@@ -265,8 +264,7 @@ namespace JMW.Collections
 
         public bool Remove(Range<T, C> item)
         {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
+            ArgumentNullException.ThrowIfNull(item);
 
             return Ranges.Remove(item.Start);
         }

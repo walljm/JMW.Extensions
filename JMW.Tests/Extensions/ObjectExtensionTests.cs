@@ -11,7 +11,7 @@ namespace JMW.Extensions.Object.Tests
         {
             Assert.That("This is a".IsNotEmpty());
             Assert.That(string.Empty.IsEmpty());
-            Assert.That(((string)null).IsEmpty());
+            Assert.That(((string?)null).IsEmpty());
         }
     }
 }

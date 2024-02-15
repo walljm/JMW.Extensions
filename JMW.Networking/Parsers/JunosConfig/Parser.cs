@@ -9,7 +9,7 @@ namespace JMW.Networking.Parsers.JunosConfig;
 /// </summary>
 public class Parser
 {
-    private readonly Stack<Tag> _stack = new Stack<Tag>();
+    private readonly Stack<Tag> stack = new();
 
     public Parser()
     {
@@ -29,7 +29,7 @@ public class Parser
     {
         var tokenizer = new Tokenizer(reader);
         var ast = new List<Tag>();
-        Tag last = null;
+        Tag? last = null;
         while (tokenizer.Next() != TokenType.Error)
         {
             var tag = new Tag();
@@ -37,7 +37,7 @@ public class Parser
             switch (token.Type)
             {
                 case TokenType.ObjectStart:
-                    var o_names = collapseWords();
+                    var o_names = CollapseWords();
                     if (o_names.Count > 0)
                     {
                         tag.Name = o_names.First().Value.Trim();
@@ -48,47 +48,47 @@ public class Parser
 
                     tag.TagType = TagTypes.Object;
                     tag.Children = new Stack<Tag>();
-                    _stack.Push(tag);
+                    stack.Push(tag);
                     break;
 
                 case TokenType.ArrayStart:
-                    if (_stack.Count > 0)
-                        _stack.Pop(); // you don't need the current word.
+                    if (stack.Count > 0)
+                        stack.Pop(); // you don't need the current word.
                     tag.TagType = TagTypes.Array;
                     tag.Name = token.Value.ToLower().Trim();
                     tag.Children = new Stack<Tag>();
-                    _stack.Push(tag);
+                    stack.Push(tag);
                     break;
 
                 case TokenType.ArrayStop:
                     {
-                        var curr = _stack.Pop();
-                        if (_stack.Count == 0)
+                        var curr = stack.Pop();
+                        if (stack.Count == 0)
                         {
                             ast.Add(curr);
                         }
                         else
                         {
-                            _stack.Peek().Children.Push(curr);
+                            stack.Peek().Children.Push(curr);
                         }
                         break;
                     }
                 case TokenType.ObjectStop:
                     {
-                        var curr = _stack.Pop();
+                        var curr = stack.Pop();
                         last = curr;
-                        if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Array)
+                        if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Array)
                         {
-                            _stack.Peek().Children.Push(curr);
+                            stack.Peek().Children.Push(curr);
                             break;
                         }
-                        if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Object)
+                        if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Object)
                         {
-                            _stack.Peek().Children.Push(curr);
+                            stack.Peek().Children.Push(curr);
                             break;
                         }
 
-                        if (_stack.Count == 0)
+                        if (stack.Count == 0)
                         {
                             ast.Add(curr);
                         }
@@ -96,14 +96,14 @@ public class Parser
                     }
                 case TokenType.LineStop:
                     {
-                        if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Array)
+                        if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Array)
                         {
                             tag.TagType = TagTypes.Word;
                             tag.Name = string.Empty;
                             tag.Value = token.Value;
-                            _stack.Peek().Children.Push(tag);
+                            stack.Peek().Children.Push(tag);
                         }
-                        else if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Object)
+                        else if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Object)
                         {
                             if (token.Value.Length == 0)
                                 break;
@@ -111,11 +111,11 @@ public class Parser
                             tag.TagType = TagTypes.Word;
                             tag.Name = string.Empty;
                             tag.Value = token.Value;
-                            _stack.Peek().Children.Push(tag);
+                            stack.Peek().Children.Push(tag);
                         }
-                        else if (_stack.Count > 0)
+                        else if (stack.Count > 0)
                         {
-                            var words = collapseWords();
+                            var words = CollapseWords();
                             tag.TagType = TagTypes.Property;
 
                             if (words.Count > 2)
@@ -134,9 +134,9 @@ public class Parser
                                 tag.Name = words[0].Value;
                             }
 
-                            if (_stack.Count > 0)
+                            if (stack.Count > 0)
                             {
-                                _stack.Peek().Children.Push(tag);
+                                stack.Peek().Children.Push(tag);
                             }
                             else
                                 ast.Add(tag);
@@ -147,12 +147,12 @@ public class Parser
                     {
                         tag.TagType = TagTypes.Word;
                         tag.Value = token.Value;
-                        if (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Array)
+                        if (stack.Count > 0 && stack.Peek().TagType == TagTypes.Array)
                         {
-                            _stack.Peek().Children.Push(tag);
+                            stack.Peek().Children.Push(tag);
                         }
                         else
-                            _stack.Push(tag);
+                            stack.Push(tag);
                     }
                     break;
             }
@@ -162,18 +162,16 @@ public class Parser
         {
             throw new ParseException(tokenizer.Token);
         }
-        if (_stack.Count != 0)
-        {
-            throw new ParseException("Parsing code ended prematurely. Did you forget a closing }?", tokenizer.Token);
-        }
-        return ast;
+        return stack.Count != 0
+            ? throw new ParseException("Parsing code ended prematurely. Did you forget a closing }?", tokenizer.Token)
+            : ast;
     }
 
-    private List<Tag> collapseWords()
+    private List<Tag> CollapseWords()
     {
         var words = new List<Tag>();
-        while (_stack.Count > 0 && _stack.Peek().TagType == TagTypes.Word)
-            words.Add(_stack.Pop());
+        while (stack.Count > 0 && stack.Peek().TagType == TagTypes.Word)
+            words.Add(stack.Pop());
         return words;
     }
 }

@@ -26,14 +26,14 @@ namespace JMW.Types.Tests
             Assert.That(new List<Variant> { "jason" }, Is.EqualTo(v2.ListValue));
 
             Variant tv2 = new List<Variant> { "jason" };
+            Assert.That(1, Is.EqualTo(((List<Variant>)tv2).Count));
+            Assert.That(1, Is.EqualTo(((List<string>)tv2).Count));
+            Assert.That(tv2.IsList, Is.True);
             Assert.That(true, Is.EqualTo(tv2.IsList));
             Assert.That(new List<Variant> { "jason" }, Is.EqualTo(tv2.ListValue));
             Assert.That(tv2.Equals(new List<Variant> { "jason" }), Is.True);
             Assert.That(tv2.Equals(null), Is.False);
-            Assert.That(((Variant)tv2).IsList, Is.True);
             Assert.That(((Variant)new List<string> { "jason" }).IsList, Is.True);
-            Assert.That(1, Is.EqualTo(((List<Variant>)tv2).Count));
-            Assert.That(1, Is.EqualTo(((List<string>)tv2).Count));
             v2.ListValue = [];
             Assert.That(0, Is.EqualTo(v2.ListValue.Count));
             Assert.That("(List) Count: 1", Is.EqualTo(tv2.ToString()));

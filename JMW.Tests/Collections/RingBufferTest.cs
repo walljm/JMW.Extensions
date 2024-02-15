@@ -117,7 +117,7 @@ namespace JMW.Collections.Tests
             Assert.That(arr2.Length, Is.EqualTo(buff.Count));
 
             buff.ReverseIteration = true;
-            arr2 = buff.ToArray();
+            arr2 = [.. buff];
             Assert.That(arr2.Length, Is.EqualTo(buff.Count));
         }
     }

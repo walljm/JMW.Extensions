@@ -195,12 +195,12 @@ public static class Ifconfig
         }
     }
 
-    private static readonly HashSet<string> arrayPairs = new(){
+    private static readonly HashSet<string> arrayPairs = [
         "inet",
         "inet6",
         "agent",
         "member",
-    };
+    ];
 
     private record GroupDefinition(
         string Kind,

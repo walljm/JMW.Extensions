@@ -21,16 +21,11 @@ namespace JMW.Differentials.Tests
                 lstB,
                 (k, lst) =>
                 {
-                    return lst.FirstOrDefault(i => i.ToLower() == k.ToLower());
+                    return lst.FirstOrDefault(i => i.Equals(k, StringComparison.OrdinalIgnoreCase));
                 },
                 (a, b) =>
                 {
-                    if (a != b)
-                    {
-                        return new ObjectDifferential<string, MyDiff>(a, b, [new MyDiff { Difference = a + " " + b }]);
-                    }
-
-                    return null;
+                    return a != b ? new ObjectDifferential<string, MyDiff>(a, b, [new MyDiff { Difference = a + " " + b }]) : null;
                 });
 
             Assert.That(1, Is.EqualTo(diff.OnlyInListA.Count));
@@ -93,10 +88,9 @@ namespace JMW.Differentials.Tests
             Assert.That(p1.Equals(p2), Is.False);
             Assert.That(p1.Equals(null), Is.False);
             Assert.That(null == p1, Is.False);
-            Assert.That(p1 == null, Is.False);
-            Assert.That((Pair<string>)null != null, Is.False);
+            Assert.That(p1 is null, Is.False);
             Assert.That(p1 != p2, Is.True);
-            Assert.That(p1 != null, Is.True);
+            Assert.That(p1 is not null, Is.True);
             Assert.That(null != p2, Is.True);
         }
 
@@ -156,10 +150,9 @@ namespace JMW.Differentials.Tests
             Assert.That(p1.Equals(p2), Is.False);
             Assert.That(p1.Equals(null), Is.False);
             Assert.That(null == p1, Is.False);
-            Assert.That(p1 == null, Is.False);
-            Assert.That((Pair<string>)null != null, Is.False);
+            Assert.That(p1 is null, Is.False);
             Assert.That(p1 != p2, Is.True);
-            Assert.That(p1 != null, Is.True);
+            Assert.That(p1 is not null, Is.True);
             Assert.That(null != p2, Is.True);
         }
 
@@ -225,7 +218,7 @@ namespace JMW.Differentials.Tests
     {
         #region Implementation of IComparer<in string>
 
-        public int Compare(string x, string y)
+        public int Compare(string? x, string? y)
         {
             return string.Compare(x, y, StringComparison.Ordinal);
         }

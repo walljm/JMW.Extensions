@@ -9,11 +9,11 @@ namespace JMW.Template
         private string _Name = string.Empty;
         public string Name { get { return _Name; } set { _Name = value.Trim().ToLower(); } }
 
-        public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Properties { get; set; } = [];
 
         public string TokenText { get; set; } = string.Empty;
 
-        public List<Tag> Children { get; set; } = new List<Tag>();
+        public List<Tag> Children { get; set; } = [];
 
         public bool HasChildren
         {

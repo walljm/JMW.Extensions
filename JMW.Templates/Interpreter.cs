@@ -1,10 +1,10 @@
+using JMW.Extensions.String;
+using JMW.Functional;
+using JMW.Template.Tags;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JMW.Extensions.String;
-using JMW.Functional;
-using JMW.Template.Tags;
 using Version = JMW.Template.Tags.Version;
 
 namespace JMW.Template
@@ -17,15 +17,15 @@ namespace JMW.Template
     {
         #region Handlers
 
-        private Variable _varHandler;
-        private Text _textHandler;
+        private readonly Variable _varHandler;
+        private readonly Text _textHandler;
 
         #endregion Handlers
 
         #region Properties
 
-        public readonly Dictionary<string, ValueRetriever> Retrievers = new();
-        public Dictionary<string, ITagHandler> Handlers { get; } = new Dictionary<string, ITagHandler>();
+        public readonly Dictionary<string, ValueRetriever> Retrievers = [];
+        public Dictionary<string, ITagHandler> Handlers { get; } = [];
         public Optional<Handler> DefaultHandler { get; set; } = Optional<Handler>.None();
         public TextWriter OutputStream { get; set; }
         public Parser Parser { get; }
@@ -96,8 +96,8 @@ namespace JMW.Template
                         //  then you need to get the name attribute.
                         if (tag.Name == Table.TAG || tag.Name == Table.TAB_TAG)
                         {
-                            if (tag.Properties.ContainsKey(Table.ATTR_NAME))
-                                tag_name = tag.Properties[Table.ATTR_NAME].ToLower();
+                            if (tag.Properties.TryGetValue(Table.ATTR_NAME, out var attrName))
+                                tag_name = attrName.ToLower();
                             else
                                 tag_name = Table.ANON_TABLE_NAME;
                         }
@@ -124,13 +124,11 @@ namespace JMW.Template
                             if (!Handlers.ContainsKey(tag_name))
                             {
                                 // we need to create the handler here using the data from the tables specified.
-                                if (!Handlers.ContainsKey(left_tag))
+                                if (!Handlers.TryGetValue(left_tag, out var leftHandler) || leftHandler is not Table left || left.TableData is null)
                                     throw new Exception("Specified table: '" + left_tag + "' in '" + Join.ATTR_LEFT_TABLE + "' attribute does not exist.");
-                                if (!Handlers.ContainsKey(right_tag))
+                                if (!Handlers.TryGetValue(right_tag, out var rightHandler) || rightHandler is not Table right || right.TableData is null)
                                     throw new Exception("Specified table: '" + right_tag + "' in '" + Join.ATTR_RIGHT_TABLE + "' attribute does not exist.");
 
-                                var left = (Table)Handlers[left_tag];
-                                var right = (Table)Handlers[right_tag];
                                 AddHandler(new Join(left.TableData, right.TableData, this));
                             }
                         }
@@ -151,17 +149,16 @@ namespace JMW.Template
                             if (!Handlers.ContainsKey(tag_name))
                             {
                                 // we need to create the handler here using the data from the tables specified.
-                                if (!Handlers.ContainsKey(table_tag))
+                                if (!Handlers.TryGetValue(table_tag, out var tableHandler) || tableHandler is not Table table || table.TableData is null)
                                     throw new Exception("Specified table: '" + table_tag + "' in '" + Lookup.ATTR_TABLE + "' attribute does not exist.");
 
-                                var table = (Table)Handlers[table_tag];
                                 AddHandler(new Lookup(table.TableData, this));
                             }
                         }
 
-                        if (Handlers.ContainsKey(tag_name))
-                            Handlers[tag_name].Handler(tag, this);
-                        else if (tag_name.Contains(":") && Handlers.ContainsKey(tag_name.ParseToIndexOf(":"))) // handle variables
+                        if (Handlers.TryGetValue(tag_name, out var tagHandler))
+                            tagHandler.Handler(tag, this);
+                        else if (tag_name.Contains(':') && Handlers.ContainsKey(tag_name.ParseToIndexOf(":"))) // handle variables
                         {
                             Handlers[tag_name.ParseToIndexOf(":")].Handler(tag, this);
                         }

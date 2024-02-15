@@ -9,10 +9,10 @@ namespace JMW.Template.Tags
 {
     public class Variable : TagHandlerBase
     {
-        private Dictionary<string, string> _variables = new();
+        private Dictionary<string, string> _variables = [];
 
         public override string TagName { get; } = TAG;
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_NAME, ATTR_VALUE, ATTR_OCT, ATTR_EXP, ATTR_STORE, ATTR_PRINT };
+        public override HashSet<string> ALLOWEDPROPS { get; } = [ATTR_NAME, ATTR_VALUE, ATTR_OCT, ATTR_EXP, ATTR_STORE, ATTR_PRINT];
         public const string TAG = "var";
         public const string ATTR_EXP = "exp";
         public const string ATTR_OCT = "oct";
@@ -108,7 +108,7 @@ namespace JMW.Template.Tags
             foreach (var key in keys)
             {
                 var property_value = token.Properties[key].ToLower();
-                while (property_value.Contains("[" + TAG + ":") && property_value.Contains("]"))
+                while (property_value.Contains("[" + TAG + ":") && property_value.Contains(']'))
                 {
                     var full_variable = property_value.ParseAfterIndexOf("[" + TAG + ":").ParseToIndexOf("]") + "]";
 

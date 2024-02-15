@@ -16,7 +16,9 @@
     <RepositoryUrl>https://github.com/walljm/jmw.extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>en</NeutralLanguage>
-    </PropertyGroup>
+    <Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
 
 </Project>

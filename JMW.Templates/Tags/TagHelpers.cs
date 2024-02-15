@@ -19,7 +19,7 @@ public static partial class TagHelpers
             {
                 PrefixIfColumns(tag, sheet_name);
             }
-            else if (tag.TagType == TagTypes.Tag && !Output.IsOutput(tag) && !Table.IsTable(tag) && !Variable.IsVariable(tag) && !tag.Name.Contains(":"))
+            else if (tag.TagType == TagTypes.Tag && !Output.IsOutput(tag) && !Table.IsTable(tag) && !Variable.IsVariable(tag) && !tag.Name.Contains(':'))
             {
                 PrefixTag(tag, sheet_name);
             }
@@ -34,7 +34,7 @@ public static partial class TagHelpers
 
     public static void PrefixTag(Tag tag, string name)
     {
-        if (!Output.IsOutput(tag) && !Table.IsTable(tag) && !tag.Name.Contains(":"))
+        if (!Output.IsOutput(tag) && !Table.IsTable(tag) && !tag.Name.Contains(':'))
         {
             tag.Name = name + ":" + tag.Name;
         }
@@ -47,12 +47,12 @@ public static partial class TagHelpers
 
         if (Transform.IsTransform(tag))
         {
-            columns = tag.Properties[Transform.ATTR_COLUMN].Split(',').ToList();
+            columns = [.. tag.Properties[Transform.ATTR_COLUMN].Split(',')];
             attr = Transform.ATTR_COLUMN;
         }
         else if (Conditional.IsConditional(tag))
         {
-            columns = tag.Properties[Conditional.ATTR_COLUMN].Split(',').ToList();
+            columns = [.. tag.Properties[Conditional.ATTR_COLUMN].Split(',')];
             attr = Conditional.ATTR_COLUMN;
         }
 
@@ -65,7 +65,7 @@ public static partial class TagHelpers
                 var column = columns[i].Trim();
                 if (!string.IsNullOrWhiteSpace(column))
                 {
-                    if (!column.Contains(":"))
+                    if (!column.Contains(':'))
                     {
                         column = name + ":" + column;
                     }
@@ -79,7 +79,7 @@ public static partial class TagHelpers
         }
 
         // If name of column is not prefixed, conditional belongs in current sheet.
-        else if (!tag.Properties[attr].Contains(":"))
+        else if (!tag.Properties[attr].Contains(':'))
         {
             tag.Properties[attr] = name + ":" + tag.Properties[attr];
         }
@@ -101,7 +101,7 @@ public static partial class TagHelpers
             throw new Exception("The value provided for octet argument was invalid. Must be a number between 1 and 4.");
         }
         string val;
-        if (data.Contains("."))
+        if (data.Contains('.'))
         {
             var split = data.Split(dotSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (split.Length != 4)

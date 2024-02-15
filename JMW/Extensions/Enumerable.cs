@@ -21,7 +21,7 @@ namespace JMW.Extensions.Enumerable
     {
         public static IEnumerable<T> ReverseOrder<T>(this IList<T> lst)
         {
-            for (var i = lst.Count-1; i >= 0; i--)
+            for (var i = lst.Count - 1; i >= 0; i--)
             {
                 yield return lst[i];
             }
@@ -35,16 +35,12 @@ namespace JMW.Extensions.Enumerable
         /// <returns></returns>
         public static bool IsLast<T>(this IEnumerable<T> source, int i)
         {
-            switch (source)
+            return source switch
             {
-                case T[] source1:
-                    return source1.Length - 1 == i;
-
-                case ICollection<T> collection:
-                    return collection.Count - 1 == i;
-            }
-
-            return source.ToArray().Length - 1 == i;
+                T[] source1 => source1.Length - 1 == i,
+                ICollection<T> collection => collection.Count - 1 == i,
+                _ => source.ToArray().Length - 1 == i,
+            };
         }
 
         /// <summary>
@@ -90,7 +86,7 @@ namespace JMW.Extensions.Enumerable
             var hash = new HashSet<T>();
             foreach (var i in lst)
             {
-                if (!hash.Contains(i)) hash.Add(i);
+                hash.Add(i);
             }
             return hash;
         }
@@ -105,7 +101,7 @@ namespace JMW.Extensions.Enumerable
         {
             foreach (var i in hsh2)
             {
-                if (!hsh1.Contains(i)) hsh1.Add(i);
+                hsh1.Add(i);
             }
 
             return hsh1;
@@ -162,15 +158,24 @@ namespace JMW.Extensions.Enumerable
         /// <param name="dict">Dictionary to add pairs to</param>
         /// <param name="key">The key</param>
         /// <param name="val">The value to add to the list</param>
-        public static void SafeAdd<K, V>(this IDictionary<K, List<V>> dict, K key, V val)
+        public static void SafeAdd<K, V>(this IDictionary<K, List<V>> dict, K? key, V? val)
         {
-            if (dict.ContainsKey(key))
+            if (key is null)
             {
-                dict[key].Add(val);
+                return;
+            }
+            if (val is null)
+            {
+                return;
+            }
+
+            if (dict.TryGetValue(key, out List<V>? value))
+            {
+                value.Add(val);
             }
             else
             {
-                dict.Add(key, new List<V>() { val });
+                dict.Add(key, [val]);
             }
         }
 
@@ -183,8 +188,13 @@ namespace JMW.Extensions.Enumerable
         /// <param name="key"></param>
         /// <param name="val"></param>
         /// <returns></returns>
-        public static bool AddIfNotPresent<K, V>(this IDictionary<K, V> dict, K key, V val)
+        public static bool AddIfNotPresent<K, V>(this IDictionary<K, V> dict, K? key, V? val)
         {
+            if (key is null || val is null)
+            {
+                return false;
+            }
+
             if (dict.ContainsKey(key)) return false;
             dict.Add(key, val);
             return true;
@@ -210,12 +220,12 @@ namespace JMW.Extensions.Enumerable
         /// <returns></returns>
         public static string ToDelimitedString(this IEnumerable Ss, string delimiter, bool trimend = true)
         {
-            var r = string.Empty;
             var o = new StringBuilder();
             foreach (var s in Ss)
             {
                 o.Append(s); o.Append(delimiter);
             }
+            string? r;
             if (trimend)
             {
                 r = o.ToString().TrimEnd(delimiter.ToCharArray());
@@ -251,9 +261,9 @@ namespace JMW.Extensions.Enumerable
         private static class ThreadSafeRandom
         {
             [ThreadStatic]
-            private static Random Local;
+            private static Random? Local;
 
-            public static Random ThisThreadsRandom => Local ?? (Local = new Random(unchecked(Environment.TickCount * 31 + System.Threading.Thread.CurrentThread.ManagedThreadId)));
+            public static Random ThisThreadsRandom => Local ??= new Random(unchecked(Environment.TickCount * 31 + Environment.CurrentManagedThreadId));
         }
 
         /// <summary>
@@ -270,9 +280,7 @@ namespace JMW.Extensions.Enumerable
             {
                 n--;
                 var k = ThreadSafeRandom.ThisThreadsRandom.Next(n + 1);
-                var value = list[k];
-                list[k] = list[n];
-                list[n] = value;
+                (list[n], list[k]) = (list[k], list[n]);
             }
 
             return list;
@@ -285,14 +293,12 @@ namespace JMW.Extensions.Enumerable
         /// <returns></returns>
         public static IEnumerable<T> GetDuplicates<T>(this IEnumerable<T> lst)
         {
-            var niques = new HashSet<T>();
+            var uniques = new HashSet<T>();
 
             foreach (var s in lst)
             {
-                if (niques.Contains(s))
+                if (!uniques.Add(s))
                     yield return s;
-                else
-                    niques.Add(s);
             }
         }
 
@@ -307,9 +313,8 @@ namespace JMW.Extensions.Enumerable
         /// <returns></returns>
         public static List<T> GetRangeSafe<T>(this List<T> lst, int start, int length)
         {
-            if (lst.Count == 0 || start > lst.Count) return new List<T>();
-            if (lst.Count < start + length) return lst.GetRange(start, lst.Count - start);
-            return lst.GetRange(start, length);
+            if (lst.Count == 0 || start > lst.Count) return [];
+            return lst.Count < start + length ? lst.GetRange(start, lst.Count - start) : lst.GetRange(start, length);
         }
 
         /// <summary> This function allows you to create a histogram on any property of an <see cref="IEnumerable{T}"/> list. </summary>
@@ -324,7 +329,7 @@ namespace JMW.Extensions.Enumerable
             {
                 if (!groups.ContainsKey(get_key(dvc)))
                 {
-                    groups.Add(get_key(dvc), new List<T>() { dvc });
+                    groups.Add(get_key(dvc), [dvc]);
                 }
                 else
                 {
@@ -342,13 +347,14 @@ namespace JMW.Extensions.Enumerable
         /// <param name="key">a function that returns the value being tested in the histogram</param>
         /// <returns>a histogram of the values returned by the get function</returns>
         public static Dictionary<K, List<V>> CreateHistogram<K, V>(this IEnumerable<V> items, Func<V, K> key)
+            where K : notnull
         {
             var groups = new Dictionary<K, List<V>>();
             foreach (var dvc in items)
             {
                 if (!groups.ContainsKey(key(dvc)))
                 {
-                    groups.Add(key(dvc), new List<V> { dvc });
+                    groups.Add(key(dvc), [dvc]);
                 }
                 else
                 {
@@ -378,7 +384,7 @@ namespace JMW.Extensions.Enumerable
         /// <returns>An IEnumerable&lt;T&gt; consisting of a single item.</returns>
         public static List<T> ToListOfItem<T>(this T item)
         {
-            return new List<T> { item };
+            return [item];
         }
 
         /// <summary>
@@ -417,10 +423,10 @@ namespace JMW.Extensions.Enumerable
         /// <param name="val">Value Item</param>
         public static void AddOrCreate<K, V>(this IDictionary<K, List<V>> dict, K key, V val)
         {
-            if (dict.ContainsKey(key))
-                dict[key].Add(val);
+            if (dict.TryGetValue(key, out List<V>? value))
+                value.Add(val);
             else
-                dict.Add(key, new List<V> { val });
+                dict.Add(key, [val]);
         }
 
         /// <summary>
@@ -433,10 +439,10 @@ namespace JMW.Extensions.Enumerable
         /// <param name="val">Value Item</param>
         public static void AddOrCreate<K, V>(this IDictionary<K, HashSet<V>> dict, K key, V val)
         {
-            if (dict.ContainsKey(key))
-                dict[key].Add(val);
+            if (dict.TryGetValue(key, out HashSet<V>? value))
+                value.Add(val);
             else
-                dict.Add(key, new HashSet<V> { val });
+                dict.Add(key, [val]);
         }
 
         /// <summary>
@@ -450,6 +456,7 @@ namespace JMW.Extensions.Enumerable
         /// <param name="keySelector">function that takes an item of type <typeparamref name="V"/> and returns a key of type <see cref="K"/>.</param>
         /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="keySelector"/></returns>
         public static Dictionary<K, List<V>> ToDictionaryOfLists<K, V>(this IEnumerable<V> lst, Func<V, K> keySelector)
+            where K : notnull
         {
             var ret = new Dictionary<K, List<V>>();
             foreach (var item in lst)
@@ -470,6 +477,7 @@ namespace JMW.Extensions.Enumerable
         /// <param name="keySelector">function that takes an item of type <typeparamref name="V"/> and returns an <see cref="IEnumerable{K}"/> of keys.</param>
         /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="keySelector"/></returns>
         public static Dictionary<K, List<V>> ToDictionaryOfListsOfMany<K, V>(this IEnumerable<V> lst, Func<V, IEnumerable<K>> keySelector)
+            where K : notnull
         {
             var ret = new Dictionary<K, List<V>>();
             foreach (var item in lst)
@@ -493,6 +501,7 @@ namespace JMW.Extensions.Enumerable
         /// <param name="keySelector">function that takes an item of type <typeparamref name="V"/> and returns an <see cref="IEnumerable{K}"/> of keys.</param>
         /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="keySelector"/></returns>
         public static Dictionary<K, HashSet<V>> ToDictionaryOfHashSetsOfMany<K, V>(this IEnumerable<V> lst, Func<V, IEnumerable<K>> keySelector)
+            where K : notnull
         {
             var ret = new Dictionary<K, HashSet<V>>();
             foreach (var item in lst)
@@ -512,6 +521,7 @@ namespace JMW.Extensions.Enumerable
         /// <param name="keySelector">function that takes an item of type <typeparamref name="V"/> and returns a key of type <see cref="K"/>.</param>
         /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="keySelector"/></returns>
         public static Dictionary<K, HashSet<V>> ToDictionaryOfHashSets<K, V>(this IEnumerable<V> lst, Func<V, K> keySelector)
+            where K : notnull
         {
             var ret = new Dictionary<K, HashSet<V>>();
             foreach (var item in lst)
@@ -530,6 +540,7 @@ namespace JMW.Extensions.Enumerable
         /// <param name="get_keys">function that takes an item of type <typeparamref name="V"/> and returns an <see cref="IEnumerable{K}"/> of keys to be indexed by.</param>
         /// <returns>a <see cref="Dictionary{K, V}"/> of the items indexed by the keys returned by the <paramref name="get_keys"/></returns>
         public static Dictionary<K, V> ToDictionaryOfMany<K, V>(this IEnumerable<V> lst, Func<V, IEnumerable<K>> get_keys)
+            where K : notnull
         {
             var dict = new Dictionary<K, V>();
             foreach (var item in lst)
@@ -549,9 +560,10 @@ namespace JMW.Extensions.Enumerable
         /// <param name="key">Key to check for</param>
         /// <param name="act">Action to run if the key is present.</param>
         public static void IfHasKey<K, V>(this Dictionary<K, V> dict, K key, Action<V> act)
+            where K : notnull
         {
-            if (dict.ContainsKey(key))
-                act(dict[key]);
+            if (dict.TryGetValue(key, out V? value))
+                act(value);
         }
 
         /// <summary>
@@ -574,7 +586,7 @@ namespace JMW.Extensions.Enumerable
 
                     // you're past the first junk set, reset.
                     first = false;
-                    set = new List<T>();
+                    set = [];
                 }
 
                 set.Add(item);

@@ -2,7 +2,7 @@
 
 internal class Token
 {
-    public string Value;
+    public string? Value;
     public TokenType Type;
     public int Line;
     public int Column;

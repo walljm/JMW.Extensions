@@ -112,13 +112,13 @@ public abstract class IndexedClass : ObservableClass
         if (EqualityComparer<T>.Default.Equals(field, value))
             return false;
 
-        raiseIndexedPropertyChanging(property_name, field, value);
+        RaiseIndexedPropertyChanging(property_name, field, value);
         return base.Set(ref field, value, property_name);
     }
 
     #region Private Methods
 
-    private void raiseIndexedPropertyChanging(string prop_name, object before, object after)
+    private void RaiseIndexedPropertyChanging(string prop_name, object before, object after)
     {
         _IndexedPropertyChanged.Raise(this, new IndexedPropertyChangedEventArgs(prop_name, before, after));
     }

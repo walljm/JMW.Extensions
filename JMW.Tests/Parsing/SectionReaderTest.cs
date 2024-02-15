@@ -38,8 +38,8 @@ start
             using (var sr = new StreamReader(ms))
             {
                 var rdr = new SectionReader(sr, start, stop);
-                string line;
-                while ((line = rdr.ReadLine()) != null)
+                string? line;
+                while ((line = rdr.ReadLine()) is not null)
                 {
                     lines.Add(line);
                 }
@@ -76,8 +76,8 @@ start
             using (var sr = new StreamReader(ms))
             {
                 var rdr = new SectionReader(sr, start, stop, true, true);
-                string line;
-                while ((line = rdr.ReadLine()) != null)
+                string? line;
+                while ((line = rdr.ReadLine()) is not null)
                 {
                     lines.Add(line);
                 }
@@ -113,8 +113,8 @@ start
             using (var sr = new StreamReader(ms))
             {
                 var rdr = new SectionReader(sr, null, null);
-                string line;
-                while ((line = rdr.ReadLine()) != null)
+                string? line;
+                while ((line = rdr.ReadLine()) is not null)
                 {
                     lines.Add(line);
                 }

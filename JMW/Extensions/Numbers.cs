@@ -43,7 +43,7 @@ public static class Extensions
     /// </summary>
     public static bool IsNotNull(this object o)
     {
-        return o != null;
+        return o is not null;
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public static class Extensions
     /// </summary>
     public static bool IsNull(this object o)
     {
-        return o == null;
+        return o is null;
     }
 
     /// <summary>
@@ -105,16 +105,16 @@ public static class Extensions
 
         var result = 0;
         var c = s[0];
-        var sign = 0;
         var start = 0;
         var end = s.Length;
 
         for (; end > 0; end--)
         {
-            if (!ignoreChar(s[end - 1]))
+            if (!IgnoreChar(s[end - 1]))
                 break;
         }
 
+        int sign;
         if (c == '-')
         {
             sign = -1;
@@ -122,13 +122,13 @@ public static class Extensions
         }
         else if (c > 57 || c < 48)
         {
-            if (ignoreChar(c))
+            if (IgnoreChar(c))
             {
                 do
                 {
                     ++start;
                 }
-                while (start < end && ignoreChar(c = s[start]));
+                while (start < end && IgnoreChar(c = s[start]));
 
                 if (start >= end)
                 {
@@ -186,17 +186,17 @@ public static class Extensions
 
         var result = 0;
         var c = s[0];
-        var sign = 0;
         var start = 0;
         var end = s.Length;
 
         // handle trailing whitespace
         for (; end > 0; end--)
         {
-            if (!ignoreChar(s[end - 1]))
+            if (!IgnoreChar(s[end - 1]))
                 break;
         }
 
+        int sign;
         if (c == '-')
         {
             sign = -1;
@@ -204,13 +204,13 @@ public static class Extensions
         }
         else if (c > 57 || c < 48)
         {
-            if (ignoreChar(c))
+            if (IgnoreChar(c))
             {
                 do
                 {
                     ++start;
                 }
-                while (start < end && ignoreChar(c = s[start]));
+                while (start < end && IgnoreChar(c = s[start]));
 
                 if (start >= end)
                 {
@@ -306,7 +306,7 @@ public static class Extensions
         return Convert.ToDouble(i);
     }
 
-    private static Dictionary<string, long> _numAbbreviations = new()
+    private static readonly Dictionary<string, long> numAbbreviations = new()
     {
         { "k", 1000 },
         { "m", 1000000 },
@@ -336,9 +336,9 @@ public static class Extensions
         var prefix = i.ToLower().Substring(0, i.Length - 1);
 
         // first, check if its abbreviated.
-        if (!_numAbbreviations.ContainsKey(last) || !prefix.IsDouble()) return long.Parse(i);
+        if (!numAbbreviations.TryGetValue(last, out var value) || !prefix.IsDouble()) return long.Parse(i);
 
-        var n = prefix.ToDouble() * _numAbbreviations[last];
+        var n = prefix.ToDouble() * value;
         return long.Parse(n.ToString());
     }
 
@@ -384,16 +384,14 @@ public static class Extensions
         var last = i.ToLower().ToCharArray().Last().ToString();
         var prefex = i.ToLower().Substring(0, i.Length - 1);
         // first, check if its abbreviated.
-        if (_numAbbreviations.ContainsKey(last) && prefex.IsDouble())
+        if (numAbbreviations.TryGetValue(last, out var value) && prefex.IsDouble())
         {
-            var n = prefex.ToDouble() * _numAbbreviations[last];
+            var n = prefex.ToDouble() * value;
 
-            if (long.TryParse(n.ToString(), out val)) return val;
-            return def;
+            return long.TryParse(n.ToString(), out val) ? val : def;
         }
 
-        if (long.TryParse(i, out val)) return val;
-        return def;
+        return long.TryParse(i, out val) ? val : def;
     }
 
     /// <summary>
@@ -414,9 +412,9 @@ public static class Extensions
         var last = i.ToLower().ToCharArray().Last().ToString();
         var prefex = i.ToLower().Substring(0, i.Length - 1);
         // first, check if its abbreviated.
-        if (_numAbbreviations.ContainsKey(last) && prefex.IsDouble())
+        if (numAbbreviations.TryGetValue(last, out var value) && prefex.IsDouble())
         {
-            var n = prefex.ToDouble() * _numAbbreviations[last];
+            var n = prefex.ToDouble() * value;
 
             return int.Parse(n.ToString());
         }
@@ -454,32 +452,26 @@ public static class Extensions
     {
         int val;
         if (i.Length == 0)
-            return -1;
+            return def;
 
         var last = i.ToLower().ToCharArray().Last().ToString();
         var prefex = i.ToLower().Substring(0, i.Length - 1);
         // first, check if its abbreviated.
-        if (_numAbbreviations.ContainsKey(last) && prefex.IsDouble())
+        if (numAbbreviations.TryGetValue(last, out var value) && prefex.IsDouble())
         {
-            var n = prefex.ToDouble() * _numAbbreviations[last];
+            var n = prefex.ToDouble() * value;
 
-            if (int.TryParse(n.ToString(), out val)) return val;
-            return -1;
+            return int.TryParse(n.ToString(), out val) ? val : def;
         }
 
-        if (int.TryParse(i, out val)) return val;
-        return -1;
+        return int.TryParse(i, out val) ? val : def;
     }
 
     public static float? ToFloat(this string s)
     {
         var r = float.TryParse(s, out var i);
 
-        if (r)
-        {
-            return i;
-        }
-        return null;
+        return r ? i : null;
     }
 
     ///  <summary>
@@ -502,11 +494,7 @@ public static class Extensions
     {
         var r = float.TryParse(s, out var i);
 
-        if (r)
-        {
-            return i;
-        }
-        return def;
+        return r ? i : def;
     }
 
     ///  <summary>
@@ -529,11 +517,7 @@ public static class Extensions
     {
         var r = double.TryParse(s, out var i);
 
-        if (r)
-        {
-            return i;
-        }
-        return def;
+        return r ? i : def;
     }
 
     public static string CollapseIntsToRanges(this IEnumerable<string> ints)
@@ -732,7 +716,7 @@ public static class Extensions
         return diff / (absA + absB) < epsilon;
     }
 
-    private static bool ignoreChar(char c)
+    private static bool IgnoreChar(char c)
     {
         return c < 33;
     }

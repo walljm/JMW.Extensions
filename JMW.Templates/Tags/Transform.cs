@@ -12,16 +12,16 @@ namespace JMW.Template.Tags
         public const string TAGALT2 = "tr";
 
         public override string TagName { get; } = TAG;
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string>
-        {
+        public override HashSet<string> ALLOWEDPROPS { get; } =
+        [
             ATTR_COLUMN,
             ATTR_EXP
-        };
+        ];
 
         public const string ATTR_EXP = "exp";
         public const string ATTR_COLUMN = "columns";
 
-        private Dictionary<string, ValueRetriever> _retrievers = new();
+        private Dictionary<string, ValueRetriever> _retrievers = [];
         private static readonly string[] separator = [","];
 
         public Transform()
@@ -44,7 +44,7 @@ namespace JMW.Template.Tags
 
                     if (token.Properties.ContainsKey(ATTR_COLUMN))
                     {
-                        columns = token.Properties[ATTR_COLUMN].Split(separator, StringSplitOptions.None).ToList();
+                        columns = [.. token.Properties[ATTR_COLUMN].Split(separator, StringSplitOptions.None)];
                     }
 
                     foreach (var column in columns)

@@ -12,12 +12,12 @@ namespace JMW.Parsing.Handlers
         public const string INCLUDESTART = "include_start";
         public const string INCLUDESTOP = "include_stop";
 
-        public IExpression Start { get; }
-        public IExpression Stop { get; }
+        public IExpression? Start { get; }
+        public IExpression? Stop { get; }
         public bool IncludeStart { get; private set; } = false;
         public bool IncludeStop { get; private set; } = false;
 
-        public Include(IExpression start, IExpression stop)
+        public Include(IExpression? start, IExpression? stop)
         {
             this.Start = start;
             this.Stop = stop;
@@ -25,21 +25,21 @@ namespace JMW.Parsing.Handlers
 
         public Include(Tag t)
         {
-            if (t.Properties.TryGetValue(START, out Tag startTag))
+            if (t.Properties.TryGetValue(START, out var startTag))
             {
                 this.Start = Expressions.Base.ToExpression(startTag);
             }
-            if (t.Properties.TryGetValue(STOP, out Tag stopTag))
+            if (t.Properties.TryGetValue(STOP, out var stopTag))
             {
                 this.Stop = Expressions.Base.ToExpression(stopTag);
             }
-            if (t.Properties.TryGetValue(INCLUDESTART, out Tag includeStartTag))
+            if (t.Properties.TryGetValue(INCLUDESTART, out var includeStartTag))
             {
-                includeStartTag.Value.ToString().ToBoolean().IfSuccess(v => this.IncludeStart = v);
+                includeStartTag.Value.ToString()?.ToBoolean().IfSuccess(v => this.IncludeStart = v);
             }
-            if (t.Properties.TryGetValue(INCLUDESTOP, out Tag includeStopTag))
+            if (t.Properties.TryGetValue(INCLUDESTOP, out var includeStopTag))
             {
-                includeStopTag.Value.ToString().ToBoolean().IfSuccess(v => this.IncludeStop = v);
+                includeStopTag.Value.ToString()?.ToBoolean().IfSuccess(v => this.IncludeStop = v);
             }
         }
     }

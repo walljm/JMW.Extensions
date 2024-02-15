@@ -30,14 +30,11 @@ public class Split : Base
             ? value.ToLower().Split(splitSeparators, splitOptions)
             : value.Split(splitSeparators, splitOptions);
 
-        if (fields.Length > this.Index)
-        {
-            return this.Search.Mods.Contains(Constants.TRIM) // should trim the output?
+        return fields.Length > this.Index
+            ? this.Search.Mods.Contains(Constants.TRIM) // should trim the output?
                 ? fields[this.Index].Trim()
-                : fields[this.Index];
-        }
-
-        throw new IndexOutOfRangeException();
+                : fields[this.Index]
+            : throw new IndexOutOfRangeException();
     }
 
     public Split(Tag t) : base(t)
