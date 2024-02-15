@@ -1,42 +1,37 @@
-﻿using System.Collections.Generic;
-using JMW.Extensions.String;
+﻿using JMW.Extensions.String;
 using JMW.Parsing.Compile;
+using System.Collections.Generic;
 
-namespace JMW.Parsing.Extractors
+namespace JMW.Parsing.Extractors;
+
+public class After : Base
 {
-    public class After : Base
+    public const string NAME = "after";
+
+    public override string Parse(string s)
     {
-        public const string NAME = "after";
+        var isCaseInsensitive = this.Search.Mods.Contains(Constants.CASE_INSENSITIVE); // case insensitive
+        var shouldTrim = this.Search.Mods.Contains(Constants.TRIM); // trim the output
+        var excludeSearchItem = this.Search.Mods.Contains(Constants.WITH_VALUE);
 
-        public override string Parse(string s)
+        var value = excludeSearchItem switch
         {
-            var i = Search.Mods.Contains(Constants.CASE_INSENSITIVE); // case insensitive
-            var t = Search.Mods.Contains(Constants.TRIM); // trim the output
+            true when this.Quantifier > -1
+                => s.ParseAfterDesignatedIndexOf_PlusLength(this.Quantifier, isCaseInsensitive, [.. this.Search.Query]),
+            true when this.Search.Mods.Contains(Constants.LAST)
+                => s.ParseAfterLastIndexOf_PlusLength(isCaseInsensitive, [.. this.Search.Query]),
+            true => s.ParseAfterIndexOf_PlusLength(isCaseInsensitive, [.. this.Search.Query]),
+            _ => s.ParseAfterIndexOf(isCaseInsensitive, [.. this.Search.Query]),
+        };
 
-            if (Search.Mods.Contains(Constants.WITH_VALUE)) // exclude the search item
-            {
-                if (Quantifier > -1) // after a specific item
-                    return t ? s.ParseAfterDesignatedIndexOf_PlusLength(Quantifier, i, Search.Query.ToArray()).Trim()
-                             : s.ParseAfterDesignatedIndexOf_PlusLength(Quantifier, i, Search.Query.ToArray());
+        return shouldTrim ? value.Trim() : value;
+    }
 
-                if (Search.Mods.Contains(Constants.LAST)) // after the last item
-                    return t ? s.ParseAfterLastIndexOf_PlusLength(i, Search.Query.ToArray()).Trim()
-                             : s.ParseAfterLastIndexOf_PlusLength(i, Search.Query.ToArray());
+    public After(Tag t) : base(t)
+    {
+    }
 
-                return t ? s.ParseAfterIndexOf_PlusLength(i, Search.Query.ToArray()).Trim()
-                         : s.ParseAfterIndexOf_PlusLength(i, Search.Query.ToArray());
-            }
-
-            return t ? s.ParseAfterIndexOf(i, Search.Query.ToArray()).Trim()
-                     : s.ParseAfterIndexOf(i, Search.Query.ToArray());
-        }
-
-        public After(Tag t) : base(t)
-        {
-        }
-
-        public After(List<string> search, string mods, int q) : base(search, mods, q, -1)
-        {
-        }
+    public After(List<string> search, string mods, int q) : base(search, mods, q, -1)
+    {
     }
 }

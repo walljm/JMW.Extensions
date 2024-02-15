@@ -1,89 +1,95 @@
-﻿using System.IO;
-using JMW.Parsing.Expressions;
+﻿using JMW.Parsing.Expressions;
 using JMW.Parsing.Handlers;
+using System.IO;
 
-namespace JMW.Parsing.IO
+namespace JMW.Parsing.IO;
+
+public class SectionReader
 {
-    public class SectionReader
+    private readonly StreamReader reader;
+
+    private readonly IExpression start;
+    private readonly IExpression stop;
+
+    private readonly bool includeStartLine = false;
+    private readonly bool includeStopLine = false;
+
+    private bool started = false;
+    private bool stopped = false;
+
+    #region Constructors
+
+    public SectionReader(StreamReader stream, IExpression start, IExpression stop) : this(stream, start, stop, false, false)
     {
-        private StreamReader _rdr;
+    }
 
-        private IExpression _start;
-        private IExpression _stop;
+    public SectionReader(StreamReader stream, Include include)
+    {
+        this.reader = stream;
+        this.start = include.Start;
+        this.stop = include.Stop;
+        this.includeStartLine = include.IncludeStart;
+        this.includeStopLine = include.IncludeStop;
+    }
 
-        private bool _started = false;
-        private bool _stopped = false;
+    public SectionReader(StreamReader stream, IExpression start, IExpression stop, bool include_start_line, bool include_stop_line)
+    {
+        this.reader = stream;
+        this.start = start;
+        this.stop = stop;
+        this.includeStartLine = include_start_line;
+        this.includeStopLine = include_stop_line;
+    }
 
-        private bool _includeStartLine = false;
-        private bool _includeStopLine = false;
+    #endregion Constructors
 
-        #region Constructors
-
-        public SectionReader(StreamReader stream, IExpression start, IExpression stop) : this(stream, start, stop, false, false)
+    /// <summary>Reads a line of characters from the current stream and returns the data as a string.</summary>
+    /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
+    /// <exception cref="T:System.OutOfMemoryException">There is insufficient memory to allocate a buffer for the returned string. </exception>
+    /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+    /// <filterpriority>1</filterpriority>
+    public string ReadLine()
+    {
+        if (this.start == null && this.stop == null)
         {
+            return this.reader.ReadLine();
         }
 
-        public SectionReader(StreamReader stream, Include include)
+        if (this.stopped)
         {
-            _rdr = stream;
-            _start = include.Start;
-            _stop = include.Stop;
-            _includeStartLine = include.IncludeStart;
-            _includeStopLine = include.IncludeStop;
-        }
-
-        public SectionReader(StreamReader stream, IExpression start, IExpression stop, bool include_start_line, bool include_stop_line)
-        {
-            _rdr = stream;
-            _start = start;
-            _stop = stop;
-            _includeStartLine = include_start_line;
-            _includeStopLine = include_stop_line;
-        }
-
-        #endregion Constructors
-
-        #region Overrides
-
-        /// <summary>Reads a line of characters from the current stream and returns the data as a string.</summary>
-        /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
-        /// <exception cref="T:System.OutOfMemoryException">There is insufficient memory to allocate a buffer for the returned string. </exception>
-        /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-        /// <filterpriority>1</filterpriority>
-        public string ReadLine()
-        {
-            if (_start == null && _stop == null)
-                return _rdr.ReadLine();
-
-            if (_stopped)
-                return null;
-
-            string line;
-            while ((line = _rdr.ReadLine()) != null)
-            {
-                if (!_started && _start != null && !_start.Test(line))
-                    continue;
-
-                if (!_stopped && _stop != null && _stop.Test(line))
-                {
-                    _stopped = true;
-                    if (!_includeStopLine)
-                        break;
-                }
-
-                if (!_started)
-                {
-                    _started = true;
-                    if (!_includeStartLine)
-                        continue; // don't include the line that starts the section.
-                }
-
-                return line;
-            }
-
             return null;
         }
 
-        #endregion Overrides
+        string line;
+        while ((line = this.reader.ReadLine()) != null)
+        {
+            if (!this.started && this.start != null && !this.start.Test(line))
+            {
+                continue;
+            }
+
+            if (!this.stopped && this.stop != null && this.stop.Test(line))
+            {
+                this.stopped = true;
+                if (!this.includeStopLine)
+                {
+                    break;
+                }
+            }
+
+            if (!this.started)
+            {
+                this.started = true;
+                if (!this.includeStartLine)
+                {
+                    // don't include the line that starts the section.
+                    continue;
+                }
+            }
+
+            return line;
+        }
+
+        return null;
     }
 }

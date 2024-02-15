@@ -1,359 +1,347 @@
-﻿using System;
+﻿using JMW.IO;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JMW.IO;
 
-namespace JMW.Parsing.Compile
+namespace JMW.Parsing.Compile;
+
+public class Tokenizer
 {
-    public class Tokenizer
+    public Token Token { get; } = new Token();
+
+    public const string INVALID_UNICODE_ERROR = "Invalid Character Encoding for parsing instruction input";
+
+    internal int Line => this.lineReader.Line;
+    internal int Column => this.lineReader.Column;
+
+    private const string objectStart = @"{";
+    private const string objectStop = @"}";
+    private const string arrayStart = @"[";
+    private const string arrayStop = @"]";
+    private const string propertyStart = @":";
+    private const string commentStart = @"#";
+
+    private static readonly HashSet<char> acceptableWordChars = new("abcdefghijklmnopqrstuvwxyz_-".ToCharArray());
+
+    private readonly LineTrackingReader lineReader;
+
+    private bool inWord = false;
+    private bool eof = false;
+
+    public Tokenizer(TextReader reader)
     {
-        private readonly string _objectStart = @"{";
-        private readonly string _objectStop = @"}";
-        private readonly string _arrayStart = @"[";
-        private readonly string _arrayStop = @"]";
-        private readonly string _propertyStart = @":";
-        private readonly string _commentStart = @"#";
+        this.lineReader = new(reader);
+    }
 
-        internal LineTrackingReader _reader;
-        public Token Token
+    public Tokenizer(string template) : this(new StringReader(template))
+    {
+    }
+
+    public TokenType Next()
+    {
+        try
         {
-            get;
-        }
-
-        public static readonly string INVALID_UNICODE_ERROR = "Invalid Character Encoding for parsing instruction input";
-
-        internal bool _inWord = false;
-        internal bool _eof = false;
-
-        internal int Line
-        {
-            get { return _reader.Line; }
-        }
-
-        internal int Column
-        {
-            get { return _reader.Column; }
-        }
-
-        public Tokenizer(string template)
-            : this(new StringReader(template))
-        {
-        }
-
-        public Tokenizer(TextReader reader)
-        {
-            _reader = new LineTrackingReader(reader);
-            Token = new Token();
-        }
-
-        public TokenType Next()
-        {
-            try
+            if (this.eof)
             {
-                if (_eof)
+                return this.SetupErrorToken("EOF");
+            }
+
+            this.Token.Line = this.Line;
+            this.Token.Column = this.Column;
+
+            if (this.inWord)
+            {
+                this.inWord = false;
+
+                // you have a word, is it a property or an object?
+                if (this.MaybeReadObjectStart())
                 {
-                    return setupErrorToken("EOF");
-                }
-                Token.Line = Line;
-                Token.Column = Column;
-
-                if (_inWord)
-                {
-                    _inWord = false;
-
-                    // you have a word, is it a property or an object?
-                    if (maybeReadObjectStart())
-                    {
-                        return consumeObjectStart();
-                    }
-
-                    if (maybeReadPropertyStart())
-                    {
-                        return consumePropertyName();
-                    }
-
-                    // if its not a prop and its not an object, then its a set of options.
-                    Token.Type = TokenType.Options;
-                    return Token.Type;
+                    return this.ConsumeObjectStart();
                 }
 
-                if (maybeReadArrayStart())
+                if (this.MaybeReadPropertyStart())
                 {
-                    return consumeArrayStart();
+                    return this.ConsumePropertyName();
                 }
 
-                if (maybeReadCommentStart())
-                {
-                    return consumeComment();
-                }
-
-                if (maybeReadObjectStop())
-                {
-                    return consumeObjectStop();
-                }
-
-                if (maybeReadArrayStop())
-                {
-                    return consumeArrayStop();
-                }
-
-                if (maybeReadBeginPropertyValue())
-                {
-                    return consumePropertyValue();
-                }
-
-                if (maybeReadWord())
-                {
-                    return consumeWord();
-                }
-
-                return consumeWhitespace();
+                // if its not a prop and its not an object, then its a set of options.
+                this.Token.Type = TokenType.Options;
+                return this.Token.Type;
             }
-            catch (Exception ex)
+
+            if (this.MaybeReadArrayStart())
             {
-                return setupErrorToken(ex.Message);
+                return this.ConsumeArrayStart();
             }
-        }
 
-        private TokenType setupErrorToken(string msg)
-        {
-            return setupErrorToken(msg, Line, Column);
-        }
-
-        private TokenType setupErrorToken(string msg, int line, int column)
-        {
-            Token.Type = TokenType.Error;
-            Token.Value = msg;
-            Token.Line = line;
-            Token.Column = column;
-            return Token.Type;
-        }
-
-        internal TokenType consumeUntil(int cc, TokenType type)
-        {
-            Token.Type = type;
-            var c = _reader.Read();
-            var value = new List<char>();
-            while (c != cc && c != 0 && c != -1)
+            if (this.MaybeReadCommentStart())
             {
-                value.Add((char)c);
-                c = _reader.Read();
-                // This is the unicode invalid character. If we encounter this it means we parsed the
-                // template with an invalid encoding. Or the template was stored with an invalid
-                // encoding.
-                if (c == '\uffff')
-                {
-                    return setupErrorToken(INVALID_UNICODE_ERROR);
-                }
+                return this.ConsumeComment();
             }
-            if (c == -1)
+
+            if (this.MaybeReadObjectStop())
             {
-                _eof = true;
+                return this.ConsumeObjectStop();
             }
-            else if (c != cc)
+
+            if (this.MaybeReadArrayStop())
             {
-                _reader.PushBack((char)c);
+                return this.ConsumeArrayStop();
             }
-            
-            Token.Value = new string(value.ToArray());
-            return type;
-        }
 
-        internal TokenType consumeComment()
-        {
-            var c = _reader.Read();
-            if (c == -1)
+            if (this.MaybeReadBeginPropertyValue())
             {
-                _eof = true;
-                return setupErrorToken("EOF");
+                return this.ConsumePropertyValue();
             }
-            _reader.PushBack(new[] { (char)c });
 
-            consumeUntil('\n', TokenType.Comment);
-            Token.Value = Token.Value.TrimEnd('\r', '\n');
-            return Token.Type;
-        }
-
-        internal TokenType consumePropertyValue()
-        {
-            var c = _reader.Read();
-            if (c == -1)
+            if (this.MaybeReadWord())
             {
-                _eof = true;
-                return setupErrorToken("EOF");
+                return this.ConsumeWord();
             }
-            if (c == '"' || c == '\'')
+
+            return this.ConsumeWhitespace();
+        }
+        catch (Exception ex)
+        {
+            return this.SetupErrorToken(ex.Message);
+        }
+    }
+
+    private TokenType SetupErrorToken(string msg)
+    {
+        return this.SetupErrorToken(msg, this.Line, this.Column);
+    }
+
+    private TokenType SetupErrorToken(string msg, int line, int column)
+    {
+        this.Token.Type = TokenType.Error;
+        this.Token.Value = msg;
+        this.Token.Line = line;
+        this.Token.Column = column;
+        return this.Token.Type;
+    }
+
+    private TokenType ConsumeUntil(int cc, TokenType type)
+    {
+        this.Token.Type = type;
+        var c = this.lineReader.Read();
+        var value = new List<char>();
+        while (c != cc && c != 0 && c != -1)
+        {
+            value.Add((char)c);
+            c = this.lineReader.Read();
+            // This is the unicode invalid character. If we encounter this it means we parsed the
+            // template with an invalid encoding. Or the template was stored with an invalid
+            // encoding.
+            if (c == '\uffff')
             {
-                return consumeUntil(c, TokenType.Value);
+                return this.SetupErrorToken(INVALID_UNICODE_ERROR);
             }
-            _reader.PushBack((char)c);
-            return Token.Type;
+        }
+        if (c == -1)
+        {
+            this.eof = true;
+        }
+        else if (c != cc)
+        {
+            this.lineReader.PushBack((char)c);
         }
 
-        internal TokenType consumePropertyName()
+        this.Token.Value = new string(value.ToArray());
+        return type;
+    }
+
+    private TokenType ConsumeComment()
+    {
+        var c = this.lineReader.Read();
+        if (c == -1)
         {
-            Token.Type = TokenType.PropertyName;
-            return Token.Type;
+            this.eof = true;
+            return this.SetupErrorToken("EOF");
         }
+        this.lineReader.PushBack([(char)c]);
 
-        internal TokenType consumeObjectStart()
+        this.ConsumeUntil('\n', TokenType.Comment);
+        this.Token.Value = this.Token.Value.TrimEnd('\r', '\n');
+        return this.Token.Type;
+    }
+
+    private TokenType ConsumePropertyValue()
+    {
+        var c = this.lineReader.Read();
+        if (c == -1)
         {
-            Token.Type = TokenType.ObjectStart;
-            return Token.Type;
+            this.eof = true;
+            return this.SetupErrorToken("EOF");
         }
-
-        internal TokenType consumeObjectStop()
+        if (c == '"' || c == '\'')
         {
-            Token.Value = string.Empty;
-            Token.Type = TokenType.ObjectStop;
-            return Token.Type;
+            return this.ConsumeUntil(c, TokenType.Value);
         }
+        this.lineReader.PushBack((char)c);
+        return this.Token.Type;
+    }
 
-        internal TokenType consumeArrayStart()
+    private TokenType ConsumePropertyName()
+    {
+        this.Token.Type = TokenType.PropertyName;
+        return this.Token.Type;
+    }
+
+    private TokenType ConsumeObjectStart()
+    {
+        this.Token.Type = TokenType.ObjectStart;
+        return this.Token.Type;
+    }
+
+    private TokenType ConsumeObjectStop()
+    {
+        this.Token.Value = string.Empty;
+        this.Token.Type = TokenType.ObjectStop;
+        return this.Token.Type;
+    }
+
+    private TokenType ConsumeArrayStart()
+    {
+        this.Token.Type = TokenType.ArrayStart;
+        return this.Token.Type;
+    }
+
+    private TokenType ConsumeArrayStop()
+    {
+        this.Token.Value = string.Empty;
+        this.Token.Type = TokenType.ArrayStop;
+        return this.Token.Type;
+    }
+
+    private TokenType ConsumeWord()
+    {
+        var identifier = new List<char>();
+        var c = this.lineReader.Read();
+        while (!char.IsWhiteSpace((char)c) && acceptableWordChars.Contains((char)c))
         {
-            Token.Type = TokenType.ArrayStart;
-            return Token.Type;
-        }
-
-        internal TokenType consumeArrayStop()
-        {
-            Token.Value = string.Empty;
-            Token.Type = TokenType.ArrayStop;
-            return Token.Type;
-        }
-
-        internal TokenType consumeWord()
-        {
-            var acceptable = "abcdefghijklmnopqrstuvwxyz_-".ToCharArray();
-
-            var identifier = new List<char>();
-            var c = _reader.Read();
-            while (!Char.IsWhiteSpace((char)c) && acceptable.Contains((char)c))
+            identifier.Add((char)c);
+            c = this.lineReader.Read();
+            // This is the unicode invalid character. If we encounter this it means we parsed the
+            // template with an invalid encoding. Or the template was stored with an invalid
+            // encoding.
+            if (c == '\uffff')
             {
-                identifier.Add((char)c);
-                c = _reader.Read();
-                // This is the unicode invalid character. If we encounter this it means we parsed the
-                // template with an invalid encoding. Or the template was stored with an invalid
-                // encoding.
-                if (c == '\uffff')
-                {
-                    return setupErrorToken(INVALID_UNICODE_ERROR);
-                }
+                return this.SetupErrorToken(INVALID_UNICODE_ERROR);
             }
-            if (c == -1)
+        }
+        if (c == -1)
+        {
+            this.eof = true;
+        }
+        else
+        {
+            this.lineReader.PushBack((char)c);
+        }
+        this.inWord = true;
+        this.Token.Type = TokenType.Word;
+        this.Token.Value = new string(identifier.ToArray());
+        return this.ConsumeWhitespace();
+    }
+
+    private TokenType ConsumeWhitespace()
+    {
+        var c = this.lineReader.Read();
+        while (c != -1 && (char.IsWhiteSpace((char)c) || c == ';') || c == ',') // ignore the ';', its optional.
+        {
+            c = this.lineReader.Read();
+            // This is the unicode invalid character. If we encounter this it means we parsed the
+            // template with an invalid encoding. Or the template was stored with an invalid
+            // encoding.
+            if (c == '\uffff')
             {
-                _eof = true;
+                return this.SetupErrorToken(INVALID_UNICODE_ERROR);
             }
-            else
-            {
-                _reader.PushBack((char)c);
-            }
-            _inWord = true;
-            Token.Type = TokenType.Word;
-            Token.Value = new string(identifier.ToArray());
-            return consumeWhitespace();
         }
-
-        internal TokenType consumeWhitespace()
+        if (c == -1)
         {
-            var c = _reader.Read();
-            while (c != -1 && (Char.IsWhiteSpace((char)c) || c == ';') || c == ',') // ignore the ';', its optional.
-            {
-                c = _reader.Read();
-                // This is the unicode invalid character. If we encounter this it means we parsed the
-                // template with an invalid encoding. Or the template was stored with an invalid
-                // encoding.
-                if (c == '\uffff')
-                {
-                    return setupErrorToken(INVALID_UNICODE_ERROR);
-                }
-            }
-            if (c == -1)
-            {
-                _eof = true;
-            }
-            else
-            {
-                _reader.PushBack((char)c);
-            }
-            return Next();
+            this.eof = true;
         }
-
-        internal bool maybeReadWord()
+        else
         {
-            readText(" ", out var buf, out var n);
-            _reader.PushBack(buf.Take(n).ToArray());
-
-            var c = buf.First();
-            var acceptable = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
-            if (acceptable.Contains(c))
-                return true;
-
-            return false;
+            this.lineReader.PushBack((char)c);
         }
+        return this.Next();
+    }
 
-        internal bool maybeReadCommentStart()
+    private bool MaybeReadWord()
+    {
+        this.ReadText(" ", out var buf, out var n);
+        this.lineReader.PushBack(buf.Take(n).ToArray());
+
+        var c = buf.First();
+        if (acceptableWordChars.Contains(c))
+            return true;
+
+        return false;
+    }
+
+    private bool MaybeReadCommentStart()
+    {
+        return this.MaybeReadText(commentStart);
+    }
+
+    private bool MaybeReadObjectStart()
+    {
+        return this.MaybeReadText(objectStart);
+    }
+
+    private bool MaybeReadObjectStop()
+    {
+        return this.MaybeReadText(objectStop);
+    }
+
+    private bool MaybeReadArrayStart()
+    {
+        return this.MaybeReadText(arrayStart);
+    }
+
+    private bool MaybeReadArrayStop()
+    {
+        return this.MaybeReadText(arrayStop);
+    }
+
+    private bool MaybeReadPropertyStart()
+    {
+        return this.MaybeReadText(propertyStart);
+    }
+
+    private bool MaybeReadBeginPropertyValue()
+    {
+        var c = this.lineReader.Read();
+        this.lineReader.PushBack((char)c);
+
+        if (c == '"' || c == '\'')
+            return true;
+
+        return false;
+    }
+
+    private bool MaybeReadText(string text)
+    {
+        this.ReadText(text, out var buf, out var n);
+        var ok = (n == text.Length && new string(buf) == text);
+        if (!ok)
         {
-            return maybeReadText(_commentStart);
+            this.lineReader.PushBack(buf.Take(n).ToArray());
         }
+        return ok;
+    }
 
-        internal bool maybeReadObjectStart()
+    private void ReadText(string text, out char[] buf, out int n)
+    {
+        buf = new char[text.Length];
+        n = this.lineReader.Read(buf);
+
+        if (n == 0)
         {
-            return maybeReadText(_objectStart);
-        }
-
-        internal bool maybeReadObjectStop()
-        {
-            return maybeReadText(_objectStop);
-        }
-
-        internal bool maybeReadArrayStart()
-        {
-            return maybeReadText(_arrayStart);
-        }
-
-        internal bool maybeReadArrayStop()
-        {
-            return maybeReadText(_arrayStop);
-        }
-
-        internal bool maybeReadPropertyStart()
-        {
-            return maybeReadText(_propertyStart);
-        }
-
-        internal bool maybeReadBeginPropertyValue()
-        {
-            var c = _reader.Read();
-            _reader.PushBack((char)c);
-
-            if (c == '"' || c == '\'')
-                return true;
-
-            return false;
-        }
-
-        internal bool maybeReadText(string text)
-        {
-            readText(text, out var buf, out var n);
-            var ok = (n == text.Length && new String(buf) == text);
-            if (!ok)
-            {
-                _reader.PushBack(buf.Take(n).ToArray());
-            }
-            return ok;
-        }
-
-        private void readText(string text, out char[] buf, out int n)
-        {
-            buf = new char[text.Length];
-            n = _reader.Read(buf);
-
-            if (n == 0)
-            {
-                _eof = true;
-            }
+            this.eof = true;
         }
     }
 }

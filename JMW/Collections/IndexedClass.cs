@@ -79,7 +79,7 @@ namespace JMW.Collections
 
         #region Events
 
-        private readonly WeakEventSource<IndexedPropertyChangedEventArgs> _IndexedPropertyChanged = new WeakEventSource<IndexedPropertyChangedEventArgs>();
+        private readonly WeakEventSource<IndexedPropertyChangedEventArgs> _IndexedPropertyChanged = new();
         /// <summary>
         /// Fires when a property has changed.  This event will give you the before and after value of the
         /// property, as well as the property name.

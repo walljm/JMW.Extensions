@@ -1,5 +1,5 @@
 ﻿### Record types
-Record types take a string[] and return an object (either a string, or string[]) to be stored
+Record types take a string[] and returns an object (either a string, or string[]) to be stored
 ```coffeescript
 para {
     # sets boundaries on the whole document, not on

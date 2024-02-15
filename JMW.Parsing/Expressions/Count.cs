@@ -1,63 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using JMW.Collections;
+﻿using JMW.Collections;
 using JMW.Extensions.String;
 using JMW.Parsing.Compile;
-using JMW.Types;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace JMW.Parsing.Expressions
+namespace JMW.Parsing.Expressions;
+
+public class Count : IExpression
 {
-    public class Count : IExpression
+    public const string NAME = "count";
+    public const string RNG = "rng";
+
+    public Search Search { get; set; } = new();
+    public IntegerRangeCollection Rng { get; set; }
+
+    public Count(Tag t)
     {
-        public const string NAME = "count";
-        public const string RNG = "rng";
-
-        public Search Search { get; set; } = new Search();
-        public IntegerRangeCollection Rng { get; set; }
-
-        public Count(Tag t)
+        if (t.Properties.TryGetValue(Search.SEARCH, out Tag searchTag))
         {
-            if (t.Properties.ContainsKey(Search.SEARCH))
+            foreach (var val in (Stack<Tag>)searchTag.Value)
             {
-                foreach (var val in (Stack<Tag>)t.Properties[Search.SEARCH].Value)
-                    Search.Query.Add(val.Value.ToString());
-
-                if (t.Properties[Search.SEARCH].Properties.ContainsKey(Search.MODS))
-                    Search.Mods = t.Properties[Search.SEARCH].Properties[Search.MODS].Value.ToString();
+                this.Search.Query.Add(val.Value.ToString());
             }
-            else
-                throw new ArgumentException("Required Property Missing: " + Search.SEARCH);
 
-            if (t.Properties.ContainsKey(RNG))
-                Rng = new IntegerRangeCollection(t.Properties[RNG].Value.ToString());
-            else
-                throw new ArgumentException("Required Property Missing: " + RNG);
-        }
-
-        public Count(List<string> search, IntegerRangeCollection rng, string mods)
-        {
-            Rng = rng;
-            Search.Query = search;
-            Search.Mods = mods;
-        }
-
-        public bool Test(string s)
-        {
-            var i = Search.Mods.Contains(Constants.CASE_INSENSITIVE);
-            var c = 0;
-            var t = s;
-            while (Search.Query.Any(sr =>
+            if (searchTag.Properties.TryGetValue(Search.MODS, out Tag modsTag))
             {
-                if (i) return t.ToLower().Contains(sr.ToLower());
-
-                return t.Contains(sr);
-            }))
-            {
-                c++;
-                t = t.ParseAfterIndexOf_PlusLength(i, Search.Query.ToArray());
+                this.Search.Mods = modsTag.Value.ToString();
             }
-            return Rng.Contains(c);
         }
+        else
+        {
+            throw new ArgumentException("Required Property Missing: " + Search.SEARCH);
+        }
+
+        if (t.Properties.TryGetValue(RNG, out Tag rngTag))
+        {
+            this.Rng = new IntegerRangeCollection(rngTag.Value.ToString());
+        }
+        else
+        {
+            throw new ArgumentException("Required Property Missing: " + RNG);
+        }
+    }
+
+    public Count(List<string> search, IntegerRangeCollection rng, string mods)
+    {
+        this.Rng = rng;
+        this.Search.Query = search;
+        this.Search.Mods = mods;
+    }
+
+    public bool Test(string inputValue)
+    {
+        var caseInsensitive = this.Search.Mods.Contains(Constants.CASE_INSENSITIVE);
+        var compareOptions = caseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        var queryArray = this.Search.Query.ToArray();
+
+        var working = inputValue;
+        var c = 0;
+        while (this.Search.Query.Any(sr => working.Contains(sr, compareOptions)))
+        {
+            c++;
+            working = working.ParseAfterIndexOf_PlusLength(caseInsensitive, queryArray);
+        }
+        return this.Rng.Contains(c);
     }
 }

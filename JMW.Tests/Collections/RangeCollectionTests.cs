@@ -123,22 +123,22 @@ namespace JMW.Collections.Tests
             Assert.That(foo.ToString(), Is.EqualTo("1-5,7-10,12-15,19-34,40-50"));
 
             foo = new IntegerRangeCollection(new List<IntegerRange>{
-                new IntegerRange(1,5),
-                new IntegerRange(7,10),
-                new IntegerRange(12,15),
-                new IntegerRange(19,34),
-                new IntegerRange(40,50)
+                new(1,5),
+                new(7,10),
+                new(12,15),
+                new(19,34),
+                new(40,50)
             });
             Assert.That(foo.ToString(), Is.EqualTo("1-5,7-10,12-15,19-34,40-50"));
 
             var foo1 = new LongRangeCollection("1-4,5,7,10,8, 12-15, 8-10, 19-34, 20-24, 45-50, 40-46");
             Assert.That(foo1.ToString(), Is.EqualTo("1-5,7-10,12-15,19-34,40-50"));
             _ = new LongRangeCollection(new List<LongRange>{
-                new LongRange(1,5),
-                new LongRange(new Range<long, LongMath>(7,10)),
-                new LongRange(12,15),
-                new LongRange(19,34),
-                new LongRange(40,50)
+                new(1,5),
+                new(new Range<long, LongMath>(7,10)),
+                new(12,15),
+                new(19,34),
+                new(40,50)
             });
             Assert.That(foo.ToString(), Is.EqualTo("1-5,7-10,12-15,19-34,40-50"));
         }
@@ -158,7 +158,7 @@ namespace JMW.Collections.Tests
             Assert.AreEqual(0, foo.Count);
 
             var foo1 = new LongRangeCollection("1-4,10,8, 12-15,19");
-            foo1.AddRange(new List<LongRange> { new LongRange("3-9"), new LongRange("12-20") });
+            foo1.AddRange(new List<LongRange> { new("3-9"), new("12-20") });
 
             // assert
             Assert.That(foo1.ToString(), Is.EqualTo("1-10,12-20"));
@@ -200,7 +200,7 @@ namespace JMW.Collections.Tests
             Assert.That(foo.ToString(), Is.EqualTo("1-6,8,10-15,19,35"));
 
             foo = new IntegerRangeCollection("1-4,10,8, 12-15,19");
-            foo.AddRange(new List<IntegerRange> { new IntegerRange("3-11"), new IntegerRange("13-14"), new IntegerRange("19-21") });
+            foo.AddRange(new List<IntegerRange> { new("3-11"), new("13-14"), new("19-21") });
 
             // assert
             Assert.That(foo.ToString(), Is.EqualTo("1-15,19-21"));

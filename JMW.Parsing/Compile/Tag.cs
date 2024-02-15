@@ -7,15 +7,20 @@ namespace JMW.Parsing.Compile
         public TagTypes TagType { get; set; } = TagTypes.Object;
 
         private string _Name = string.Empty;
-        public string Name { get { return _Name; } set { _Name = value.Trim().ToLower(); } }
 
-        public Dictionary<string, Tag> Properties { get; set; } = new Dictionary<string, Tag>();
+        public string Name
+        {
+            get { return this._Name; }
+            set { this._Name = value.Trim().ToLower(); }
+        }
+
+        public Dictionary<string, Tag> Properties { get; set; } = [];
 
         public object Value { get; set; } = string.Empty;
-        
+
         public override string ToString()
         {
-            return Name + ":" + TagType;
+            return $"{this.Name}:{this.TagType}";
         }
     }
 }

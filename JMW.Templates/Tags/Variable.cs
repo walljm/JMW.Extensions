@@ -9,7 +9,7 @@ namespace JMW.Template.Tags
 {
     public class Variable : TagHandlerBase
     {
-        private Dictionary<string, string> _variables = new Dictionary<string, string>();
+        private Dictionary<string, string> _variables = new();
 
         public override string TagName { get; } = TAG;
         public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string> { ATTR_NAME, ATTR_VALUE, ATTR_OCT, ATTR_EXP, ATTR_STORE, ATTR_PRINT };

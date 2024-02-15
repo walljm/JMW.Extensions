@@ -1,7 +1,6 @@
-﻿using System.IO;
+﻿using NUnit.Framework;
+using System.IO;
 using System.Reflection;
-using JMW.Networking.Junos.Parser;
-using NUnit.Framework;
 
 namespace JMW.Parsing.Tests
 {
@@ -13,7 +12,7 @@ namespace JMW.Parsing.Tests
         {
             var dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "..", "..", "Networking", "junos.txt");
             var junos = File.ReadAllText(dir);
-            _ = new Parser().Parse(junos);
+            _ = new JMW.Networking.Parsers.JunosConfig.Parser().Parse(junos);
         }
     }
 }

@@ -146,7 +146,7 @@ namespace JMW.Extensions.Enumerable.Tests
         [Test]
         public void EachTest()
         {
-            var lst = new List<Foo> { new Foo { Value = 1 }, new Foo { Value = 2 }, new Foo { Value = 3 }, new Foo { Value = 4 } };
+            var lst = new List<Foo> { new() { Value = 1 }, new() { Value = 2 }, new() { Value = 3 }, new() { Value = 4 } };
             lst.Each(i => i.Value *= 2);
 
             Assert.That(new List<int> { 2, 4, 6, 8 }, Is.EquivalentTo(lst.Select(i => i.Value)));
@@ -157,16 +157,16 @@ namespace JMW.Extensions.Enumerable.Tests
         {
             var lst = new List<Foo>
             {
-                new Foo { Value = 0 },
-                new Foo { Value = 1 },
-                new Foo { Value = 2 },
-                new Foo { Value = 3 },
-                new Foo { Value = 4 },
-                new Foo { Value = 5 },
-                new Foo { Value = 6 },
-                new Foo { Value = 7 },
-                new Foo { Value = 8 },
-                new Foo { Value = 9 }
+                new() { Value = 0 },
+                new() { Value = 1 },
+                new() { Value = 2 },
+                new() { Value = 3 },
+                new() { Value = 4 },
+                new() { Value = 5 },
+                new() { Value = 6 },
+                new() { Value = 7 },
+                new() { Value = 8 },
+                new() { Value = 9 }
             };
 
             var sets = lst.GroupIntoSets(o => o.Value % 3 == 0).ToList();
@@ -181,16 +181,16 @@ namespace JMW.Extensions.Enumerable.Tests
         {
             var lst = new List<Foo>
             {
-                new Foo { Value = 0, Bar=10 },
-                new Foo { Value = 1, Bar=20 },
-                new Foo { Value = 2, Bar=30 },
-                new Foo { Value = 3, Bar=40 },
-                new Foo { Value = 4, Bar=50 },
-                new Foo { Value = 5, Bar=60 },
-                new Foo { Value = 6, Bar=70 },
-                new Foo { Value = 7, Bar=80 },
-                new Foo { Value = 8, Bar=90 },
-                new Foo { Value = 9, Bar=100 }
+                new() { Value = 0, Bar=10 },
+                new() { Value = 1, Bar=20 },
+                new() { Value = 2, Bar=30 },
+                new() { Value = 3, Bar=40 },
+                new() { Value = 4, Bar=50 },
+                new() { Value = 5, Bar=60 },
+                new() { Value = 6, Bar=70 },
+                new() { Value = 7, Bar=80 },
+                new() { Value = 8, Bar=90 },
+                new() { Value = 9, Bar=100 }
             };
             var dict = lst.ToDictionaryOfMany(o => new List<int> { o.Value, o.Bar });
 
@@ -203,16 +203,16 @@ namespace JMW.Extensions.Enumerable.Tests
         {
             var lst = new List<Foo>
             {
-                new Foo { Value = 0, Bar=10 },
-                new Foo { Value = 1, Bar=20 },
-                new Foo { Value = 2, Bar=10 },
-                new Foo { Value = 3, Bar=20 },
-                new Foo { Value = 4, Bar=10 },
-                new Foo { Value = 5, Bar=20 },
-                new Foo { Value = 6, Bar=10 },
-                new Foo { Value = 7, Bar=20 },
-                new Foo { Value = 8, Bar=10 },
-                new Foo { Value = 9, Bar=20 }
+                new() { Value = 0, Bar=10 },
+                new() { Value = 1, Bar=20 },
+                new() { Value = 2, Bar=10 },
+                new() { Value = 3, Bar=20 },
+                new() { Value = 4, Bar=10 },
+                new() { Value = 5, Bar=20 },
+                new() { Value = 6, Bar=10 },
+                new() { Value = 7, Bar=20 },
+                new() { Value = 8, Bar=10 },
+                new() { Value = 9, Bar=20 }
             };
             var dict = lst.ToDictionaryOfHashSets(o => o.Bar);
 
@@ -225,16 +225,16 @@ namespace JMW.Extensions.Enumerable.Tests
         {
             var lst = new List<Foo>
             {
-                new Foo { Value = 0, Bar=10 },
-                new Foo { Value = 1, Bar=20 },
-                new Foo { Value = 2, Bar=10 },
-                new Foo { Value = 3, Bar=20 },
-                new Foo { Value = 4, Bar=10 },
-                new Foo { Value = 5, Bar=20 },
-                new Foo { Value = 6, Bar=10 },
-                new Foo { Value = 7, Bar=20 },
-                new Foo { Value = 8, Bar=10 },
-                new Foo { Value = 9, Bar=20 }
+                new() { Value = 0, Bar=10 },
+                new() { Value = 1, Bar=20 },
+                new() { Value = 2, Bar=10 },
+                new() { Value = 3, Bar=20 },
+                new() { Value = 4, Bar=10 },
+                new() { Value = 5, Bar=20 },
+                new() { Value = 6, Bar=10 },
+                new() { Value = 7, Bar=20 },
+                new() { Value = 8, Bar=10 },
+                new() { Value = 9, Bar=20 }
             };
             var dict = lst.ToDictionaryOfLists(o => o.Bar);
 
@@ -247,16 +247,16 @@ namespace JMW.Extensions.Enumerable.Tests
         {
             var lst = new List<Foo>
             {
-                new Foo { Value = 0, Bar=10 },
-                new Foo { Value = 1, Bar=20 },
-                new Foo { Value = 2, Bar=10 },
-                new Foo { Value = 3, Bar=20 },
-                new Foo { Value = 4, Bar=10 },
-                new Foo { Value = 5, Bar=20 },
-                new Foo { Value = 6, Bar=10 },
-                new Foo { Value = 7, Bar=20 },
-                new Foo { Value = 8, Bar=10 },
-                new Foo { Value = 9, Bar=20 }
+                new() { Value = 0, Bar=10 },
+                new() { Value = 1, Bar=20 },
+                new() { Value = 2, Bar=10 },
+                new() { Value = 3, Bar=20 },
+                new() { Value = 4, Bar=10 },
+                new() { Value = 5, Bar=20 },
+                new() { Value = 6, Bar=10 },
+                new() { Value = 7, Bar=20 },
+                new() { Value = 8, Bar=10 },
+                new() { Value = 9, Bar=20 }
             };
             var dict = lst.ToDictionaryOfListsOfMany(o => new List<int> { o.Bar });
 
@@ -269,16 +269,16 @@ namespace JMW.Extensions.Enumerable.Tests
         {
             var lst = new List<Foo>
             {
-                new Foo { Value = 0, Bar=10 },
-                new Foo { Value = 1, Bar=20 },
-                new Foo { Value = 2, Bar=10 },
-                new Foo { Value = 3, Bar=20 },
-                new Foo { Value = 4, Bar=10 },
-                new Foo { Value = 5, Bar=20 },
-                new Foo { Value = 6, Bar=10 },
-                new Foo { Value = 7, Bar=20 },
-                new Foo { Value = 8, Bar=10 },
-                new Foo { Value = 9, Bar=20 }
+                new() { Value = 0, Bar=10 },
+                new() { Value = 1, Bar=20 },
+                new() { Value = 2, Bar=10 },
+                new() { Value = 3, Bar=20 },
+                new() { Value = 4, Bar=10 },
+                new() { Value = 5, Bar=20 },
+                new() { Value = 6, Bar=10 },
+                new() { Value = 7, Bar=20 },
+                new() { Value = 8, Bar=10 },
+                new() { Value = 9, Bar=20 }
             };
             var dict = lst.ToDictionaryOfHashSetsOfMany(o => new List<int> { o.Bar, o.Value });
 
@@ -305,16 +305,16 @@ namespace JMW.Extensions.Enumerable.Tests
         {
             var lst = new List<Foo>
             {
-                new Foo { Value = 0, Bar=10 },
-                new Foo { Value = 1, Bar=20 },
-                new Foo { Value = 2, Bar=10 },
-                new Foo { Value = 3, Bar=20 },
-                new Foo { Value = 4, Bar=10 },
-                new Foo { Value = 5, Bar=20 },
-                new Foo { Value = 6, Bar=10 },
-                new Foo { Value = 7, Bar=20 },
-                new Foo { Value = 8, Bar=10 },
-                new Foo { Value = 9, Bar=20 }
+                new() { Value = 0, Bar=10 },
+                new() { Value = 1, Bar=20 },
+                new() { Value = 2, Bar=10 },
+                new() { Value = 3, Bar=20 },
+                new() { Value = 4, Bar=10 },
+                new() { Value = 5, Bar=20 },
+                new() { Value = 6, Bar=10 },
+                new() { Value = 7, Bar=20 },
+                new() { Value = 8, Bar=10 },
+                new() { Value = 9, Bar=20 }
             };
             var dict = lst.Distinct(k => k.Bar).ToList();
 
@@ -338,16 +338,16 @@ namespace JMW.Extensions.Enumerable.Tests
         {
             var lst = new List<Foo>
             {
-                new Foo { Value = 0, Bar=10 },
-                new Foo { Value = 1, Bar=20 },
-                new Foo { Value = 2, Bar=30 },
-                new Foo { Value = 3, Bar=40 },
-                new Foo { Value = 4, Bar=50 },
-                new Foo { Value = 5, Bar=60 },
-                new Foo { Value = 6, Bar=70 },
-                new Foo { Value = 7, Bar=80 },
-                new Foo { Value = 8, Bar=90 },
-                new Foo { Value = 9, Bar=100 }
+                new() { Value = 0, Bar=10 },
+                new() { Value = 1, Bar=20 },
+                new() { Value = 2, Bar=30 },
+                new() { Value = 3, Bar=40 },
+                new() { Value = 4, Bar=50 },
+                new() { Value = 5, Bar=60 },
+                new() { Value = 6, Bar=70 },
+                new() { Value = 7, Bar=80 },
+                new() { Value = 8, Bar=90 },
+                new() { Value = 9, Bar=100 }
             };
             var dict = lst.ToDictionaryOfMany(o => new List<int> { o.Value, o.Bar });
 

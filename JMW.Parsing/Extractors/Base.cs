@@ -1,75 +1,74 @@
-﻿using System;
-using System.Collections.Generic;
-using JMW.Extensions.Numbers;
+﻿using JMW.Extensions.Numbers;
 using JMW.Parsing.Compile;
+using System;
+using System.Collections.Generic;
 
-namespace JMW.Parsing.Extractors
+namespace JMW.Parsing.Extractors;
+
+public abstract class Base
 {
-    public abstract class Base
+    public const string QUANTIFIER = "q";
+    public const string INDEX = "i";
+
+    public Base(Tag t)
     {
-        public const string QUANTIFIER = "q";
-        public const string INDEX = "i";
-
-        public Base(Tag t)
+        if (t.Properties.TryGetValue(Search.SEARCH, out Tag searchTag))
         {
-            if (t.Properties.ContainsKey(Search.SEARCH))
+            foreach (var val in (Stack<Tag>)searchTag.Value)
             {
-                foreach (var val in (Stack<Tag>)t.Properties[Search.SEARCH].Value)
-                    Search.Query.Add(val.Value.ToString());
-
-                if (t.Properties[Search.SEARCH].Properties.ContainsKey(Search.MODS))
-                    Search.Mods = t.Properties[Search.SEARCH].Properties[Search.MODS].Value.ToString();
+                this.Search.Query.Add(val.Value.ToString());
             }
 
-            if (t.Properties.ContainsKey(QUANTIFIER))
+            if (searchTag.Properties.TryGetValue(Search.MODS, out Tag modsTag))
             {
-                var n = t.Properties[QUANTIFIER].Value.ToString().ToIntOrNeg1();
-                if (n == -1)
-                    throw new ParseException(INDEX + " must be a 32 bit integer.");
-                Quantifier = n;
-            }
-
-            if (t.Properties.ContainsKey(INDEX))
-            {
-                var n = t.Properties[INDEX].Value.ToString().ToIntOrNeg1();
-                if (n == -1)
-                    throw new ParseException(INDEX + " must be a 32 bit integer.");
-                Index = n;
+                this.Search.Mods = modsTag.Value.ToString();
             }
         }
 
-        public Base(List<string> search, string mods, int q, int idx)
+        if (t.Properties.TryGetValue(QUANTIFIER, out Tag quantifierTag))
         {
-            Search.Query = search;
-            Search.Mods = mods;
-            Quantifier = q;
-            Index = idx;
-        }
-
-        public Search Search { get; set; } = new Search();
-        public int Quantifier { get; set; } = -1;
-        public int Index { get; set; } = -1;
-
-        public abstract string Parse(string s);
-
-        public static Base ToExtractor(Tag t)
-        {
-            switch (t.Name)
+            var n = quantifierTag.Value.ToString().ToIntOrNeg1();
+            if (n == -1)
             {
-                case To.NAME:
-                    return new To(t);
-
-                case After.NAME:
-                    return new After(t);
-
-                case Split.NAME:
-                    return new Split(t);
-
-                case Column.NAME:
-                    return new Column(t);
+                throw new ParseException(INDEX + " must be a 32 bit integer.");
             }
-
-            throw new ArgumentException("Unsupported Expression Tag", nameof(t));
+            this.Quantifier = n;
         }
+
+        if (t.Properties.TryGetValue(INDEX, out Tag indexTag))
+        {
+            var n = indexTag.Value.ToString().ToIntOrNeg1();
+            if (n == -1)
+            {
+                throw new ParseException(INDEX + " must be a 32 bit integer.");
+            }
+            this.Index = n;
+        }
+    }
+
+    public Base(List<string> search, string mods, int q, int idx)
+    {
+        this.Search.Query = search;
+        this.Search.Mods = mods;
+        this.Quantifier = q;
+        this.Index = idx;
+    }
+
+    public Search Search { get; set; } = new();
+    public int Quantifier { get; set; } = -1;
+    public int Index { get; set; } = -1;
+
+    public abstract string Parse(string s);
+
+    public static Base ToExtractor(Tag t)
+    {
+        return t.Name switch
+        {
+            To.NAME => new To(t),
+            After.NAME => new After(t),
+            Split.NAME => new Split(t),
+            Column.NAME => new Column(t),
+            _ => throw new ArgumentException("Unsupported Expression Tag", nameof(t)),
+        };
     }
 }

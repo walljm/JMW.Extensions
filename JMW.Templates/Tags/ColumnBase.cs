@@ -8,7 +8,7 @@ namespace JMW.Template.Tags
     /// </summary>
     public abstract class ColumnBase : TagHandlerBase
     {
-        public static HashSet<string> ALLOWED = new HashSet<string> { ATTR_EXP, ATTR_OCT };
+        public static HashSet<string> ALLOWED = new() { ATTR_EXP, ATTR_OCT };
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         public override string TagName { get; }
 

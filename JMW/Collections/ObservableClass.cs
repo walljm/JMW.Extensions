@@ -72,7 +72,7 @@ namespace JMW.Collections
 
         #region Events
 
-        private readonly WeakEventSource<PropertyChangingEventArgs> _PropertyChanging = new WeakEventSource<PropertyChangingEventArgs>();
+        private readonly WeakEventSource<PropertyChangingEventArgs> _PropertyChanging = new();
         /// <summary>
         /// The <see cref="INotifyPropertyChanging"/> event.  Gives you the property name before
         /// the value is changed.
@@ -87,7 +87,7 @@ namespace JMW.Collections
             remove { _PropertyChanging.Unsubscribe(value.CastDelegate<EventHandler<PropertyChangingEventArgs>>()); }
         }
 
-        private readonly WeakEventSource<PropertyChangedEventArgs> _PropertyChanged = new WeakEventSource<PropertyChangedEventArgs>();
+        private readonly WeakEventSource<PropertyChangedEventArgs> _PropertyChanged = new();
         /// <summary>
         /// The <see cref="INotifyPropertyChanged"/> event.  Gives you the property name after
         /// the value has changed.

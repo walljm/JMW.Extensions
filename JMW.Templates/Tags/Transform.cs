@@ -21,7 +21,7 @@ namespace JMW.Template.Tags
         public const string ATTR_EXP = "exp";
         public const string ATTR_COLUMN = "columns";
 
-        private Dictionary<string, ValueRetriever> _retrievers = new Dictionary<string, ValueRetriever>();
+        private Dictionary<string, ValueRetriever> _retrievers = new();
 
         public Transform()
         {

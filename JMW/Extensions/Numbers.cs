@@ -306,7 +306,7 @@ namespace JMW.Extensions.Numbers
             return Convert.ToDouble(i);
         }
 
-        private static Dictionary<string, long> _numAbbreviations = new Dictionary<string, long>
+        private static Dictionary<string, long> _numAbbreviations = new()
         {
             { "k", 1000 },
             { "m", 1000000 },
@@ -317,7 +317,7 @@ namespace JMW.Extensions.Numbers
         };
 
         /// <summary>
-        /// Handles converting text to an <see cref="Int64"/>. Will properly deal with the following common abbreviations
+        /// Handles converting text to an <see cref="long"/>. Will properly deal with the following common abbreviations
         ///
         /// <para>
         /// k1 == 1000 // 1 thousand (kila)
@@ -343,7 +343,7 @@ namespace JMW.Extensions.Numbers
         }
 
         /// <summary>
-        /// Handles converting text to an <see cref="Int64"/>. Will properly deal with the following common abbreviations
+        /// Handles converting text to an <see cref="long"/>. Will properly deal with the following common abbreviations
         ///
         /// <para>
         /// k1 == 1000 // 1 thousand (kila)
@@ -362,7 +362,7 @@ namespace JMW.Extensions.Numbers
         }
 
         ///  <summary>
-        ///  Handles converting text to an <see cref="Int64"/>. Will properly deal with the following common abbreviations
+        ///  Handles converting text to an <see cref="long"/>. Will properly deal with the following common abbreviations
         ///
         ///  <para>
         ///  k1 == 1000 // 1 thousand (kila)

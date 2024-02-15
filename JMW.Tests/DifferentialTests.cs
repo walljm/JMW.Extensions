@@ -26,7 +26,7 @@ namespace JMW.Differentials.Tests
                 {
                     if (a != b)
                     {
-                        return new ObjectDifferential<string, MyDiff>(a, b, new List<MyDiff> { new MyDiff { Difference = a + " " + b } });
+                        return new ObjectDifferential<string, MyDiff>(a, b, [new MyDiff { Difference = a + " " + b }]);
                     }
 
                     return null;
@@ -182,17 +182,17 @@ namespace JMW.Differentials.Tests
         {
             var lst_a = new List<T1>
             {
-                new T1 { Foo="1"},
-                new T1 { Foo="2"},
-                new T1 { Foo="3"},
-                new T1 { Foo="4"}
+                new() { Foo="1"},
+                new() { Foo="2"},
+                new() { Foo="3"},
+                new() { Foo="4"}
             };
             var lst_b = new List<T1>
             {
-                new T1 { Foo="2"},
-                new T1 { Foo="4"},
-                new T1 { Foo="5"},
-                new T1 { Foo="6"}
+                new() { Foo="2"},
+                new() { Foo="4"},
+                new() { Foo="5"},
+                new() { Foo="6"}
             };
 
             var diff = Differential.RunCollectionDifferential(lst_a, lst_b, p => p.Foo);
@@ -206,17 +206,17 @@ namespace JMW.Differentials.Tests
         {
             var lst_a = new List<T1>
             {
-                new T1 { Foo="1"},
-                new T1 { Foo="2"},
-                new T1 { Foo="3"},
-                new T1 { Foo="4"}
+                new() { Foo="1"},
+                new() { Foo="2"},
+                new() { Foo="3"},
+                new() { Foo="4"}
             };
             var lst_b = new List<T2>
             {
-                new T2 { Foo="2"},
-                new T2 { Foo="4"},
-                new T2 { Foo="5"},
-                new T2 { Foo="6"}
+                new() { Foo="2"},
+                new() { Foo="4"},
+                new() { Foo="5"},
+                new() { Foo="6"}
             };
 
             var diff = Differential.RunCollectionDifferential(lst_a, lst_b, p => p.Foo, p => p.Foo);
@@ -232,7 +232,7 @@ namespace JMW.Differentials.Tests
 
         public int Compare(string x, string y)
         {
-            return String.Compare(x, y, StringComparison.Ordinal);
+            return string.Compare(x, y, StringComparison.Ordinal);
         }
 
         #endregion Implementation of IComparer<in string>
@@ -244,14 +244,14 @@ namespace JMW.Differentials.Tests
 
         public int Bar { get; set; } = -1;
 
-        public List<string> Jason { get; set; } = new List<string>();
+        public List<string> Jason { get; set; } = [];
     }
 
     internal class T2
     {
         public string Foo { get; set; } = string.Empty;
 
-        public List<int> Jason { get; set; } = new List<int>();
+        public List<int> Jason { get; set; } = [];
 
         public bool Wall { get; set; } = false;
     }

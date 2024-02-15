@@ -1,36 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using JMW.Extensions.Enumerable;
+﻿using JMW.Extensions.Enumerable;
 using JMW.Parsing.Compile;
 using JMW.Parsing.Handlers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace JMW.Parsing.Extractors
+namespace JMW.Parsing.Extractors;
+
+public class Column : Base
 {
-    public class Column : Base
+    private static readonly char[] separator = [' '];
+
+    public const string NAME = "col";
+
+    public List<ColumnPosition> Positions { get; set; }
+
+    public override string Parse(string s)
     {
-        public const string NAME = "col";
-
-        public List<ColumnPosition> Positions { get; set; }
-
-        public override string Parse(string s)
+        if (this.Positions != null && this.Positions.Count < this.Index)
         {
-            if (Positions != null && Positions.Count < Index)
-                throw new ArgumentException("Provided index (" + Index + ") exceeded the number of columns (" + Positions.Count + "):" + Positions.Select(c => c.Name).ToDelimitedString(","));
-
-            if (Positions != null)
-                return Positions[Index].GetColumnValue(s);
-         
-            // treat it like a split.
-            return s.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[Index];
+            throw new ArgumentException($"Provided index ({this.Index}) exceeded the number of columns ({this.Positions.Count}):{this.Positions.Select(c => c.Name).ToDelimitedString(",")}");
         }
 
-        public Column(Tag t) : base(t)
+        if (this.Positions != null)
         {
+            return this.Positions[this.Index].GetColumnValue(s);
         }
 
-        public Column(int idx) : base(null, "", -1, idx)
-        {
-        }
+        // treat it like a split.
+        return s.Split(separator, StringSplitOptions.RemoveEmptyEntries)[this.Index];
+    }
+
+    public Column(Tag t) : base(t)
+    {
+    }
+
+    public Column(int idx) : base(null, "", -1, idx)
+    {
     }
 }

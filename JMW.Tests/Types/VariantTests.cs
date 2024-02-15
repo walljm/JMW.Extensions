@@ -34,7 +34,7 @@ namespace JMW.Types.Tests
             Assert.IsTrue(((Variant)new List<string>{"jason"}).IsList);
             Assert.AreEqual(1, ((List<Variant>) tv2).Count);
             Assert.AreEqual(1, ((List<string>)tv2).Count);
-            v2.ListValue = new List<Variant>();
+            v2.ListValue = [];
             Assert.AreEqual(0, v2.ListValue.Count);
             Assert.AreEqual("(List) Count: 1", tv2.ToString());
             Assert.IsTrue(v2.GetHashCode() > 0);
@@ -49,7 +49,7 @@ namespace JMW.Types.Tests
             Assert.IsTrue(tv3.Equals(new Dictionary<string, Variant> { { "one", "jason" } }));
             Assert.IsTrue(((Variant)new Dictionary<string, Variant> { {"one", "jason" }}).IsDict);
             Assert.AreEqual(1, ((Dictionary<string, Variant>)tv3).Count);
-            v3.DictValue = new Dictionary<string, Variant>();
+            v3.DictValue = [];
             Assert.AreEqual(0, v3.DictValue.Count);
             Assert.AreEqual("(Dict) Count: 1", tv3.ToString());
             Assert.IsTrue(v3.GetHashCode() > 0);

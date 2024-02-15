@@ -21,7 +21,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4" });
+            var data = new TableData("test", ["foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -82,7 +82,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data = new TableData("test", new List<string> { "foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4" });
+                var data = new TableData("test", ["foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -108,7 +108,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data = new TableData("test", new List<string> { "foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4" });
+                var data = new TableData("test", ["foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -134,7 +134,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data = new TableData("test", new List<string> { "foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4" });
+                var data = new TableData("test", ["foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -160,7 +160,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data = new TableData("test", new List<string> { "foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4" });
+                var data = new TableData("test", ["foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -186,7 +186,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data = new TableData("", new List<string> { "foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4" });
+                var data = new TableData("", ["foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -210,7 +210,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4" });
+            var data = new TableData("test", ["foo,bar,ip", "blah,flaw,1.1.1.1", "floo,blue,1.2.3.4"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -276,7 +276,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+            var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -302,7 +302,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+            var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -324,7 +324,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "ablah,flaw", "bfloo,blue", "cblah,flaw", "dfloo,blue" });
+            var data = new TableData("test", ["foo,bar", "ablah,flaw", "bfloo,blue", "cblah,flaw", "dfloo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -346,7 +346,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "ablah,flaw", "bfloo,blue", "cblah,flaw", "dfloo,blue" });
+            var data = new TableData("test", ["foo,bar", "ablah,flaw", "bfloo,blue", "cblah,flaw", "dfloo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -368,7 +368,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("", new List<string> { "foo,bar", "blah,1.1.1.1", "floo,1.2.3.4", "blah,10.130.0.12", "floo,192.168.12.56" });
+            var data = new TableData("", ["foo,bar", "blah,1.1.1.1", "floo,1.2.3.4", "blah,10.130.0.12", "floo,192.168.12.56"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -394,7 +394,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,1.1.1.1", "floo,1.2.3.4", "blah,10.130.0.12", "floo,192.168.12.56" });
+            var data = new TableData("test", ["foo,bar", "blah,1.1.1.1", "floo,1.2.3.4", "blah,10.130.0.12", "floo,192.168.12.56"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -421,12 +421,12 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue" });
+                var data1 = new TableData("test1", ["foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
 
-                var data2 = new TableData("test2", new List<string> { "baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown" });
+                var data2 = new TableData("test2", ["baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown"]);
                 var tbl2 = new Table(data2, i);
                 i.AddHandler(tbl2);
 
@@ -450,12 +450,12 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue" });
+                var data1 = new TableData("test1", ["foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
 
-                var data2 = new TableData("test2", new List<string> { "baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown" });
+                var data2 = new TableData("test2", ["baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown"]);
                 var tbl2 = new Table(data2, i);
                 i.AddHandler(tbl2);
 
@@ -479,12 +479,12 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar", "green,1.1.1.1", "blue,1.1.1.1", "red,1.1.1.1", "black,1.1.1.1" });
+                var data1 = new TableData("test1", ["foo,bar", "green,1.1.1.1", "blue,1.1.1.1", "red,1.1.1.1", "black,1.1.1.1"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
 
-                var data2 = new TableData("test2", new List<string> { "baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown" });
+                var data2 = new TableData("test2", ["baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown"]);
                 var tbl2 = new Table(data2, i);
                 i.AddHandler(tbl2);
 
@@ -509,12 +509,12 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue" });
+                var data1 = new TableData("test1", ["foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
 
-                var data2 = new TableData("test2", new List<string> { "baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown" });
+                var data2 = new TableData("test2", ["baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown"]);
                 var tbl2 = new Table(data2, i);
                 i.AddHandler(tbl2);
 
@@ -537,12 +537,12 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue" });
+                var data1 = new TableData("test1", ["foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
 
-                var data2 = new TableData("test2", new List<string> { "baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown" });
+                var data2 = new TableData("test2", ["baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown"]);
                 var tbl2 = new Table(data2, i);
                 i.AddHandler(tbl2);
 
@@ -569,13 +569,12 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string>
-                        { "foo,bar", "foo,flaw", "foo,blue", "red,flaw", "black,blue" });
+                var data1 = new TableData("test1", ["foo,bar", "foo,flaw", "foo,blue", "red,flaw", "black,blue"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
 
-                var data2 = new TableData("test2", new List<string> { "baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown" });
+                var data2 = new TableData("test2", ["baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown"]);
                 var tbl2 = new Table(data2, i);
                 i.AddHandler(tbl2);
 
@@ -598,12 +597,12 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue" });
+                var data1 = new TableData("test1", ["foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
 
-                var data2 = new TableData("test2", new List<string> { "baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown" });
+                var data2 = new TableData("test2", ["baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown"]);
                 var tbl2 = new Table(data2, i);
                 i.AddHandler(tbl2);
 
@@ -626,12 +625,12 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue" });
+                var data1 = new TableData("test1", ["foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
 
-                var data2 = new TableData("test2", new List<string> { "baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown" });
+                var data2 = new TableData("test2", ["baz,bar", "green,yellow", "blue,purple", "red,pink", "black,brown"]);
                 var tbl2 = new Table(data2, i);
                 i.AddHandler(tbl2);
 
@@ -659,7 +658,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+            var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -687,7 +686,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+                var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -717,7 +716,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+                var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -744,7 +743,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+            var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -777,7 +776,7 @@ namespace JMW.Template.Tests
             using var wr = new StringWriter(sb);
             var i = new Interpreter(wr);
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+            var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -804,7 +803,7 @@ namespace JMW.Template.Tests
                 using var wr = new StringWriter(sb);
                 var i = new Interpreter(wr);
 
-                var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+                var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -830,7 +829,7 @@ namespace JMW.Template.Tests
                 using var wr = new StringWriter(sb);
                 var i = new Interpreter(wr);
 
-                var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+                var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -855,7 +854,7 @@ namespace JMW.Template.Tests
             using var wr = new StringWriter(sb);
             var i = new Interpreter(wr);
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+            var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -878,7 +877,7 @@ namespace JMW.Template.Tests
                 using var wr = new StringWriter(sb);
                 var i = new Interpreter(wr);
 
-                var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+                var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
                 var tbl = new Table(data, i);
                 i.AddHandler(tbl);
 
@@ -902,7 +901,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data1 = new TableData("test1", new List<string> { "foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue" });
+            var data1 = new TableData("test1", ["foo,bar", "green,flaw", "blue,blue", "red,flaw", "black,blue"]);
             var tbl1 = new Table(data1, i);
 
             i.AddHandler(tbl1);
@@ -930,7 +929,7 @@ namespace JMW.Template.Tests
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data1 = new TableData("test1", new List<string> { "foo,bar,ip", "green,flaw,1.1.1.1", "blue,blue,1.1.1.1", "red,flaw,1.1.1.1", "black,blue,1.1.1.1" });
+            var data1 = new TableData("test1", ["foo,bar,ip", "green,flaw,1.1.1.1", "blue,blue,1.1.1.1", "red,flaw,1.1.1.1", "black,blue,1.1.1.1"]);
             var tbl1 = new Table(data1, i);
 
             i.AddHandler(tbl1);
@@ -957,7 +956,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar,ip", "green,flaw,1.1.1.1", "blue,blue,1.1.1.1", "red,flaw,1.1.1.1", "black,blue,1.1.1.1" });
+                var data1 = new TableData("test1", ["foo,bar,ip", "green,flaw,1.1.1.1", "blue,blue,1.1.1.1", "red,flaw,1.1.1.1", "black,blue,1.1.1.1"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
@@ -986,7 +985,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar,ip", "green,flaw,1.1.1.1", "blue,blue,1.1.1.1", "red,flaw,1.1.1.1", "black,blue,1.1.1.1" });
+                var data1 = new TableData("test1", ["foo,bar,ip", "green,flaw,1.1.1.1", "blue,blue,1.1.1.1", "red,flaw,1.1.1.1", "black,blue,1.1.1.1"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
@@ -1015,7 +1014,7 @@ namespace JMW.Template.Tests
                 var i = new Interpreter(wr);
                 i.AddVariable("walljm", "wooooo");
 
-                var data1 = new TableData("test1", new List<string> { "foo,bar,ip", "green,flaw,1.1.1.1", "blue,blue,1.1.1.1", "red,flaw,1.1.1.1", "black,blue,1.1.1.1" });
+                var data1 = new TableData("test1", ["foo,bar,ip", "green,flaw,1.1.1.1", "blue,blue,1.1.1.1", "red,flaw,1.1.1.1", "black,blue,1.1.1.1"]);
                 var tbl1 = new Table(data1, i);
 
                 i.AddHandler(tbl1);
@@ -1268,7 +1267,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+            var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -1289,7 +1288,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+            var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -1310,7 +1309,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
             var i = new Interpreter(wr);
             i.AddVariable("walljm", "wooooo");
 
-            var data = new TableData("test", new List<string> { "foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue" });
+            var data = new TableData("test", ["foo,bar", "blah,flaw", "floo,blue", "blah,flaw", "floo,blue"]);
             var tbl = new Table(data, i);
             i.AddHandler(tbl);
 
@@ -1327,7 +1326,7 @@ datetime: <timestamp format=""M-d-yy hh:mm:ss"" exp=""x1.substr(0,x1.indexOf(' '
     public class TestHandler : TagHandlerBase
     {
         public override string TagName { get; } = "test";
-        public override HashSet<string> ALLOWEDPROPS { get; } = new HashSet<string>();
+        public override HashSet<string> ALLOWEDPROPS { get; } = [];
 
         public override void Handler(Tag token, Interpreter interp)
         {

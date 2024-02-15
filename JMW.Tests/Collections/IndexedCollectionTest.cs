@@ -11,8 +11,8 @@ namespace JMW.Collections.Tests
         public void Test1()
         {
             var idx = new IndexedCollection<Foo>();
-            var f1 = new Foo { Bar = "jason", BarCollection = new List<string> { "one", "two" }, Baz = "me", BazCollection = new List<int> { 1, 2 } };
-            var f2 = new Foo { Bar = "wall", BarCollection = new List<string> { "three", "two" }, Baz = "me", BazCollection = new List<int> { 3, 4 } };
+            var f1 = new Foo { Bar = "jason", BarCollection = ["one", "two"], Baz = "me", BazCollection = [1, 2] };
+            var f2 = new Foo { Bar = "wall", BarCollection = ["three", "two"], Baz = "me", BazCollection = [3, 4] };
             idx.Add(f1);
             idx.Add(f2);
 
@@ -35,9 +35,9 @@ namespace JMW.Collections.Tests
             Assert.That(idx.Contains(f1));
 
             f1.Baz = "my";
-            f1.BazCollection = new List<int> { 1, 2, 5 };
-            f1.BarCollection = new List<string> { "1", "2" };
-            f1.BarCollection = new List<string> { "one", "two" };
+            f1.BazCollection = [1, 2, 5];
+            f1.BarCollection = ["1", "2"];
+            f1.BarCollection = ["one", "two"];
 
             Assert.That(idx.Count == 2);
 
@@ -109,7 +109,7 @@ namespace JMW.Collections.Tests
             idx.RefreshIndices();
             try
             {
-                f1.BazCollection = new List<int> { 1, 2, 5, 5 };
+                f1.BazCollection = [1, 2, 5, 5];
             }
             catch (Exception ex)
             {
@@ -117,7 +117,7 @@ namespace JMW.Collections.Tests
             }
             try
             {
-                var f3 = new Foo { Bar = "wall", BarCollection = new List<string> { "three", "two" }, Baz = "me", BazCollection = new List<int> { 6, 7, 7 } };
+                var f3 = new Foo { Bar = "wall", BarCollection = ["three", "two"], Baz = "me", BazCollection = [6, 7, 7] };
                 idx.Add(f3);
             }
             catch
@@ -125,7 +125,7 @@ namespace JMW.Collections.Tests
             {
                 Assert.That(ex.GetType() == typeof(OperationCanceledException));
             }
-            f1.BarCollection = new List<string> { "1", "2", "3" };
+            f1.BarCollection = ["1", "2", "3"];
 
             f1.PropertyChanged += f1_PropertyChanged;
             f1.PropertyChanging += f1_PropertyChanging;
@@ -173,9 +173,9 @@ namespace JMW.Collections.Tests
             idx.IndexViolated += (o, e) => { cnt++;
                 msg = e.ErrorMessage;
             };
-            var f1 = new Foo { Bar = "jason", BarCollection = new List<string> { "one", "two" }, Baz = "me", BazCollection = new List<int> { 1, 2 } };
-            var f2 = new Foo { Bar = "wall", BarCollection = new List<string> { "three", "two" }, Baz = "me", BazCollection = new List<int> { 3, 4 } };
-            var f3 = new Foo { Bar = "wall", BarCollection = new List<string> { "three", "two" }, Baz = "me", BazCollection = new List<int> { 3, 4 } };
+            var f1 = new Foo { Bar = "jason", BarCollection = ["one", "two"], Baz = "me", BazCollection = [1, 2] };
+            var f2 = new Foo { Bar = "wall", BarCollection = ["three", "two"], Baz = "me", BazCollection = [3, 4] };
+            var f3 = new Foo { Bar = "wall", BarCollection = ["three", "two"], Baz = "me", BazCollection = [3, 4] };
             idx.Add(f1);
             idx.Add(f2);
             try
@@ -227,7 +227,7 @@ namespace JMW.Collections.Tests
                 }
             }
 
-            private List<string> barCollection = new List<string>();
+            private List<string> barCollection = [];
             [Indexed]
             public List<string> BarCollection
             {
@@ -257,7 +257,7 @@ namespace JMW.Collections.Tests
                 }
             }
 
-            private List<int> bazCollection = new List<int>();
+            private List<int> bazCollection = [];
             [Indexed(IsUnique = true)]
             public List<int> BazCollection
             {

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace JMW.Parsing.Compile
+namespace JMW.Parsing.Compile;
+
+public interface IProperty
 {
-    public interface IProperty
-    {
-        string Name { get; }
-        object Parse(StreamReader reader);
-    }
+    string Name { get; }
+
+    object Parse(StreamReader reader);
 }

@@ -130,13 +130,13 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.AreEqual(11234, "11234".ToInt());
             Assert.AreEqual(1000, "1k".ToInt());
             Assert.AreEqual(4321341, "4321341".ToInt());
-            Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToInt());
+            Assert.AreEqual(int.MaxValue, int.MaxValue.ToString().ToInt());
             Assert.AreEqual(1431234121, "1431234121".ToInt());
 
             Assert.AreEqual(1, "1".ToIntFast());
             Assert.AreEqual(11234, "11234".ToIntFast());
             Assert.AreEqual(4321341, "4321341".ToIntFast());
-            Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToIntFast());
+            Assert.AreEqual(int.MaxValue, int.MaxValue.ToString().ToIntFast());
             Assert.AreEqual(1431234121, "1431234121".ToIntFast());
 
             Assert.AreEqual(1, "1".ToIntFast());
@@ -148,7 +148,7 @@ namespace JMW.Extensions.Numbers.Tests
             Assert.AreEqual(1, "1".ToIntOrDefaultFast());
             Assert.AreEqual(11234, "11234".ToIntOrDefaultFast());
             Assert.AreEqual(4321341, "4321341".ToIntOrDefaultFast());
-            Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToIntOrDefaultFast());
+            Assert.AreEqual(int.MaxValue, int.MaxValue.ToString().ToIntOrDefaultFast());
             Assert.AreEqual(1431234121, "1431234121".ToIntOrDefaultFast());
 
             Assert.AreEqual(1, "1".ToIntOrDefaultFast());
@@ -177,10 +177,10 @@ namespace JMW.Extensions.Numbers.Tests
         public void ToIntOrNeg1Test()
         {
             Assert.AreEqual(-1, "basdf".ToIntOrDefaultFast(-1));
-            Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToIntOrDefaultFast(-1));
+            Assert.AreEqual(int.MaxValue, int.MaxValue.ToString().ToIntOrDefaultFast(-1));
 
             Assert.AreEqual(-1, "basdf".ToIntOrNeg1());
-            Assert.AreEqual(Int32.MaxValue, Int32.MaxValue.ToString().ToIntOrNeg1());
+            Assert.AreEqual(int.MaxValue, int.MaxValue.ToString().ToIntOrNeg1());
             Assert.AreEqual(1000, "1k".ToIntOrNeg1());
             Assert.AreEqual(-1, "143123412000001b".ToIntOrNeg1());
         }
@@ -217,9 +217,9 @@ namespace JMW.Extensions.Numbers.Tests
         {
             var expected = new List<IntegerRange>
             {
-                new IntegerRange(1,1),
-                new IntegerRange(4,8),
-                new IntegerRange(11,11)
+                new(1,1),
+                new(4,8),
+                new(11,11)
             };
 
             Assert.AreEqual(expected.Count, new List<int> { 1, 4, 5, 6, 7, 8, 11 }.CollapseIntsToIntegerRanges().ToList().Count);

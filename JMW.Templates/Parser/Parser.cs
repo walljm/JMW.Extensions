@@ -14,9 +14,9 @@ namespace JMW.Template
     /// </summary>
     public class Parser
     {
-        private readonly Stack<Tag> _stack = new Stack<Tag>();
-        private readonly Dictionary<string, ITagHandler> _tags = new Dictionary<string, ITagHandler>();
-        private readonly HashSet<string> _columnTags = new HashSet<string>();
+        private readonly Stack<Tag> _stack = new();
+        private readonly Dictionary<string, ITagHandler> _tags = new();
+        private readonly HashSet<string> _columnTags = new();
 
         public void AddColumnTag(string column)
         {

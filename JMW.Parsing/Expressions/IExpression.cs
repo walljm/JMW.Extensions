@@ -1,7 +1,6 @@
-﻿namespace JMW.Parsing.Expressions
+﻿namespace JMW.Parsing.Expressions;
+
+public interface IExpression
 {
-    public interface IExpression
-    {
-        bool Test(string s);
-    }
+    bool Test(string s);
 }

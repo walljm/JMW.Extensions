@@ -19,20 +19,28 @@ namespace JMW.Parsing.Handlers
 
         public Include(IExpression start, IExpression stop)
         {
-            Start = start;
-            Stop = stop;
+            this.Start = start;
+            this.Stop = stop;
         }
 
         public Include(Tag t)
         {
-            if (t.Properties.ContainsKey(START))
-                Start = Expressions.Base.ToExpression(t.Properties[START]);
-            if (t.Properties.ContainsKey(STOP))
-                Stop = Expressions.Base.ToExpression(t.Properties[STOP]);
-            if (t.Properties.ContainsKey(INCLUDESTART))
-                t.Properties[INCLUDESTART].Value.ToString().ToBoolean().IfSuccess(v => IncludeStart = v);
-            if (t.Properties.ContainsKey(INCLUDESTOP))
-                t.Properties[INCLUDESTOP].Value.ToString().ToBoolean().IfSuccess(v => IncludeStop = v);
+            if (t.Properties.TryGetValue(START, out Tag startTag))
+            {
+                this.Start = Expressions.Base.ToExpression(startTag);
+            }
+            if (t.Properties.TryGetValue(STOP, out Tag stopTag))
+            {
+                this.Stop = Expressions.Base.ToExpression(stopTag);
+            }
+            if (t.Properties.TryGetValue(INCLUDESTART, out Tag includeStartTag))
+            {
+                includeStartTag.Value.ToString().ToBoolean().IfSuccess(v => this.IncludeStart = v);
+            }
+            if (t.Properties.TryGetValue(INCLUDESTOP, out Tag includeStopTag))
+            {
+                includeStopTag.Value.ToString().ToBoolean().IfSuccess(v => this.IncludeStop = v);
+            }
         }
     }
 }

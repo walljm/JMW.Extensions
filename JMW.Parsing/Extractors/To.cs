@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using JMW.Extensions.String;
+﻿using JMW.Extensions.String;
 using JMW.Parsing.Compile;
+using System.Collections.Generic;
 
 namespace JMW.Parsing.Extractors
 {
@@ -10,25 +10,23 @@ namespace JMW.Parsing.Extractors
 
         public override string Parse(string s)
         {
-            var i = Search.Mods.Contains(Constants.CASE_INSENSITIVE); // case insensitive
-            var t = Search.Mods.Contains(Constants.TRIM); // trim the output
+            var isCaseInsensitive = this.Search.Mods.Contains(Constants.CASE_INSENSITIVE); // case insensitive
+            var shouldTripOutput = this.Search.Mods.Contains(Constants.TRIM); // trim the output
+            var includeSearchItem = this.Search.Mods.Contains(Constants.WITH_VALUE);
+            var queryArray = this.Search.Query.ToArray();
 
-            if (Search.Mods.Contains(Constants.WITH_VALUE)) // include search item
+            var r = includeSearchItem switch
             {
-                if (Quantifier > 0) // parse to a specific number of the item
-                    return t ? s.ParseToDesignatedIndexOf_PlusLength(Quantifier, i, Search.Query.ToArray()).Trim()
-                             : s.ParseToDesignatedIndexOf_PlusLength(Quantifier, i, Search.Query.ToArray());
+                true when this.Quantifier > 0
+                    => s.ParseToDesignatedIndexOf_PlusLength(this.Quantifier, isCaseInsensitive, queryArray),
+                true when this.Search.Mods.Contains(Constants.LAST)
+                    => s.ParseToLastIndexOf_PlusLength(isCaseInsensitive, queryArray),
+                true
+                    => s.ParseToIndexOf_PlusLength(isCaseInsensitive, queryArray),
+                _ => s.ParseToIndexOf(isCaseInsensitive, queryArray),
+            };
 
-                if (Search.Mods.Contains(Constants.LAST)) // make it the last item
-                    return t ? s.ParseToLastIndexOf_PlusLength(i, Search.Query.ToArray()).Trim()
-                        : s.ParseToLastIndexOf_PlusLength(i, Search.Query.ToArray());
-
-                return t ? s.ParseToIndexOf_PlusLength(i, Search.Query.ToArray()).Trim()
-                         : s.ParseToIndexOf_PlusLength(i, Search.Query.ToArray());
-            }
-
-            return t ? s.ParseToIndexOf(i, Search.Query.ToArray()).Trim()
-                     : s.ParseToIndexOf(i, Search.Query.ToArray());
+            return shouldTripOutput ? r.Trim() : r;
         }
 
         public To(Tag t) : base(t)

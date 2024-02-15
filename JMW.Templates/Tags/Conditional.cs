@@ -30,7 +30,7 @@ namespace JMW.Template.Tags
             "ends", "nends"
         };
 
-        private Dictionary<string, ValueRetriever> _retrievers = new Dictionary<string, ValueRetriever>();
+        private Dictionary<string, ValueRetriever> _retrievers = new();
 
         public Conditional()
         {

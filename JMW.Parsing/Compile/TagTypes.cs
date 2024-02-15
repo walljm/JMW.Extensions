@@ -1,10 +1,9 @@
-namespace JMW.Parsing.Compile
+namespace JMW.Parsing.Compile;
+
+public enum TagTypes
 {
-    public enum TagTypes
-    {
-        Object,
-        Array,
-        Property,
-        Word
-    }
+    Object,
+    Array,
+    Property,
+    Word
 }

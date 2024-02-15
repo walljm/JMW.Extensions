@@ -13,7 +13,7 @@ namespace JMW.Template.Tests
         {
             try
             {
-                TagHelpers.EvaluateBooleanExpression("x1.substr(0,2)", new List<string> { "jason" });
+                TagHelpers.EvaluateBooleanExpression("x1.substr(0,2)", ["jason"]);
             }
             catch (Exception ex)
             {
@@ -26,7 +26,7 @@ namespace JMW.Template.Tests
         {
             try
             {
-                TagHelpers.EvaluateArithmeticExpression("x1.substr(0,2)", new List<string> { "jason" });
+                TagHelpers.EvaluateArithmeticExpression("x1.substr(0,2)", ["jason"]);
             }
             catch (Exception ex)
             {
@@ -107,7 +107,7 @@ namespace JMW.Template.Tests
         {
             try
             {
-                TagHelpers.EvaluateBooleanExpression("x1.substr(0,2); x2", new List<string> { "jason" });
+                TagHelpers.EvaluateBooleanExpression("x1.substr(0,2); x2", ["jason"]);
             }
             catch (Exception ex)
             {
@@ -128,7 +128,7 @@ namespace JMW.Template.Tests
                 };
                 t.Properties.Add("foo", "bar");
 
-                TagHelpers.CheckAllowedAttributes(t, new HashSet<string> { "blah" }, new Token());
+                TagHelpers.CheckAllowedAttributes(t, ["blah"], new Token());
             }
             catch (Exception ex)
             {

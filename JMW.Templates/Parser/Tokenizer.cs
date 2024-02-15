@@ -240,7 +240,7 @@ namespace JMW.Template
         {
             var identifier = new List<char>();
             var c = _reader.Read();
-            while (c != -1 && c != FORWARD_SLASH && c != CLOSE && c != BEGIN && c != PARAM_ASSIGN && !Char.IsWhiteSpace((char)c))
+            while (c != -1 && c != FORWARD_SLASH && c != CLOSE && c != BEGIN && c != PARAM_ASSIGN && !char.IsWhiteSpace((char)c))
             {
                 identifier.Add((char)c);
                 c = _reader.Read();
@@ -335,7 +335,7 @@ namespace JMW.Template
         internal bool maybeReadText(string text)
         {
             readText(text, out var buf, out var n);
-            var ok = (n == text.Length && new String(buf) == text);
+            var ok = (n == text.Length && new string(buf) == text);
             if (!ok)
             {
                 _reader.PushBack(buf.Take(n).ToArray());

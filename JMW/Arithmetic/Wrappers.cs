@@ -20,7 +20,7 @@ namespace Lambda.Generic.Arithmetic
         where O : ISignedMath<T>, new()
         where T : IComparable<T>, IComparable, IFormattable, IConvertible, IEquatable<T>
     {
-        private static readonly O o = new O();
+        private static readonly O o = new();
         internal readonly T value;
 
         public Signed(T a)

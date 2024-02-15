@@ -24,7 +24,7 @@ namespace JMW.Template
 
         #region Properties
 
-        public readonly Dictionary<string, ValueRetriever> Retrievers = new Dictionary<string, ValueRetriever>();
+        public readonly Dictionary<string, ValueRetriever> Retrievers = new();
         public Dictionary<string, ITagHandler> Handlers { get; } = new Dictionary<string, ITagHandler>();
         public Optional<Handler> DefaultHandler { get; set; } = Optional<Handler>.None();
         public TextWriter OutputStream { get; set; }

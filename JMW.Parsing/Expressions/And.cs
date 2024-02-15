@@ -1,38 +1,36 @@
-﻿using System.Collections.Generic;
-using JMW.Parsing.Compile;
+﻿using JMW.Parsing.Compile;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace JMW.Parsing.Expressions
+namespace JMW.Parsing.Expressions;
+
+public class And : IExpression
 {
-    public class And : IExpression
+    public const string NAME = "and";
+
+    public Stack<IExpression> Expressions = new();
+
+    public And(Tag t)
     {
-        public const string NAME = "and";
-
-        public Stack<IExpression> Expressions = new Stack<IExpression>();
-
-        public And(Tag t)
+        if (t.Value is Stack<Tag> tags)
         {
-            if (t.Value is Stack<Tag> tags)
+            foreach (var tag in tags)
             {
-                foreach (var tag in tags)
-                    Expressions.Push(Base.ToExpression(tag));
+                this.Expressions.Push(Base.ToExpression(tag));
             }
         }
+    }
 
-        public And(IEnumerable<IExpression> expressions)
+    public And(IEnumerable<IExpression> expressions)
+    {
+        foreach (var exp in expressions)
         {
-            foreach (var exp in expressions)
-                Expressions.Push(exp);
+            this.Expressions.Push(exp);
         }
+    }
 
-        public bool Test(string s)
-        {
-            foreach (var exp in Expressions)
-            {
-                if (!exp.Test(s))
-                    return false;
-            }
-
-            return true;
-        }
+    public bool Test(string s)
+    {
+        return !this.Expressions.Any(o => !o.Test(s));
     }
 }

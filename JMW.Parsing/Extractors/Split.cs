@@ -1,45 +1,50 @@
-﻿using System;
+﻿using JMW.Parsing.Compile;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using JMW.Parsing.Compile;
 
-namespace JMW.Parsing.Extractors
+namespace JMW.Parsing.Extractors;
+
+public class Split : Base
 {
-    public class Split : Base
+    public const string NAME = "split";
+
+    public override string Parse(string value)
     {
-        public const string NAME = "split";
-
-        public override string Parse(string s)
+        if (this.Index < 0)
         {
-            if (Index < 0)
-                throw new ArgumentException("Required Attribute Missing: " + INDEX);
-
-            var r = Search.Mods.Contains(Constants.REMOVE_EMPTY_ENTRIES); // remove the empty entries
-            var t = Search.Mods.Contains(Constants.TRIM); // trim the output
-
-            string[] fields;
-
-            if (Search.Mods.Contains(Constants.CASE_INSENSITIVE)) // case insensitive
-                fields = s.ToLower().Split(Search.Query.Select(o => o.ToLower()).ToArray(), r ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
-            else
-                fields = s.Split(Search.Query.ToArray(), r ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
-
-            if (fields.Length > Index)
-            {
-                return t
-                    ? fields[Index].Trim()
-                    : fields[Index];
-            }
-
-            throw new IndexOutOfRangeException();
+            throw new ArgumentException("Required Attribute Missing: " + INDEX);
         }
 
-        public Split(Tag t) : base(t)
+        // should we remove the empty entries?
+        var splitOptions = this.Search.Mods.Contains(Constants.REMOVE_EMPTY_ENTRIES)
+             ? StringSplitOptions.RemoveEmptyEntries
+             : StringSplitOptions.None;
+        var isCaseInsensitive = this.Search.Mods.Contains(Constants.CASE_INSENSITIVE);
+
+        var splitSeparators = isCaseInsensitive
+            ? this.Search.Query.Select(o => o.ToLower()).ToArray()
+            : [.. this.Search.Query];
+
+        string[] fields = isCaseInsensitive
+            ? value.ToLower().Split(splitSeparators, splitOptions)
+            : value.Split(splitSeparators, splitOptions);
+
+        if (fields.Length > this.Index)
         {
+            return this.Search.Mods.Contains(Constants.TRIM) // should trim the output?
+                ? fields[this.Index].Trim()
+                : fields[this.Index];
         }
 
-        public Split(List<string> search, string mods, int idx) : base(search, mods, -1, idx)
-        {
-        }
+        throw new IndexOutOfRangeException();
+    }
+
+    public Split(Tag t) : base(t)
+    {
+    }
+
+    public Split(List<string> search, string mods, int idx) : base(search, mods, -1, idx)
+    {
     }
 }

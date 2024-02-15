@@ -6,7 +6,7 @@ namespace JMW.Template.Tags
 {
     public class Output : TagHandlerBase
     {
-        private Dictionary<string, int> _iteration = new Dictionary<string, int>();
+        private Dictionary<string, int> _iteration = new();
 
         public const string TAG = "output";
         public override string TagName { get; } = TAG;

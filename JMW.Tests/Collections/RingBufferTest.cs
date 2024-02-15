@@ -107,10 +107,12 @@ namespace JMW.Collections.Tests
         [Test]
         public void RingBufferTest6()
         {
-            var buff = new RingBuffer<int>(100);
-            buff.Add(3);
-            buff.Add(4);
-            buff.Add(5);
+            var buff = new RingBuffer<int>(100)
+            {
+                3,
+                4,
+                5
+            };
             var arr2 = buff.ToArray();
             Assert.AreEqual(arr2.Length, buff.Count);
 
